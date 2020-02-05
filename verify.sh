@@ -1,4 +1,4 @@
-set -e
+set -ex
 
 mix compile --force --warnings-as-errors
 mix format --check-formatted

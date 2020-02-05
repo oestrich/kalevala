@@ -1,11 +1,11 @@
-defmodule Kalevala.MixProject do
+defmodule Example.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :kalevala,
+      app: :example,
       version: "0.1.0",
-      elixir: "~> 1.9",
+      elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -15,16 +15,14 @@ defmodule Kalevala.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Kalevala.Application, []}
+      mod: {Example.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.2"},
-      {:ranch, "~> 1.7"},
-      {:telnet, "~> 0.1"}
+      {:kalevala, path: "../"}
     ]
   end
 end
