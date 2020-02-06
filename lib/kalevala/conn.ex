@@ -12,9 +12,11 @@ defmodule Kalevala.Conn do
   @type t() :: %__MODULE__{}
 
   defstruct [
-    :assigns,
+    :next_controller,
+    assigns: %{},
+    lines: [],
     private: %Kalevala.Conn.Private{},
-    lines: []
+    session: %{}
   ]
 end
 

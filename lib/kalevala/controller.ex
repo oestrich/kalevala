@@ -38,6 +38,8 @@ defmodule Kalevala.Controller do
       @behaviour unquote(__MODULE__)
 
       import unquote(__MODULE__)
+
+      alias Kalevala.Event
     end
   end
 
@@ -47,5 +49,43 @@ defmodule Kalevala.Controller do
   def push(conn, lines, newline \\ false) do
     lines = %Kalevala.Conn.Lines{data: lines, newline: newline}
     Map.put(conn, :lines, conn.lines ++ [lines])
+  end
+
+  @doc """
+  Render text to the conn
+  """
+  def render(conn, view, template, assigns) do
+    data = view.render(template, Map.merge(conn.assigns, assigns))
+
+    push(conn, [data])
+  end
+
+  @doc """
+  Render a prompt to the conn
+  """
+  def prompt(conn, view, template, assigns) do
+    data = view.render(template, Map.merge(conn.assigns, assigns))
+
+    push(conn, [data], true)
+  end
+
+  @doc """
+  Put a value into the session data
+  """
+  def put_session(conn, key, value) do
+    session = Map.put(conn.session, key, value)
+    Map.put(conn, :session, session)
+  end
+
+  @doc """
+  Get a value out of the session data
+  """
+  def get_session(conn, key), do: Map.get(conn.session, key)
+
+  @doc """
+  Put the new controller that the foreman should swap to
+  """
+  def put_controller(conn, controller) do
+    Map.put(conn, :next_controller, controller)
   end
 end

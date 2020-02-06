@@ -3,13 +3,15 @@ defmodule Example.LoginController do
 
   require Logger
 
-  alias Kalevala.Event
+  alias Example.CommandController
+  alias Example.LoginView
 
   @impl true
   def init(conn) do
-    :timer.send_interval(1000, %Event{topic: "timer/send"})
-
     conn
+    |> put_session(:login_state, :unauthenticated)
+    |> render(LoginView, "welcome", %{})
+    |> prompt(LoginView, "name", %{})
   end
 
   @impl true
@@ -18,20 +20,22 @@ defmodule Example.LoginController do
   def recv(conn, data) do
     Logger.info("Received - #{inspect(data)}")
 
-    push(conn, String.trim(data) <> "\n", true)
+    name = String.trim(data)
+
+    conn
+    |> put_session(:login_state, :authenticated)
+    |> put_session(:username, name)
+    |> render(LoginView, "signed-in", %{username: name})
+    |> put_controller(CommandController)
   end
 
   @impl true
   def option(conn, option) do
     Logger.info("Received option - #{inspect(option)}")
 
-    push(conn, "You wanted to alter a telnet option", true)
+    conn
   end
 
   @impl true
-  def event(conn, %Event{topic: "timer/send"}) do
-    Logger.info("Timer ticked")
-
-    push(conn, "This is the timer", true)
-  end
+  def event(conn, _event), do: conn
 end

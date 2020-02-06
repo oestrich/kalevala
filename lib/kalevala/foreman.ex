@@ -12,7 +12,7 @@ defmodule Kalevala.Foreman do
   alias Kalevala.Conn
   alias Kalevala.Event
 
-  defstruct [:protocol, :controller, :options]
+  defstruct [:protocol, :controller, :options, session: %{}]
 
   @doc """
   Start a new foreman for a connecting player
@@ -42,26 +42,26 @@ defmodule Kalevala.Foreman do
 
   @impl true
   def handle_continue(:init_controller, state) do
-    %Conn{}
+    %Conn{session: state.session}
     |> state.controller.init()
     |> handle_conn(state)
   end
 
   @impl true
   def handle_info({:recv, :text, data}, state) do
-    %Conn{}
+    %Conn{session: state.session}
     |> state.controller.recv(data)
     |> handle_conn(state)
   end
 
   def handle_info({:recv, :option, option}, state) do
-    %Conn{}
+    %Conn{session: state.session}
     |> state.controller.option(option)
     |> handle_conn(state)
   end
 
   def handle_info(event = %Event{}, state) do
-    %Conn{}
+    %Conn{session: state.session}
     |> state.controller.event(event)
     |> handle_conn(state)
   end
@@ -76,6 +76,17 @@ defmodule Kalevala.Foreman do
       send(state.protocol, {:send, line})
     end)
 
-    {:noreply, state}
+    session = Map.merge(state.session, conn.session)
+    state = Map.put(state, :session, session)
+
+    case is_nil(conn.next_controller) do
+      true ->
+        {:noreply, state}
+
+      false ->
+        state = Map.put(state, :controller, conn.next_controller)
+
+        {:noreply, state, {:continue, :init_controller}}
+    end
   end
 end
