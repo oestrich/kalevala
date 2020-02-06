@@ -24,7 +24,9 @@ defmodule Kalevala.Telnet.Listener do
       max_connections: 4096
     }
 
-    case :ranch.start_listener({__MODULE__, :tcp}, :ranch_tcp, opts, Protocol, []) do
+    foreman_options = Map.get(state.config, :foreman, [])
+
+    case :ranch.start_listener({__MODULE__, :tcp}, :ranch_tcp, opts, Protocol, foreman_options) do
       {:ok, listener} ->
         set_listener(state, listener)
 
@@ -37,13 +39,15 @@ defmodule Kalevala.Telnet.Listener do
     opts = %{
       socket_opts: [
         {:port, 4443},
-        {:keyfile, keyfile(state.config)},
-        {:certfile, certfile(state.config)}
+        {:keyfile, keyfile(state.config.tls)},
+        {:certfile, certfile(state.config.tls)}
       ],
       max_connections: 4096
     }
 
-    case :ranch.start_listener({__MODULE__, :tls}, :ranch_ssl, opts, Protocol, []) do
+    foreman_options = Map.get(state.config, :foreman, [])
+
+    case :ranch.start_listener({__MODULE__, :tls}, :ranch_ssl, opts, Protocol, foreman_options) do
       {:ok, listener} ->
         set_tls_listener(state, listener)
 
@@ -77,12 +81,14 @@ defmodule Kalevala.Telnet.Listener do
 
     state = Map.put(state, :listener, listener)
 
-    case Map.get(state.config, :tls, false) do
+    tls_config = Map.get(state.config, :tls)
+
+    case is_nil(tls_config) || Enum.empty?(tls_config) do
       true ->
-        {:noreply, state, {:continue, :listen_tls}}
+        {:noreply, state}
 
       false ->
-        {:noreply, state}
+        {:noreply, state, {:continue, :listen_tls}}
     end
   end
 

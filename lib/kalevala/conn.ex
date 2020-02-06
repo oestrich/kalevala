@@ -9,10 +9,10 @@ defmodule Kalevala.Conn do
   Struct for tracking data being processed in a command or action
   """
 
+  @type t() :: %__MODULE__{}
+
   defstruct [
-    :params,
     :assigns,
-    messages: [],
     private: %Kalevala.Conn.Private{},
     lines: []
   ]
@@ -26,13 +26,13 @@ defmodule Kalevala.Conn.Event do
   defstruct [:topic, :data]
 end
 
-defmodule Kalevala.Conn.Prompt do
+defmodule Kalevala.Conn.Lines do
   @moduledoc """
-  An event to print the prompt
+  Struct to print lines
 
   Used to determine if a new line should be sent before sending out
   new text.
   """
 
-  defstruct [:text]
+  defstruct [:data, newline: false, go_ahead: false]
 end

@@ -4,7 +4,8 @@ defmodule Kalevala.Telnet.Protocol do
   """
 
   alias Kalevala.Conn.Event
-  alias Kalevala.Conn.Prompt
+  alias Kalevala.Conn.Lines
+  alias Kalevala.Foreman
   alias Telnet.Options
 
   require Logger
@@ -20,7 +21,7 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   @doc false
-  def init(ref, transport, _opts) do
+  def init(ref, transport, foreman_options) do
     # See deadlock comment above
     {:ok, socket} = :ranch.handshake(ref)
     :ok = transport.setopts(socket, active: true)
@@ -30,6 +31,8 @@ defmodule Kalevala.Telnet.Protocol do
       socket: socket,
       transport: transport,
       buffer: <<>>,
+      foreman_pid: nil,
+      foreman_options: foreman_options,
       options: %{
         newline: false
       }
@@ -39,14 +42,9 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   def handle_info(:init, state) do
-    # {:ok, foreman} = Sessions.start(self())
-    # state = Map.put(state, :foreman, foreman)
+    {:ok, foreman_pid} = Foreman.start(self(), state.foreman_options)
+    state = Map.put(state, :foreman_pid, foreman_pid)
     {:noreply, state, {:continue, :initial_iacs}}
-  end
-
-  def handle_info({:takeover, foreman}, state) do
-    state = Map.put(state, :foreman, foreman)
-    {:noreply, state}
   end
 
   def handle_info({:tcp, _socket, data}, state) do
@@ -67,7 +65,7 @@ defmodule Kalevala.Telnet.Protocol do
 
   def handle_info(:terminate, state) do
     Logger.info("Session terminating")
-    # send(state.foreman, :terminate)
+    send(state.foreman_pid, :terminate)
     {:stop, :normal, state}
   end
 
@@ -76,18 +74,7 @@ defmodule Kalevala.Telnet.Protocol do
 
     state =
       Enum.reduce(data, state, fn data, state ->
-        push(state, data, %{})
-      end)
-
-    {:noreply, state}
-  end
-
-  def handle_info({:send, data, opts}, state) do
-    data = List.wrap(data)
-
-    state =
-      Enum.reduce(data, state, fn data, state ->
-        push(state, data, opts)
+        push(state, data)
       end)
 
     {:noreply, state}
@@ -103,7 +90,7 @@ defmodule Kalevala.Telnet.Protocol do
     {:noreply, state}
   end
 
-  defp push(state, output = %Event{}, _opts) do
+  defp push(state, output = %Event{}) do
     data = <<255, 250, 201>>
     data = data <> output.topic <> " "
     data = data <> Jason.encode!(output.data)
@@ -113,21 +100,15 @@ defmodule Kalevala.Telnet.Protocol do
     state
   end
 
-  defp push(state, output = %Prompt{}, _opts) do
+  defp push(state, output = %Lines{go_ahead: true}) do
     push_text(state, output.data)
     state.transport.send(state.socket, <<255, 249>>)
-    update_newline(state, true)
+    update_newline(state, output.newline)
   end
 
-  defp push(state, data, %{ga: true}) when is_binary(data) do
-    push_text(state, data)
-    state.transport.send(state.socket, <<255, 249>>)
-    update_newline(state, false)
-  end
-
-  defp push(state, data, _opts) do
-    push_text(state, data)
-    update_newline(state, false)
+  defp push(state, output = %Lines{}) do
+    push_text(state, output.data)
+    update_newline(state, output.newline)
   end
 
   defp push_text(state, text) do
@@ -145,16 +126,10 @@ defmodule Kalevala.Telnet.Protocol do
     state = %{state | buffer: buffer}
 
     Enum.each(options, fn option ->
-      # send(state.foreman, {:recv, :option, option})
-
-      # credo:disable-for-next-line
-      IO.inspect(option)
+      send(state.foreman_pid, {:recv, :option, option})
     end)
 
-    # credo:disable-for-next-line
-    IO.inspect(string)
-
-    # send(state.foreman, {:recv, :text, string})
+    send(state.foreman_pid, {:recv, :text, string})
 
     {:noreply, update_newline(state, String.length(string) == 0)}
   end

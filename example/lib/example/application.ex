@@ -7,12 +7,17 @@ defmodule Example.Application do
 
   def start(_type, _args) do
     listener_config = [
-      tls: true,
-      keyfile: Path.join(:code.priv_dir(:example), "certs/key.pem"),
-      certfile: Path.join(:code.priv_dir(:example), "certs/cert.pem")
+      tls: [
+        keyfile: Path.join(:code.priv_dir(:example), "certs/key.pem"),
+        certfile: Path.join(:code.priv_dir(:example), "certs/cert.pem")
+      ],
+      foreman: [
+        initial_controller: Example.LoginController
+      ]
     ]
 
     children = [
+      {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config}
     ]
 
