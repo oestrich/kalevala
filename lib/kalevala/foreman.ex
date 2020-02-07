@@ -71,6 +71,9 @@ defmodule Kalevala.Foreman do
     {:noreply, state}
   end
 
+  @doc """
+  Handle the conn struct after processing
+  """
   def handle_conn(conn, state) do
     Enum.each(conn.lines, fn line ->
       send(state.protocol, {:send, line})
