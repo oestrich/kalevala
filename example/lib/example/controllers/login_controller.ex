@@ -22,20 +22,16 @@ defmodule Example.LoginController do
 
     name = String.trim(data)
 
-    conn
-    |> put_session(:login_state, :authenticated)
-    |> put_session(:username, name)
-    |> render(LoginView, "signed-in", %{username: name})
-    |> put_controller(CommandController)
+    case name != "" do
+      true ->
+        conn
+        |> put_session(:login_state, :authenticated)
+        |> put_session(:username, name)
+        |> render(LoginView, "signed-in", %{username: name})
+        |> put_controller(CommandController)
+
+      false ->
+        prompt(conn, LoginView, "name", %{})
+    end
   end
-
-  @impl true
-  def option(conn, option) do
-    Logger.info("Received option - #{inspect(option)}")
-
-    conn
-  end
-
-  @impl true
-  def event(conn, _event), do: conn
 end

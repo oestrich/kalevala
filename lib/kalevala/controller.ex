@@ -39,7 +39,25 @@ defmodule Kalevala.Controller do
 
       import unquote(__MODULE__)
 
+      require Logger
+
       alias Kalevala.Event
+
+      @impl true
+      def option(conn, option) do
+        Logger.debug("Received option - #{inspect(option)}")
+
+        conn
+      end
+
+      @impl true
+      def event(conn, event) do
+        Logger.debug("Received event - #{inspect(event)}")
+
+        conn
+      end
+
+      defoverridable option: 2, event: 2
     end
   end
 

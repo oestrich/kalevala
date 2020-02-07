@@ -18,14 +18,4 @@ defmodule Example.CommandController do
 
     prompt(conn, CommandView, "prompt", %{})
   end
-
-  @impl true
-  def option(conn, option) do
-    Logger.info("Received option - #{inspect(option)}")
-
-    conn
-  end
-
-  @impl true
-  def event(conn, _event), do: conn
 end
