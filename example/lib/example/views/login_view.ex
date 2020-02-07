@@ -12,4 +12,8 @@ defmodule Example.LoginView do
   def render("signed-in", %{username: username}) do
     "Welcome \e[37m#{username}\e[0m. Thanks for signing in.\n"
   end
+
+  def render("goodbye", _assigns) do
+    "Goodbye!\n"
+  end
 end

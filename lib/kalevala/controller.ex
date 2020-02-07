@@ -106,4 +106,12 @@ defmodule Kalevala.Controller do
   def put_controller(conn, controller) do
     Map.put(conn, :next_controller, controller)
   end
+
+  @doc """
+  Mark the connection for termination
+  """
+  def halt(conn) do
+    private = Map.put(conn.private, :halt?, true)
+    Map.put(conn, :private, private)
+  end
 end

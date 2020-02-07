@@ -1,7 +1,7 @@
 defmodule Kalevala.Conn.Private do
   @moduledoc false
 
-  defstruct [:view]
+  defstruct [:view, halt?: false]
 end
 
 defmodule Kalevala.Conn do

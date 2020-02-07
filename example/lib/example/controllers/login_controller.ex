@@ -22,16 +22,21 @@ defmodule Example.LoginController do
 
     name = String.trim(data)
 
-    case name != "" do
-      true ->
+    case name do
+      "" ->
+        prompt(conn, LoginView, "name", %{})
+
+      "quit" ->
+        conn
+        |> prompt(LoginView, "goodbye", %{})
+        |> halt()
+
+      name ->
         conn
         |> put_session(:login_state, :authenticated)
         |> put_session(:username, name)
         |> render(LoginView, "signed-in", %{username: name})
         |> put_controller(CommandController)
-
-      false ->
-        prompt(conn, LoginView, "name", %{})
     end
   end
 end

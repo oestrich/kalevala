@@ -79,14 +79,21 @@ defmodule Kalevala.Foreman do
     session = Map.merge(state.session, conn.session)
     state = Map.put(state, :session, session)
 
-    case is_nil(conn.next_controller) do
+    case conn.private.halt? do
       true ->
+        send(state.protocol, :terminate)
         {:noreply, state}
 
       false ->
-        state = Map.put(state, :controller, conn.next_controller)
+        case is_nil(conn.next_controller) do
+          true ->
+            {:noreply, state}
 
-        {:noreply, state, {:continue, :init_controller}}
+          false ->
+            state = Map.put(state, :controller, conn.next_controller)
+
+            {:noreply, state, {:continue, :init_controller}}
+        end
     end
   end
 end
