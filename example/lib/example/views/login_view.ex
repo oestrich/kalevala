@@ -9,6 +9,10 @@ defmodule Example.LoginView do
     "What is your \e[37mname\e[0m? "
   end
 
+  def render("password", _assigns) do
+    "Password: "
+  end
+
   def render("signed-in", %{username: username}) do
     "Welcome \e[37m#{username}\e[0m. Thanks for signing in.\n"
   end
