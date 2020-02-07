@@ -1,7 +1,13 @@
-defmodule Example.CommandRouter do
+defmodule Example.Commands do
   use Kalevala.Command.Router
 
   scope(Example) do
+    module(CombatCommand) do
+      command("combat start", :start)
+      command("combat stop", :stop)
+      command("combat tick", :tick)
+    end
+
     module(LookCommand) do
       command("look", :run)
     end

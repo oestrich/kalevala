@@ -3,6 +3,7 @@ defmodule Example.LoginController do
 
   require Logger
 
+  alias Example.CharacterView
   alias Example.CommandController
   alias Example.LoginView
   alias Example.QuitView
@@ -61,6 +62,7 @@ defmodule Example.LoginController do
     conn
     |> put_session(:login_state, :authenticated)
     |> render(LoginView, "signed-in", %{username: name})
+    |> render(CharacterView, "vitals", %{})
     |> put_controller(CommandController)
   end
 end

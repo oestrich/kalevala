@@ -61,11 +61,19 @@ defmodule Kalevala.Controller do
     end
   end
 
-  @doc """
-  Push text back to the user
-  """
-  def push(conn, lines, newline \\ false) do
-    lines = %Kalevala.Conn.Lines{data: lines, newline: newline}
+  # Push text back to the user
+  defp push(conn, data, newline \\ false)
+
+  defp push(conn, event = %Kalevala.Conn.Event{}, _newline) do
+    Map.put(conn, :lines, conn.lines ++ [event])
+  end
+
+  defp push(conn, data, newline) do
+    lines = %Kalevala.Conn.Lines{
+      data: data,
+      newline: newline
+    }
+
     Map.put(conn, :lines, conn.lines ++ [lines])
   end
 
@@ -75,7 +83,7 @@ defmodule Kalevala.Controller do
   def render(conn, view, template, assigns) do
     data = view.render(template, Map.merge(conn.assigns, assigns))
 
-    push(conn, [data])
+    push(conn, data)
   end
 
   @doc """
@@ -84,7 +92,7 @@ defmodule Kalevala.Controller do
   def prompt(conn, view, template, assigns) do
     data = view.render(template, Map.merge(conn.assigns, assigns))
 
-    push(conn, [data], true)
+    push(conn, data, true)
   end
 
   @doc """
@@ -113,5 +121,19 @@ defmodule Kalevala.Controller do
   def halt(conn) do
     private = Map.put(conn.private, :halt?, true)
     Map.put(conn, :private, private)
+  end
+
+  @doc """
+  Send the foreman an in-game event
+  """
+  def event(conn, topic, data) do
+    event = %Kalevala.Event{
+      to_pid: self(),
+      from_pid: self(),
+      topic: topic,
+      data: data
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
   end
 end

@@ -15,6 +15,7 @@ defmodule Kalevala.Conn do
     :next_controller,
     :params,
     assigns: %{},
+    events: [],
     lines: [],
     private: %Kalevala.Conn.Private{},
     session: %{}

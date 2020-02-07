@@ -8,6 +8,13 @@ defmodule Kalevala.Command.Router do
   defmacro __using__(_opts) do
     quote do
       import Kalevala.Command.Router
+
+      @behaviour Kalevala.Command.Router
+
+      @impl true
+      def call(conn, text) do
+        Kalevala.Command.Router.call(__MODULE__, conn, text)
+      end
     end
   end
 
@@ -97,8 +104,8 @@ defmodule Kalevala.Command.Router do
   @doc """
   Macro to generate the receive functions
 
-      scope(App.Commands) do
-        module(Help) do
+      scope(App) do
+        module(HelpCommand) do
           command("help", :base)
           command("help :topic", :topic)
         end
@@ -110,13 +117,6 @@ defmodule Kalevala.Command.Router do
       Module.register_attribute(__MODULE__, :commands, accumulate: true)
 
       unquote(parse_modules(module, opts[:do]))
-
-      @behaviour Kalevala.Command.Router
-
-      @impl true
-      def call(conn, text) do
-        Kalevala.Command.Router.call(__MODULE__, conn, text)
-      end
 
       @impl true
       def commands() do

@@ -79,6 +79,10 @@ defmodule Kalevala.Foreman do
       send(state.protocol, {:send, line})
     end)
 
+    Enum.each(conn.events, fn event ->
+      send(event.to_pid, event)
+    end)
+
     session = Map.merge(state.session, conn.session)
     state = Map.put(state, :session, session)
 
