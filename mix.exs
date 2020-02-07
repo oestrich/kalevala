@@ -22,7 +22,7 @@ defmodule Kalevala.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.2"},
+      {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:ranch, "~> 1.7"},
       {:telnet, "~> 0.1"}
     ]
