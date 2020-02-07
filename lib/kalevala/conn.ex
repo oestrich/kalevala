@@ -13,6 +13,7 @@ defmodule Kalevala.Conn do
 
   defstruct [
     :next_controller,
+    :params,
     assigns: %{},
     lines: [],
     private: %Kalevala.Conn.Private{},

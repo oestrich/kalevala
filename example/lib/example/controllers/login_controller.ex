@@ -5,6 +5,7 @@ defmodule Example.LoginController do
 
   alias Example.CommandController
   alias Example.LoginView
+  alias Example.QuitView
 
   @impl true
   def init(conn) do
@@ -28,7 +29,7 @@ defmodule Example.LoginController do
 
       "quit" ->
         conn
-        |> prompt(LoginView, "goodbye", %{})
+        |> prompt(QuitView, "goodbye", %{})
         |> halt()
 
       name ->

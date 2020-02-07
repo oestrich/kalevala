@@ -3,6 +3,7 @@ defmodule Example.CommandController do
 
   require Logger
 
+  alias Example.CommandRouter
   alias Example.CommandView
 
   @impl true
@@ -16,6 +17,14 @@ defmodule Example.CommandController do
   def recv(conn, data) do
     Logger.info("Received - #{inspect(data)}")
 
-    prompt(conn, CommandView, "prompt", %{})
+    case CommandRouter.call(conn, data) do
+      {:error, :unknown} ->
+        conn
+        |> render(CommandView, "unknown", %{})
+        |> prompt(CommandView, "prompt", %{})
+
+      conn ->
+        prompt(conn, CommandView, "prompt", %{})
+    end
   end
 end
