@@ -19,8 +19,11 @@ defmodule Kalevala.Telnet.Listener do
   end
 
   def handle_continue(:listen_tcp, state) do
+    telnet_config = Map.get(state.config, :telnet, [])
+    port = Keyword.get(telnet_config, :port, 4444)
+
     opts = %{
-      socket_opts: [{:port, 4444}],
+      socket_opts: [{:port, port}],
       max_connections: 4096
     }
 
@@ -36,9 +39,12 @@ defmodule Kalevala.Telnet.Listener do
   end
 
   def handle_continue(:listen_tls, state) do
+    telnet_config = Map.get(state.config, :tls, [])
+    port = Keyword.get(telnet_config, :port, 4444)
+
     opts = %{
       socket_opts: [
-        {:port, 4443},
+        {:port, port},
         {:keyfile, keyfile(state.config.tls)},
         {:certfile, certfile(state.config.tls)}
       ],

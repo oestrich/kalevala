@@ -20,8 +20,6 @@ defmodule Sampo.LoginController do
   def recv(conn, ""), do: conn
 
   def recv(conn, data) do
-    Logger.info("Received - #{inspect(data)}")
-
     case get_session(conn, :login_state) do
       :username ->
         process_username(conn, data)
@@ -59,6 +57,8 @@ defmodule Sampo.LoginController do
 
   defp process_password(conn, _data) do
     name = get_session(conn, :username)
+
+    Logger.info("Signing in \"#{name}\"")
 
     conn
     |> put_session(:login_state, :authenticated)

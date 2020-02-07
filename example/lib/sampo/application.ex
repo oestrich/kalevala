@@ -7,7 +7,11 @@ defmodule Sampo.Application do
 
   def start(_type, _args) do
     listener_config = [
+      telnet: [
+        port: 4444
+      ],
       tls: [
+        port: 4443,
         keyfile: Path.join(:code.priv_dir(:sampo), "certs/key.pem"),
         certfile: Path.join(:code.priv_dir(:sampo), "certs/cert.pem")
       ],
