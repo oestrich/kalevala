@@ -1,9 +1,9 @@
-defmodule Example.CombatEvent do
+defmodule Sampo.CombatEvent do
   use Kalevala.Event
 
-  alias Example.CharacterView
-  alias Example.CombatView
-  alias Example.CommandView
+  alias Sampo.CharacterView
+  alias Sampo.CombatView
+  alias Sampo.CommandView
   alias Kalevala.Event
 
   def start(conn, _event) do

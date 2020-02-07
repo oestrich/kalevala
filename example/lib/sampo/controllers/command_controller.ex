@@ -1,11 +1,11 @@
-defmodule Example.CommandController do
+defmodule Sampo.CommandController do
   use Kalevala.Controller
 
   require Logger
 
-  alias Example.Commands
-  alias Example.CommandView
-  alias Example.Events
+  alias Sampo.Commands
+  alias Sampo.CommandView
+  alias Sampo.Events
 
   @impl true
   def init(conn) do

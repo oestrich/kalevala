@@ -1,4 +1,4 @@
-defmodule Example.CommandView do
+defmodule Sampo.CommandView do
   use Kalevala.View
 
   def render("prompt", _assigns) do

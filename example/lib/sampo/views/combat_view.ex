@@ -1,4 +1,4 @@
-defmodule Example.CombatView do
+defmodule Sampo.CombatView do
   use Kalevala.View
 
   import IO.ANSI, only: [reset: 0, yellow: 0]

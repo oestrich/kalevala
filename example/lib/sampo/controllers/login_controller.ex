@@ -1,12 +1,12 @@
-defmodule Example.LoginController do
+defmodule Sampo.LoginController do
   use Kalevala.Controller
 
   require Logger
 
-  alias Example.CharacterView
-  alias Example.CommandController
-  alias Example.LoginView
-  alias Example.QuitView
+  alias Sampo.CharacterView
+  alias Sampo.CommandController
+  alias Sampo.LoginView
+  alias Sampo.QuitView
 
   @impl true
   def init(conn) do
@@ -52,6 +52,7 @@ defmodule Example.LoginController do
         conn
         |> put_session(:login_state, :password)
         |> put_session(:username, name)
+        |> send_option(:echo, true)
         |> prompt(LoginView, "password", %{})
     end
   end
@@ -63,6 +64,7 @@ defmodule Example.LoginController do
     |> put_session(:login_state, :authenticated)
     |> render(LoginView, "signed-in", %{username: name})
     |> render(CharacterView, "vitals", %{})
+    |> send_option(:echo, false)
     |> put_controller(CommandController)
   end
 end

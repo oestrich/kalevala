@@ -5,6 +5,7 @@ defmodule Kalevala.Telnet.Protocol do
 
   alias Kalevala.Conn.Event
   alias Kalevala.Conn.Lines
+  alias Kalevala.Conn.Option
   alias Kalevala.Foreman
   alias Telnet.Options
 
@@ -104,6 +105,18 @@ defmodule Kalevala.Telnet.Protocol do
     push_text(state, output.data)
     if output.go_ahead, do: state.transport.send(state.socket, <<255, 249>>)
     update_newline(state, output.newline)
+  end
+
+  defp push(state, output = %Option{name: :echo}) do
+    case output.value do
+      true ->
+        state.transport.send(state.socket, <<255, 251, 1>>)
+
+      false ->
+        state.transport.send(state.socket, <<255, 252, 1>>)
+    end
+
+    state
   end
 
   defp push_text(state, text) do

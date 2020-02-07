@@ -1,5 +1,5 @@
-defmodule Example do
+defmodule Sampo do
   @moduledoc """
-  Documentation for `Example`.
+  Documentation for `Sampo`.
   """
 end

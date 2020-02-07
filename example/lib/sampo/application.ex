@@ -1,4 +1,4 @@
-defmodule Example.Application do
+defmodule Sampo.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,11 +8,11 @@ defmodule Example.Application do
   def start(_type, _args) do
     listener_config = [
       tls: [
-        keyfile: Path.join(:code.priv_dir(:example), "certs/key.pem"),
-        certfile: Path.join(:code.priv_dir(:example), "certs/cert.pem")
+        keyfile: Path.join(:code.priv_dir(:sampo), "certs/key.pem"),
+        certfile: Path.join(:code.priv_dir(:sampo), "certs/cert.pem")
       ],
       foreman: [
-        initial_controller: Example.LoginController
+        initial_controller: Sampo.LoginController
       ]
     ]
 
@@ -23,7 +23,7 @@ defmodule Example.Application do
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Example.Supervisor]
+    opts = [strategy: :one_for_one, name: Sampo.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

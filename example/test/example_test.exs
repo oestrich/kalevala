@@ -1,5 +1,5 @@
-defmodule ExampleTest do
+defmodule SampoTest do
   use ExUnit.Case
 
-  doctest Example
+  doctest Sampo
 end

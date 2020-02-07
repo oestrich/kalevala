@@ -75,6 +75,10 @@ defmodule Kalevala.Foreman do
   Handle the conn struct after processing
   """
   def handle_conn(conn, state) do
+    Enum.each(conn.options, fn option ->
+      send(state.protocol, {:send, option})
+    end)
+
     Enum.each(conn.lines, fn line ->
       send(state.protocol, {:send, line})
     end)

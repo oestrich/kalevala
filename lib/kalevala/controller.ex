@@ -136,4 +136,11 @@ defmodule Kalevala.Controller do
 
     Map.put(conn, :events, conn.events ++ [event])
   end
+
+  @doc """
+  """
+  def send_option(conn, name, value) when is_boolean(value) do
+    option = %Kalevala.Conn.Option{name: name, value: value}
+    Map.put(conn, :options, conn.options ++ [option])
+  end
 end

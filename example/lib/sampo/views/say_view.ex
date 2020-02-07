@@ -1,4 +1,4 @@
-defmodule Example.SayView do
+defmodule Sampo.SayView do
   use Kalevala.View
 
   def render("echo", %{"message" => message}) do

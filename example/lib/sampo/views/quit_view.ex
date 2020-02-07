@@ -1,4 +1,4 @@
-defmodule Example.QuitView do
+defmodule Sampo.QuitView do
   use Kalevala.View
 
   def render("goodbye", _assigns) do

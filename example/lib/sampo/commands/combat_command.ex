@@ -1,7 +1,7 @@
-defmodule Example.CombatCommand do
+defmodule Sampo.CombatCommand do
   use Kalevala.Command
 
-  alias Example.CombatView
+  alias Sampo.CombatView
 
   def start(conn, _params) do
     conn

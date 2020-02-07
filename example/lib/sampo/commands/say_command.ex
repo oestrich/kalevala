@@ -1,7 +1,7 @@
-defmodule Example.SayCommand do
+defmodule Sampo.SayCommand do
   use Kalevala.Command
 
-  alias Example.SayView
+  alias Sampo.SayView
 
   def run(conn, params) do
     render(conn, SayView, "echo", params)

@@ -17,6 +17,7 @@ defmodule Kalevala.Conn do
     assigns: %{},
     events: [],
     lines: [],
+    options: [],
     private: %Kalevala.Conn.Private{},
     session: %{}
   ]
@@ -39,4 +40,12 @@ defmodule Kalevala.Conn.Lines do
   """
 
   defstruct [:data, newline: false, go_ahead: false]
+end
+
+defmodule Kalevala.Conn.Option do
+  @moduledoc """
+  Telnet option
+  """
+
+  defstruct [:name, :value]
 end

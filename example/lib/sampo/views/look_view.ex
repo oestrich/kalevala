@@ -1,4 +1,4 @@
-defmodule Example.LookView do
+defmodule Sampo.LookView do
   use Kalevala.View
 
   def render("look", _assigns) do

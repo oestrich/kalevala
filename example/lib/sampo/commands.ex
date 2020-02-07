@@ -1,7 +1,7 @@
-defmodule Example.Commands do
+defmodule Sampo.Commands do
   use Kalevala.Command.Router
 
-  scope(Example) do
+  scope(Sampo) do
     module(CombatCommand) do
       command("combat start", :start)
       command("combat stop", :stop)

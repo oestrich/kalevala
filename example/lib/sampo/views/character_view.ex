@@ -1,4 +1,4 @@
-defmodule Example.CharacterView do
+defmodule Sampo.CharacterView do
   use Kalevala.View
 
   alias Kalevala.Conn.Event

@@ -1,7 +1,7 @@
-defmodule Example.LookCommand do
+defmodule Sampo.LookCommand do
   use Kalevala.Command
 
-  alias Example.LookView
+  alias Sampo.LookView
 
   def run(conn, _params) do
     render(conn, LookView, "look", %{})

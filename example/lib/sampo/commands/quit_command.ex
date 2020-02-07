@@ -1,7 +1,7 @@
-defmodule Example.QuitCommand do
+defmodule Sampo.QuitCommand do
   use Kalevala.Command
 
-  alias Example.QuitView
+  alias Sampo.QuitView
 
   def run(conn, params) do
     conn

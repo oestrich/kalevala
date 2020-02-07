@@ -1,7 +1,7 @@
-defmodule Example.Events do
+defmodule Sampo.Events do
   use Kalevala.Event.Router
 
-  scope(Example) do
+  scope(Sampo) do
     module(CombatEvent) do
       event("combat/start", :start)
       event("combat/stop", :stop)

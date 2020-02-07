@@ -1,9 +1,9 @@
-defmodule Example.MixProject do
+defmodule Sampo.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :example,
+      app: :sampo,
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule Example.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Example.Application, []}
+      mod: {Sampo.Application, []}
     ]
   end
 
