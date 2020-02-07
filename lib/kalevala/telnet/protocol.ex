@@ -100,14 +100,9 @@ defmodule Kalevala.Telnet.Protocol do
     state
   end
 
-  defp push(state, output = %Lines{go_ahead: true}) do
-    push_text(state, output.data)
-    state.transport.send(state.socket, <<255, 249>>)
-    update_newline(state, output.newline)
-  end
-
   defp push(state, output = %Lines{}) do
     push_text(state, output.data)
+    if output.go_ahead, do: state.transport.send(state.socket, <<255, 249>>)
     update_newline(state, output.newline)
   end
 
