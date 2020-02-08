@@ -3,11 +3,10 @@ defmodule Sampo.World do
   GenServer to load and boot the world
   """
 
-  use GenServer
+  use Supervisor
 
+  alias Sampo.World.Cache
   alias Sampo.World.Loader
-
-  @ets_key __MODULE__
 
   @doc """
   Dereference a world variable reference
@@ -17,7 +16,7 @@ defmodule Sampo.World do
   end
 
   def dereference([zone_id | reference]) do
-    case :ets.lookup(@ets_key, zone_id) do
+    case :ets.lookup(Cache.ets_key(), zone_id) do
       [{^zone_id, zone}] ->
         Loader.dereference(zone, reference)
 
@@ -26,28 +25,19 @@ defmodule Sampo.World do
     end
   end
 
+  @doc false
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, [], opts)
+    Supervisor.start_link(__MODULE__, [], opts)
   end
 
-  def init(_) do
-    :ets.new(@ets_key, [:set, :protected, :named_table])
+  @impl true
+  def init(_opts) do
+    children = [
+      {Sampo.World.Cache, [name: Sampo.World.Cache]},
+      {Kalevala.World, [name: Sampo.World]},
+      {Sampo.World.Kickoff, []}
+    ]
 
-    {:ok, %{zones: []}, {:continue, :load}}
-  end
-
-  def handle_continue(:load, state) do
-    zones = Loader.load_zones()
-
-    zones
-    |> Enum.map(&cache_zone/1)
-    |> Enum.each(&Kalevala.World.start_zone/1)
-
-    {:noreply, Map.put(state, :zones, zones)}
-  end
-
-  defp cache_zone(zone) do
-    :ets.insert(@ets_key, {zone.id, zone})
-    zone
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end
