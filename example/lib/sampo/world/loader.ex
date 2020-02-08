@@ -49,8 +49,10 @@ defmodule Sampo.World.Loader do
     name = get_in(zone_data.zones, [String.to_atom(key), :name])
     zone = %{zone | id: key, name: name}
 
+    rooms = Map.get(zone_data, :rooms, [])
+
     rooms =
-      Enum.into(zone_data.rooms, %{}, fn {key, room_data} ->
+      Enum.into(rooms, %{}, fn {key, room_data} ->
         parse_room(zone, key, room_data)
       end)
 
@@ -82,8 +84,10 @@ defmodule Sampo.World.Loader do
   def parse_exits(zone, data, zones) do
     zone_data = Map.get(data, zone.id)
 
+    room_exits = Map.get(zone_data, :room_exits, [])
+
     exits =
-      Enum.flat_map(zone_data.room_exits, fn {_key, room_exit} ->
+      Enum.flat_map(room_exits, fn {_key, room_exit} ->
         room_exit =
           Enum.into(room_exit, %{}, fn {key, value} ->
             {key, dereference(zones, zone, value)}
@@ -117,25 +121,52 @@ defmodule Sampo.World.Loader do
 
   @doc """
   Dereference a variable to it's value
+
+  If a known key is found, use the current zone
   """
   def dereference(zones, zone, reference) do
-    reference = String.split(reference, ".")
+    [key | reference] = String.split(reference, ".")
 
+    case key in ["rooms"] do
+      true ->
+        zone
+        |> flatten_rooms()
+        |> dereference([key | reference])
+
+      false ->
+        zone =
+          Enum.find(zones, fn z ->
+            z.id == key
+          end)
+
+        zone
+        |> flatten_rooms()
+        |> dereference(reference)
+    end
+  end
+
+  defp flatten_rooms(zone) do
+    rooms = Map.values(zone.rooms)
+    Map.put(zone, :rooms, rooms)
+  end
+
+  @doc """
+  Dereference a variable for a specific zone
+  """
+  def dereference(zone, reference) when is_list(reference) do
     case reference do
       ["rooms" | room] ->
         [room_name, room_key] = room
 
         zone.rooms
-        |> Map.get(String.to_atom(room_name))
+        |> find_room(zone, room_name)
         |> Map.get(String.to_atom(room_key))
-
-      [zone_name | reference] ->
-        zone =
-          Enum.find(zones, fn z ->
-            z.id == zone_name
-          end)
-
-        dereference(zones, zone, Enum.join(reference, "."))
     end
+  end
+
+  defp find_room(rooms, zone, room_name) do
+    Enum.find(rooms, fn room ->
+      room.id == "#{zone.id}:#{room_name}"
+    end)
   end
 end

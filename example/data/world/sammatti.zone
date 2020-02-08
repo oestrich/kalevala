@@ -1,0 +1,37 @@
+zones "sammatti" {
+  name = "Sammatti"
+}
+
+rooms "town_square" {
+  name = "Town Square"
+  description = "You are in the town square."
+
+  features = [
+    {
+      keyword = "sign"
+      short = "Next to the ${npcs.town_crier} stands a sign."
+      long = "The sign reads, \"You figured out how to look at things!\""
+    }
+  ]
+}
+
+room_exits "town_square" {
+  room_id = rooms.town_square.id
+
+  north = rooms.marketplace.id
+}
+
+rooms "marketplace" {
+  name = "Marketplace"
+  description = "There are sellers hawking their wares all around you."
+}
+
+room_exits "marketplace" {
+  room_id = rooms.marketplace.id
+
+  south = rooms.town_square.id
+}
+
+npc "town_crier" {
+  name = "Town Crier"
+}

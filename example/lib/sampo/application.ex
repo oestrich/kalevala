@@ -21,6 +21,7 @@ defmodule Sampo.Application do
     ]
 
     children = [
+      {Sampo.Config, [name: Sampo.Config]},
       {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
       {Sampo.World, []}
