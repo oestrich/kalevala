@@ -26,6 +26,9 @@ defmodule Sampo.LoginController do
 
       :password ->
         process_password(conn, data)
+
+      :character ->
+        process_character(conn, data)
     end
   end
 
@@ -61,10 +64,43 @@ defmodule Sampo.LoginController do
     Logger.info("Signing in \"#{name}\"")
 
     conn
-    |> put_session(:login_state, :authenticated)
-    |> render(LoginView, "signed-in", %{username: name})
-    |> render(CharacterView, "vitals", %{})
+    |> put_session(:login_state, :character)
     |> send_option(:echo, false)
+    |> render(LoginView, "signed-in", %{})
+    |> prompt(LoginView, "character-name", %{})
+  end
+
+  defp process_character(conn, character_name) do
+    character =
+      character_name
+      |> String.trim()
+      |> build_character()
+
+    conn
+    |> put_session(:login_state, :authenticated)
+    |> put_session(:character, character)
+    |> render(CharacterView, "vitals", %{})
+    |> prompt(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
+  end
+
+  defp build_character(name) do
+    id =
+      :crypto.hash(:sha256, name)
+      |> Base.encode64()
+
+    starting_room_id =
+      Sampo.Config.get([:player, :starting_room_id])
+      |> Sampo.World.dereference()
+
+    %Kalevala.Character{
+      id: id,
+      name: name,
+      status: "#{name} is here.",
+      description: "#{name} is a person.",
+      meta: %Sampo.Character.Meta{
+        room_id: starting_room_id
+      }
+    }
   end
 end

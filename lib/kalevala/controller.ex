@@ -81,7 +81,12 @@ defmodule Kalevala.Controller do
   Render text to the conn
   """
   def render(conn, view, template, assigns) do
-    data = view.render(template, Map.merge(conn.assigns, assigns))
+    assigns =
+      conn.session
+      |> Map.merge(conn.assigns)
+      |> Map.merge(assigns)
+
+    data = view.render(template, assigns)
 
     push(conn, data)
   end
@@ -90,7 +95,12 @@ defmodule Kalevala.Controller do
   Render a prompt to the conn
   """
   def prompt(conn, view, template, assigns) do
-    data = view.render(template, Map.merge(conn.assigns, assigns))
+    assigns =
+      conn.session
+      |> Map.merge(conn.assigns)
+      |> Map.merge(assigns)
+
+    data = view.render(template, assigns)
 
     push(conn, data, true)
   end

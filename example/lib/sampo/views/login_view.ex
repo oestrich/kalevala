@@ -16,7 +16,6 @@ defmodule Sampo.LoginView do
     \e[0m
 
     Powered by \e[38;5;39mKalevala\e[0m 🧝 \e[36mv#{Kalevala.version()}\e[0m.
-
     """
   end
 
@@ -29,6 +28,19 @@ defmodule Sampo.LoginView do
   end
 
   def render("signed-in", %{username: username}) do
-    "\nWelcome \e[37m#{username}\e[0m. Thanks for signing in.\n\n"
+    """
+
+    Welcome \e[37m#{username}\e[0m. Thanks for signing in.
+    """
+  end
+
+  def render("character-name", _assigns) do
+    "What is your character name? "
+  end
+
+  def render("enter-world", %{character: character}) do
+    """
+    Welcome to the world of \e[38;5;39mSampo\e[0m, \e[37m#{character.name}\e[0m.
+    """
   end
 end

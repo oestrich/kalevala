@@ -14,8 +14,8 @@ defmodule Kalevala.World.ZoneSupervisor do
   @impl true
   def init(config) do
     children = [
-      {Zone, config},
-      {RoomSupervisor, [name: RoomSupervisor.global_name(config.zone)]}
+      {RoomSupervisor, [name: RoomSupervisor.global_name(config.zone)]},
+      {Zone, config}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

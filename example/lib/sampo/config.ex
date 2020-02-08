@@ -9,6 +9,10 @@ defmodule Sampo.Config do
     GenServer.call(__MODULE__, :get)
   end
 
+  def get(key) do
+    GenServer.call(__MODULE__, {:get, key})
+  end
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, [], opts)
   end
@@ -22,4 +26,6 @@ defmodule Sampo.Config do
   end
 
   def handle_call(:get, _from, state), do: {:reply, state, state}
+
+  def handle_call({:get, key}, _from, state), do: {:reply, get_in(state, key), state}
 end
