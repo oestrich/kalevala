@@ -1,6 +1,9 @@
 %{
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm", "7af5c7e09fe1d40f76c8e4f9dd2be7cebd83909f31fee7cd0e9eadc567da8353"},
+  "credo": {:hex, :credo, "1.2.2", "f57faf60e0a12b0ba9fd4bad07966057fde162b33496c509b95b027993494aab", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm", "8f2623cd8c895a6f4a55ef10f3fdf6a55a9ca7bef09676bd835551687bf8a740"},
+  "elias": {:hex, :elias, "0.1.0", "7794ba79d8aa8d5638cc4abe16d3b87bc432d9fb2cc0a9f9eee4f08a8786b7b5", [:mix], [], "hexpm", "8c72e677c03b7cbfda824200cc34aa5b4f55ff36ffab40b21a3b7274d97907e4"},
   "jason": {:hex, :jason, "1.1.2", "b03dedea67a99223a2eaf9f1264ce37154564de899fd3d8b9a21b1a6fd64afe7", [:mix], [{:decimal, "~> 1.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "fdf843bca858203ae1de16da2ee206f53416bbda5dc8c9e78f43243de4bc3afe"},
   "ranch": {:hex, :ranch, "1.7.1", "6b1fab51b49196860b733a49c07604465a47bdb78aa10c1c16a3d199f7f8c881", [:rebar3], [], "hexpm", "451d8527787df716d99dc36162fca05934915db0b6141bbdac2ea8d3c7afc7d7"},
   "telnet": {:hex, :telnet, "0.1.0", "a7a8ba51f855e838a0df3738a2545205c508e169b722c5a7c83bcec121e33624", [:mix], [{:jason, "~> 1.1", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm", "e62e8a09f59acf0659a96bb18564bc53a9b3154ddbb7a8fee6379a51f8d99acc"},
+  "ucl": {:git, "https://github.com/oestrich/ucl-elixir.git", "013153010b03e3830e3341d597fea68b2f75ecfe", []},
 }

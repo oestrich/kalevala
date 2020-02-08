@@ -1,4 +1,6 @@
 defmodule Sampo.Commands do
+  @moduledoc false
+
   use Kalevala.Command.Router
 
   scope(Sampo) do

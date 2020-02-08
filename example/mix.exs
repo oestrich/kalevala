@@ -22,6 +22,8 @@ defmodule Sampo.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
+      {:elias, "~> 0.1"},
       {:kalevala, path: "../"}
     ]
   end

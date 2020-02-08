@@ -22,7 +22,8 @@ defmodule Sampo.Application do
 
     children = [
       {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
-      {Kalevala.Telnet.Listener, listener_config}
+      {Kalevala.Telnet.Listener, listener_config},
+      {Sampo.World, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

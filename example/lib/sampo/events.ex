@@ -1,4 +1,6 @@
 defmodule Sampo.Events do
+  @moduledoc false
+
   use Kalevala.Event.Router
 
   scope(Sampo) do
