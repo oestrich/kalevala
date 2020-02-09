@@ -71,6 +71,21 @@ defmodule Kalevala.World.Room.Movement do
   Handle the movement event
   """
   def handle_event(state, event = %Event.Move{direction: :to}) do
+    state
+    |> broadcast(event)
+    |> append_character(event)
+  end
+
+  def handle_event(state, event = %Event.Move{direction: :from}) do
+    state
+    |> reject_character(event)
+    |> broadcast(event)
+  end
+
+  @doc """
+  Broadcast the event to characters in the room
+  """
+  def broadcast(state, event) do
     lines = %Kalevala.Conn.Lines{data: event.reason, newline: true}
     display_event = %Event.Display{lines: [lines]}
 
@@ -78,24 +93,21 @@ defmodule Kalevala.World.Room.Movement do
       send(character.pid, display_event)
     end)
 
+    state
+  end
+
+  defp append_character(state, event) do
     characters = [event.character | state.private.characters]
     private = Map.put(state.private, :characters, characters)
 
     Map.put(state, :private, private)
   end
 
-  def handle_event(state, event = %Event.Move{direction: :from}) do
+  defp reject_character(state, event) do
     characters =
       Enum.reject(state.private.characters, fn character ->
         character.id == event.character.id
       end)
-
-    lines = %Kalevala.Conn.Lines{data: event.reason, newline: true}
-    display_event = %Event.Display{lines: [lines]}
-
-    Enum.each(characters, fn character ->
-      send(character.pid, display_event)
-    end)
 
     private = Map.put(state.private, :characters, characters)
     Map.put(state, :private, private)
