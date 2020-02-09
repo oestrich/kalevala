@@ -94,11 +94,9 @@ defmodule Kalevala.Foreman do
   end
 
   def handle_info(event = %Event.Display{}, state) do
-    event
-    |> send_options(state)
-    |> send_lines(state)
-
-    {:noreply, state}
+    new_conn(state)
+    |> state.controller.display(event)
+    |> handle_conn(state)
   end
 
   def handle_info(:terminate, state) do

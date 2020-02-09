@@ -37,4 +37,11 @@ defmodule Sampo.CommandController do
 
   @impl true
   def event(conn, event), do: Events.call(conn, event)
+
+  @impl true
+  def display(conn, event) do
+    conn
+    |> super(event)
+    |> prompt(CommandView, "prompt", %{})
+  end
 end

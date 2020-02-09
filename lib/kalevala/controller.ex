@@ -31,6 +31,11 @@ defmodule Kalevala.Controller do
   @callback event(Conn.t(), Event.t()) :: Conn.t()
 
   @doc """
+  Called when a `Kalevala.Event.Display` is sent to the foreman process
+  """
+  @callback display(Conn.t(), Event.t()) :: Conn.t()
+
+  @doc """
   Marks the module as a controller and imports controller functions
   """
   defmacro __using__(_opts) do
@@ -57,7 +62,14 @@ defmodule Kalevala.Controller do
         conn
       end
 
-      defoverridable option: 2, event: 2
+      @impl true
+      def display(conn, event) do
+        conn
+        |> Map.put(:options, event.options)
+        |> Map.put(:lines, event.lines)
+      end
+
+      defoverridable display: 2, event: 2, option: 2
     end
   end
 end
