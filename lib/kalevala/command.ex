@@ -5,8 +5,7 @@ defmodule Kalevala.Command do
 
   defmacro __using__(_opts) do
     quote do
-      import Kalevala.Controller,
-        only: [assign: 3, event: 3, get_session: 2, halt: 1, prompt: 4, put_session: 3, render: 4]
+      import Kalevala.Conn
     end
   end
 end

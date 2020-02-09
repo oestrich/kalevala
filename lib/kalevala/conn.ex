@@ -18,33 +18,6 @@ defmodule Kalevala.Conn.Private do
   end
 end
 
-defmodule Kalevala.Conn do
-  @moduledoc """
-  Struct for tracking data being processed in a controller or command
-  """
-
-  @type t() :: %__MODULE__{}
-
-  alias Kalevala.Conn.Private
-
-  defstruct [
-    :next_controller,
-    :params,
-    assigns: %{},
-    events: [],
-    lines: [],
-    options: [],
-    private: %Private{},
-    session: %{}
-  ]
-
-  @doc false
-  def event_router(conn = %{private: %{event_router: nil}}),
-    do: Private.default_event_router(conn)
-
-  def event_router(%{private: %{event_router: event_router}}), do: event_router
-end
-
 defmodule Kalevala.Conn.Event do
   @moduledoc """
   Send an out of band Event
@@ -70,4 +43,129 @@ defmodule Kalevala.Conn.Option do
   """
 
   defstruct [:name, :value]
+end
+
+defmodule Kalevala.Conn do
+  @moduledoc """
+  Struct for tracking data being processed in a controller or command
+  """
+
+  @type t() :: %__MODULE__{}
+
+  alias Kalevala.Conn.Private
+
+  defstruct [
+    :next_controller,
+    :params,
+    assigns: %{},
+    events: [],
+    lines: [],
+    options: [],
+    private: %Private{},
+    session: %{}
+  ]
+
+  @doc false
+  def event_router(conn = %{private: %{event_router: nil}}),
+    do: Private.default_event_router(conn)
+
+  def event_router(%{private: %{event_router: event_router}}), do: event_router
+
+  # Push text back to the user
+  defp push(conn, event = %Kalevala.Conn.Event{}, _newline) do
+    Map.put(conn, :lines, conn.lines ++ [event])
+  end
+
+  defp push(conn, data, newline) do
+    lines = %Kalevala.Conn.Lines{
+      data: data,
+      newline: newline
+    }
+
+    Map.put(conn, :lines, conn.lines ++ [lines])
+  end
+
+  @doc """
+  Render text to the conn
+  """
+  def render(conn, view, template, assigns) do
+    assigns =
+      conn.session
+      |> Map.merge(conn.assigns)
+      |> Map.merge(assigns)
+
+    data = view.render(template, assigns)
+
+    push(conn, data, false)
+  end
+
+  @doc """
+  Render a prompt to the conn
+  """
+  def prompt(conn, view, template, assigns) do
+    assigns =
+      conn.session
+      |> Map.merge(conn.assigns)
+      |> Map.merge(assigns)
+
+    data = view.render(template, assigns)
+
+    push(conn, data, true)
+  end
+
+  @doc """
+  Add to the assignment map on the conn
+  """
+  def assign(conn, key, value) do
+    assigns = Map.put(conn.assigns, key, value)
+    Map.put(conn, :assigns, assigns)
+  end
+
+  @doc """
+  Put a value into the session data
+  """
+  def put_session(conn, key, value) do
+    session = Map.put(conn.session, key, value)
+    Map.put(conn, :session, session)
+  end
+
+  @doc """
+  Get a value out of the session data
+  """
+  def get_session(conn, key), do: Map.get(conn.session, key)
+
+  @doc """
+  Put the new controller that the foreman should swap to
+  """
+  def put_controller(conn, controller) do
+    Map.put(conn, :next_controller, controller)
+  end
+
+  @doc """
+  Mark the connection for termination
+  """
+  def halt(conn) do
+    private = Map.put(conn.private, :halt?, true)
+    Map.put(conn, :private, private)
+  end
+
+  @doc """
+  Send the foreman an in-game event
+  """
+  def event(conn, topic, data) do
+    event = %Kalevala.Event{
+      from_pid: self(),
+      topic: topic,
+      data: data
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
+  end
+
+  @doc """
+  """
+  def send_option(conn, name, value) when is_boolean(value) do
+    option = %Kalevala.Conn.Option{name: name, value: value}
+    Map.put(conn, :options, conn.options ++ [option])
+  end
 end

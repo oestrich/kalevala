@@ -37,7 +37,7 @@ defmodule Kalevala.Controller do
     quote do
       @behaviour unquote(__MODULE__)
 
-      import unquote(__MODULE__)
+      import Kalevala.Conn
 
       require Logger
 
@@ -59,103 +59,5 @@ defmodule Kalevala.Controller do
 
       defoverridable option: 2, event: 2
     end
-  end
-
-  # Push text back to the user
-  defp push(conn, event = %Kalevala.Conn.Event{}, _newline) do
-    Map.put(conn, :lines, conn.lines ++ [event])
-  end
-
-  defp push(conn, data, newline) do
-    lines = %Kalevala.Conn.Lines{
-      data: data,
-      newline: newline
-    }
-
-    Map.put(conn, :lines, conn.lines ++ [lines])
-  end
-
-  @doc """
-  Render text to the conn
-  """
-  def render(conn, view, template, assigns) do
-    assigns =
-      conn.session
-      |> Map.merge(conn.assigns)
-      |> Map.merge(assigns)
-
-    data = view.render(template, assigns)
-
-    push(conn, data, false)
-  end
-
-  @doc """
-  Render a prompt to the conn
-  """
-  def prompt(conn, view, template, assigns) do
-    assigns =
-      conn.session
-      |> Map.merge(conn.assigns)
-      |> Map.merge(assigns)
-
-    data = view.render(template, assigns)
-
-    push(conn, data, true)
-  end
-
-  @doc """
-  Add to the assignment map on the conn
-  """
-  def assign(conn, key, value) do
-    assigns = Map.put(conn.assigns, key, value)
-    Map.put(conn, :assigns, assigns)
-  end
-
-  @doc """
-  Put a value into the session data
-  """
-  def put_session(conn, key, value) do
-    session = Map.put(conn.session, key, value)
-    Map.put(conn, :session, session)
-  end
-
-  @doc """
-  Get a value out of the session data
-  """
-  def get_session(conn, key), do: Map.get(conn.session, key)
-
-  @doc """
-  Put the new controller that the foreman should swap to
-  """
-  def put_controller(conn, controller) do
-    Map.put(conn, :next_controller, controller)
-  end
-
-  @doc """
-  Mark the connection for termination
-  """
-  def halt(conn) do
-    private = Map.put(conn.private, :halt?, true)
-    Map.put(conn, :private, private)
-  end
-
-  @doc """
-  Send the foreman an in-game event
-  """
-  def event(conn, topic, data) do
-    event = %Kalevala.Event{
-      from_pid: self(),
-      topic: topic,
-      data: data
-    }
-
-    Map.put(conn, :events, conn.events ++ [event])
-  end
-
-  @doc """
-  """
-  def send_option(conn, name, value) when is_boolean(value) do
-    option = %Kalevala.Conn.Option{name: name, value: value}
-    Map.put(conn, :options, conn.options ++ [option])
   end
 end
