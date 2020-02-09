@@ -5,27 +5,48 @@ defmodule Sampo.World.Room do
 
   use Kalevala.World.Room
 
-  alias Kalevala.Event
-  alias Sampo.CommandView
-  alias Sampo.LookView
+  alias Sampo.World.Room.Events
 
   @impl true
   def init(room), do: room
 
   @impl true
-  def event(context, event = %Event{topic: "combat/start"}) do
+  def event(context, event) do
+    Events.call(context, event)
+  end
+end
+
+defmodule Sampo.World.Room.Events do
+  use Kalevala.Event.Router
+
+  scope(Sampo.World.Room) do
+    module(ForwardEvent) do
+      event("combat/start", :call)
+      event("combat/stop", :call)
+      event("combat/tick", :call)
+    end
+
+    module(LookEvent) do
+      event("room/look", :call)
+    end
+  end
+end
+
+defmodule Sampo.World.Room.ForwardEvent do
+  import Kalevala.World.Room.Context
+
+  def call(context, event) do
     event(context, event.from_pid, event.topic, %{})
   end
+end
 
-  def event(context, event = %Event{topic: "combat/stop"}) do
-    event(context, event.from_pid, event.topic, %{})
-  end
+defmodule Sampo.World.Room.LookEvent do
+  import Kalevala.World.Room.Context
 
-  def event(context, event = %Event{topic: "combat/tick"}) do
-    event(context, event.from_pid, event.topic, %{})
-  end
+  alias Sampo.CommandView
+  alias Sampo.LookView
 
-  def event(context, event = %Event{topic: "room/look"}) do
+  def call(context, event) do
     context
     |> assign(:room, context.data)
     |> render(event.from_pid, LookView, "look", %{})
