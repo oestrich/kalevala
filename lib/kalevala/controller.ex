@@ -62,8 +62,6 @@ defmodule Kalevala.Controller do
   end
 
   # Push text back to the user
-  defp push(conn, data, newline \\ false)
-
   defp push(conn, event = %Kalevala.Conn.Event{}, _newline) do
     Map.put(conn, :lines, conn.lines ++ [event])
   end
@@ -88,7 +86,7 @@ defmodule Kalevala.Controller do
 
     data = view.render(template, assigns)
 
-    push(conn, data)
+    push(conn, data, false)
   end
 
   @doc """

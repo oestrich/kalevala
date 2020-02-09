@@ -3,7 +3,7 @@ defmodule Sampo.World.Room do
   Callbacks for a Kalevala room
   """
 
-  @behaviour Kalevala.World.Room
+  use Kalevala.World.Room
 
   alias Kalevala.Event
   alias Sampo.CommandView
@@ -13,34 +13,22 @@ defmodule Sampo.World.Room do
   def init(room), do: room
 
   @impl true
-  def event(room, event = %Event{topic: "combat/start"}) do
-    send(event.from_pid, event)
-    room
+  def event(context, event = %Event{topic: "combat/start"}) do
+    event(context, event.from_pid, event.topic, %{})
   end
 
-  def event(room, event = %Event{topic: "combat/stop"}) do
-    send(event.from_pid, event)
-    room
+  def event(context, event = %Event{topic: "combat/stop"}) do
+    event(context, event.from_pid, event.topic, %{})
   end
 
-  def event(room, event = %Event{topic: "combat/tick"}) do
-    send(event.from_pid, event)
-    room
+  def event(context, event = %Event{topic: "combat/tick"}) do
+    event(context, event.from_pid, event.topic, %{})
   end
 
-  def event(room, event = %Event{topic: "room/look"}) do
-    look_line = %Kalevala.Conn.Lines{
-      data: LookView.render("look", %{room: room}),
-      newline: false
-    }
-
-    prompt_line = %Kalevala.Conn.Lines{
-      data: CommandView.render("prompt", %{}),
-      newline: true
-    }
-
-    send(event.from_pid, %Event.Display{lines: [look_line, prompt_line]})
-
-    room
+  def event(context, event = %Event{topic: "room/look"}) do
+    context
+    |> assign(:room, context.data)
+    |> render(event.from_pid, LookView, "look", %{})
+    |> prompt(event.from_pid, CommandView, "prompt", %{})
   end
 end

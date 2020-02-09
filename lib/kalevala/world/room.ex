@@ -1,3 +1,65 @@
+defmodule Kalevala.World.Room.Context do
+  @moduledoc """
+  Context for performing work for an event in a room
+  """
+
+  @type t() :: %__MODULE__{}
+
+  defstruct [:data, assigns: %{}, events: [], lines: []]
+
+  defp push(context, to_pid, event = %Kalevala.Conn.Event{}, _newline) do
+    Map.put(context, :lines, context.lines ++ [{to_pid, event}])
+  end
+
+  defp push(context, to_pid, data, newline) do
+    lines = %Kalevala.Conn.Lines{
+      data: data,
+      newline: newline
+    }
+
+    Map.put(context, :lines, context.lines ++ [{to_pid, lines}])
+  end
+
+  @doc """
+  Render text back to a pid
+  """
+  def render(context, to_pid, view, template, assigns) do
+    assigns = Map.merge(context.assigns, assigns)
+    data = view.render(template, assigns)
+    push(context, to_pid, data, false)
+  end
+
+  @doc """
+  Render a prompt back to a pid
+  """
+  def prompt(context, to_pid, view, template, assigns) do
+    assigns = Map.merge(context.assigns, assigns)
+    data = view.render(template, assigns)
+    push(context, to_pid, data, true)
+  end
+
+  @doc """
+  Add to the assignment map on the context
+  """
+  def assign(context, key, value) do
+    assigns = Map.put(context.assigns, key, value)
+    Map.put(context, :assigns, assigns)
+  end
+
+  @doc """
+  Send an event back to a pid
+  """
+  def event(context, to_pid, topic, data) do
+    event = %Kalevala.Event{
+      from_pid: self(),
+      topic: topic,
+      data: data
+    }
+
+    Map.put(context, :events, context.events ++ [{to_pid, event}])
+  end
+end
+
 defmodule Kalevala.World.Room do
   @moduledoc """
   Rooms are the base unit of space in Kalevala
@@ -8,6 +70,7 @@ defmodule Kalevala.World.Room do
   require Logger
 
   alias Kalevala.Event
+  alias Kalevala.World.Room.Context
 
   defstruct [:id, :zone_id, :name, :description, exits: []]
 
@@ -21,7 +84,15 @@ defmodule Kalevala.World.Room do
   @doc """
   Callback for when a new event is received
   """
-  @callback event(t(), event :: Event.t()) :: t()
+  @callback event(Context.t(), event :: Event.t()) :: t()
+
+  defmacro __using__(_opts) do
+    quote do
+      import Kalevala.World.Room.Context
+
+      @behaviour Kalevala.World.Room
+    end
+  end
 
   @doc false
   def global_name(room = %__MODULE__{}), do: global_name(room.id)
@@ -54,9 +125,39 @@ defmodule Kalevala.World.Room do
 
   @impl true
   def handle_info(event = %Event{}, state) do
-    data = state.callback_module.event(state.data, event)
-    state = Map.put(state, :data, data)
+    context =
+      %Context{data: state.data}
+      |> state.callback_module.event(event)
+      |> send_lines()
+      |> send_events()
+
+    state = Map.put(state, :data, context.data)
 
     {:noreply, state}
+  end
+
+  defp send_lines(context) do
+    context.lines
+    |> Enum.group_by(
+      fn {to_pid, _line} ->
+        to_pid
+      end,
+      fn {_to_pid, line} ->
+        line
+      end
+    )
+    |> Enum.each(fn {to_pid, lines} ->
+      send(to_pid, %Event.Display{lines: lines})
+    end)
+
+    context
+  end
+
+  defp send_events(context) do
+    Enum.each(context.events, fn {to_pid, event} ->
+      send(to_pid, event)
+    end)
+
+    context
   end
 end

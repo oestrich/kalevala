@@ -20,7 +20,7 @@ end
 
 defmodule Kalevala.Conn do
   @moduledoc """
-  Struct for tracking data being processed in a command or action
+  Struct for tracking data being processed in a controller or command
   """
 
   @type t() :: %__MODULE__{}
