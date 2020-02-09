@@ -3,11 +3,14 @@ defmodule Kalevala.Conn.Private do
 
   alias Kalevala.World.Room
 
-  defstruct [:event_router, :view, halt?: false]
+  defstruct [:event_router, halt?: false]
+
+  @doc false
+  def character(conn), do: conn.update_character || conn.character
 
   @doc false
   def default_event_router(conn) do
-    case Map.get(conn.session, :character) do
+    case character(conn) do
       nil ->
         nil
 
@@ -55,8 +58,10 @@ defmodule Kalevala.Conn do
   alias Kalevala.Conn.Private
 
   defstruct [
+    :character,
     :next_controller,
     :params,
+    :update_character,
     assigns: %{},
     events: [],
     lines: [],
@@ -85,17 +90,19 @@ defmodule Kalevala.Conn do
     Map.put(conn, :lines, conn.lines ++ [lines])
   end
 
+  defp merge_assigns(conn, assigns) do
+    conn.session
+    |> Map.put(:character, Private.character(conn))
+    |> Map.merge(conn.assigns)
+    |> Map.merge(assigns)
+  end
+
   @doc """
   Render text to the conn
   """
   def render(conn, view, template, assigns) do
-    assigns =
-      conn.session
-      |> Map.merge(conn.assigns)
-      |> Map.merge(assigns)
-
+    assigns = merge_assigns(conn, assigns)
     data = view.render(template, assigns)
-
     push(conn, data, false)
   end
 
@@ -103,13 +110,8 @@ defmodule Kalevala.Conn do
   Render a prompt to the conn
   """
   def prompt(conn, view, template, assigns) do
-    assigns =
-      conn.session
-      |> Map.merge(conn.assigns)
-      |> Map.merge(assigns)
-
+    assigns = merge_assigns(conn, assigns)
     data = view.render(template, assigns)
-
     push(conn, data, true)
   end
 
@@ -167,5 +169,29 @@ defmodule Kalevala.Conn do
   def send_option(conn, name, value) when is_boolean(value) do
     option = %Kalevala.Conn.Option{name: name, value: value}
     Map.put(conn, :options, conn.options ++ [option])
+  end
+
+  @doc """
+  Creates an even to move from one room to another
+  """
+  def move(conn, direction, room_id, view, template, assigns) do
+    assigns = merge_assigns(conn, assigns)
+    data = view.render(template, assigns)
+
+    event = %Kalevala.Event.Move{
+      character: Private.character(conn),
+      direction: direction,
+      reason: data,
+      room_id: room_id
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
+  end
+
+  @doc """
+  Update the character in state
+  """
+  def put_character(conn, character) do
+    Map.put(conn, :update_character, character)
   end
 end

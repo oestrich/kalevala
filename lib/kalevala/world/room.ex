@@ -60,6 +60,56 @@ defmodule Kalevala.World.Room.Context do
   end
 end
 
+defmodule Kalevala.World.Room.Movement do
+  @moduledoc """
+  Handle room movement
+  """
+
+  alias Kalevala.Event
+
+  @doc """
+  Handle the movement event
+  """
+  def handle_event(state, event = %Event.Move{direction: :to}) do
+    lines = %Kalevala.Conn.Lines{data: event.reason, newline: true}
+    display_event = %Event.Display{lines: [lines]}
+
+    Enum.each(state.private.characters, fn character ->
+      send(character.pid, display_event)
+    end)
+
+    characters = [event.character | state.private.characters]
+    private = Map.put(state.private, :characters, characters)
+
+    Map.put(state, :private, private)
+  end
+
+  def handle_event(state, event = %Event.Move{direction: :from}) do
+    characters =
+      Enum.reject(state.private.characters, fn character ->
+        character.id == event.character.id
+      end)
+
+    lines = %Kalevala.Conn.Lines{data: event.reason, newline: true}
+    display_event = %Event.Display{lines: [lines]}
+
+    Enum.each(characters, fn character ->
+      send(character.pid, display_event)
+    end)
+
+    private = Map.put(state.private, :characters, characters)
+    Map.put(state, :private, private)
+  end
+end
+
+defmodule Kalevala.World.Room.Private do
+  @moduledoc """
+  Store private information for a room, e.g. characters in the room
+  """
+
+  defstruct characters: []
+end
+
 defmodule Kalevala.World.Room do
   @moduledoc """
   Rooms are the base unit of space in Kalevala
@@ -71,8 +121,16 @@ defmodule Kalevala.World.Room do
 
   alias Kalevala.Event
   alias Kalevala.World.Room.Context
+  alias Kalevala.World.Room.Movement
+  alias Kalevala.World.Room.Private
 
-  defstruct [:id, :zone_id, :name, :description, exits: []]
+  defstruct [
+    :id,
+    :zone_id,
+    :name,
+    :description,
+    exits: []
+  ]
 
   @type t() :: %__MODULE__{}
 
@@ -117,7 +175,8 @@ defmodule Kalevala.World.Room do
     state = %{
       data: room,
       supervisor: config.supervisor,
-      callback_module: config.callback_module
+      callback_module: config.callback_module,
+      private: %Private{}
     }
 
     {:ok, state}
@@ -134,6 +193,17 @@ defmodule Kalevala.World.Room do
     state = Map.put(state, :data, context.data)
 
     {:noreply, state}
+  end
+
+  def handle_info(event = %Event.Move{}, state) do
+    case event.room_id == state.data.id do
+      true ->
+        state = Movement.handle_event(state, event)
+        {:noreply, state}
+
+      false ->
+        {:noreply, state}
+    end
   end
 
   defp send_lines(context) do

@@ -23,3 +23,19 @@ defmodule Kalevala.Event.Display do
 
   defstruct lines: [], options: []
 end
+
+defmodule Kalevala.Event.CharacterUpdate do
+  @moduledoc """
+  Update the character in local lists
+  """
+
+  defstruct [:character]
+end
+
+defmodule Kalevala.Event.Move do
+  @moduledoc """
+  An event to move from one room to another
+  """
+
+  defstruct [:character, :direction, :reason, :room_id]
+end

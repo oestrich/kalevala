@@ -2,7 +2,6 @@ defmodule Kalevala.ForemanTest do
   use ExUnit.Case
 
   alias Kalevala.Conn
-  alias Kalevala.Controller
   alias Kalevala.Foreman
 
   describe "handling the conn" do
@@ -19,7 +18,7 @@ defmodule Kalevala.ForemanTest do
       conn = setup_conn()
       state = setup_state()
 
-      conn = Controller.halt(conn)
+      conn = Conn.halt(conn)
 
       {:noreply, _state} = Foreman.handle_conn(conn, state)
 
@@ -30,7 +29,7 @@ defmodule Kalevala.ForemanTest do
       conn = setup_conn()
       state = setup_state()
 
-      conn = Controller.put_controller(conn, ExampleController)
+      conn = Conn.put_controller(conn, ExampleController)
 
       {:noreply, state, {:continue, :init_controller}} = Foreman.handle_conn(conn, state)
 

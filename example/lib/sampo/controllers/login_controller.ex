@@ -6,6 +6,7 @@ defmodule Sampo.LoginController do
   alias Sampo.CharacterView
   alias Sampo.CommandController
   alias Sampo.LoginView
+  alias Sampo.MoveView
   alias Sampo.QuitView
 
   @impl true
@@ -78,8 +79,9 @@ defmodule Sampo.LoginController do
 
     conn
     |> put_session(:login_state, :authenticated)
-    |> put_session(:character, character)
+    |> put_character(character)
     |> render(CharacterView, "vitals", %{})
+    |> move(:to, character.room_id, MoveView, "enter", %{})
     |> prompt(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
   end
@@ -95,6 +97,7 @@ defmodule Sampo.LoginController do
 
     %Kalevala.Character{
       id: id,
+      pid: self(),
       room_id: starting_room_id,
       name: name,
       status: "#{name} is here.",

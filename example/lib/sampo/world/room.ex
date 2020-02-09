@@ -17,6 +17,8 @@ defmodule Sampo.World.Room do
 end
 
 defmodule Sampo.World.Room.Events do
+  @moduledoc false
+
   use Kalevala.Event.Router
 
   scope(Sampo.World.Room) do

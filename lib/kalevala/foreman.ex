@@ -12,7 +12,15 @@ defmodule Kalevala.Foreman do
   alias Kalevala.Conn
   alias Kalevala.Event
 
-  defstruct [:protocol, :controller, :options, session: %{}]
+  defstruct [
+    :character,
+    :controller,
+    :options,
+    :protocol,
+    :quit_view,
+    :quit_template,
+    session: %{}
+  ]
 
   @doc """
   Start a new foreman for a connecting player
@@ -34,6 +42,7 @@ defmodule Kalevala.Foreman do
     state = %__MODULE__{
       protocol: opts[:protocol],
       controller: opts.initial_controller,
+      quit_view: opts.quit_view,
       options: %{}
     }
 
@@ -42,32 +51,32 @@ defmodule Kalevala.Foreman do
 
   @impl true
   def handle_continue(:init_controller, state) do
-    %Conn{session: state.session}
+    %Conn{character: state.character, session: state.session}
     |> state.controller.init()
     |> handle_conn(state)
   end
 
   @impl true
   def handle_info({:recv, :text, data}, state) do
-    %Conn{session: state.session}
+    %Conn{character: state.character, session: state.session}
     |> state.controller.recv(data)
     |> handle_conn(state)
   end
 
   def handle_info({:recv, :option, option}, state) do
-    %Conn{session: state.session}
+    %Conn{character: state.character, session: state.session}
     |> state.controller.option(option)
     |> handle_conn(state)
   end
 
   def handle_info(event = %Event{}, state) do
-    %Conn{session: state.session}
+    %Conn{character: state.character, session: state.session}
     |> state.controller.event(event)
     |> handle_conn(state)
   end
 
   def handle_info({:route, event = %Event{}}, state) do
-    %Conn{session: state.session}
+    %Conn{character: state.character, session: state.session}
     |> Map.put(:events, [event])
     |> handle_conn(state)
   end
@@ -81,8 +90,24 @@ defmodule Kalevala.Foreman do
   end
 
   def handle_info(:terminate, state) do
+    notify_disconnect(state)
     DynamicSupervisor.terminate_child(__MODULE__.Supervisor, self())
     {:noreply, state}
+  end
+
+  defp notify_disconnect(state) do
+    {quit_view, quit_template} = state.quit_view
+
+    event = %Event.Move{
+      character: state.character,
+      direction: :from,
+      reason: quit_view.render(quit_template, %{character: state.character}),
+      room_id: state.character.room_id
+    }
+
+    %Conn{character: state.character, session: state.session}
+    |> Map.put(:events, [event])
+    |> send_events()
   end
 
   @doc """
@@ -103,15 +128,9 @@ defmodule Kalevala.Foreman do
         {:noreply, state}
 
       false ->
-        case is_nil(conn.next_controller) do
-          true ->
-            {:noreply, state}
-
-          false ->
-            state = Map.put(state, :controller, conn.next_controller)
-
-            {:noreply, state, {:continue, :init_controller}}
-        end
+        state
+        |> update_character(conn)
+        |> update_controller(conn)
     end
   end
 
@@ -142,6 +161,27 @@ defmodule Kalevala.Foreman do
         end)
 
         conn
+    end
+  end
+
+  defp update_character(state, conn) do
+    case is_nil(conn.update_character) do
+      true ->
+        state
+
+      false ->
+        %{state | character: conn.update_character}
+    end
+  end
+
+  defp update_controller(state, conn) do
+    case is_nil(conn.next_controller) do
+      true ->
+        {:noreply, state}
+
+      false ->
+        state = %{state | controller: conn.next_controller}
+        {:noreply, state, {:continue, :init_controller}}
     end
   end
 end
