@@ -1,7 +1,21 @@
 defmodule Kalevala.Conn.Private do
   @moduledoc false
 
-  defstruct [:view, halt?: false]
+  alias Kalevala.World.Room
+
+  defstruct [:event_router, :view, halt?: false]
+
+  @doc false
+  def default_event_router(conn) do
+    case Map.get(conn.session, :character) do
+      nil ->
+        nil
+
+      character ->
+        {:global, name} = Room.global_name(character.room_id)
+        :global.whereis_name(name)
+    end
+  end
 end
 
 defmodule Kalevala.Conn do
@@ -11,6 +25,8 @@ defmodule Kalevala.Conn do
 
   @type t() :: %__MODULE__{}
 
+  alias Kalevala.Conn.Private
+
   defstruct [
     :next_controller,
     :params,
@@ -18,9 +34,15 @@ defmodule Kalevala.Conn do
     events: [],
     lines: [],
     options: [],
-    private: %Kalevala.Conn.Private{},
+    private: %Private{},
     session: %{}
   ]
+
+  @doc false
+  def event_router(conn = %{private: %{event_router: nil}}),
+    do: Private.default_event_router(conn)
+
+  def event_router(%{private: %{event_router: event_router}}), do: event_router
 end
 
 defmodule Kalevala.Conn.Event do

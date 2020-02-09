@@ -3,13 +3,10 @@ defmodule Sampo.CharacterView do
 
   alias Kalevala.Conn.Event
 
-  def render("vitals", _assigns) do
+  def render("vitals", %{character: character}) do
     %Event{
       topic: "Character.Vitals",
-      data: %{
-        health_points: 50,
-        max_health_points: 50
-      }
+      data: character.meta.vitals
     }
   end
 end

@@ -138,7 +138,6 @@ defmodule Kalevala.Controller do
   """
   def event(conn, topic, data) do
     event = %Kalevala.Event{
-      to_pid: self(),
       from_pid: self(),
       topic: topic,
       data: data

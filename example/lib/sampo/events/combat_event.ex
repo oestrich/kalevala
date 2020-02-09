@@ -7,7 +7,12 @@ defmodule Sampo.CombatEvent do
   alias Kalevala.Event
 
   def start(conn, _event) do
-    {:ok, timer} = :timer.send_interval(1_500, self(), %Event{topic: "combat/tick"})
+    event = %Event{
+      from_pid: self(),
+      topic: "combat/tick"
+    }
+
+    {:ok, timer} = :timer.send_interval(1_500, self(), {:route, event})
 
     conn
     |> render(CombatView, "tick", %{})

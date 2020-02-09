@@ -5,5 +5,5 @@ defmodule Kalevala.Character do
   Common data that all characters will have
   """
 
-  defstruct [:id, :name, :status, :description, meta: %{}]
+  defstruct [:id, :room_id, :name, :status, :description, meta: %{}]
 end

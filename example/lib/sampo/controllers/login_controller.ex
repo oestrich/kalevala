@@ -95,11 +95,15 @@ defmodule Sampo.LoginController do
 
     %Kalevala.Character{
       id: id,
+      room_id: starting_room_id,
       name: name,
       status: "#{name} is here.",
       description: "#{name} is a person.",
       meta: %Sampo.Character.Meta{
-        room_id: starting_room_id
+        vitals: %Sampo.Character.Vitals{
+          health_points: 25,
+          max_health_points: 25
+        }
       }
     }
   end

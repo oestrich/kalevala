@@ -66,6 +66,12 @@ defmodule Kalevala.Foreman do
     |> handle_conn(state)
   end
 
+  def handle_info({:route, event = %Event{}}, state) do
+    %Conn{session: state.session}
+    |> Map.put(:events, [event])
+    |> handle_conn(state)
+  end
+
   def handle_info(:terminate, state) do
     DynamicSupervisor.terminate_child(__MODULE__.Supervisor, self())
     {:noreply, state}
@@ -75,17 +81,10 @@ defmodule Kalevala.Foreman do
   Handle the conn struct after processing
   """
   def handle_conn(conn, state) do
-    Enum.each(conn.options, fn option ->
-      send(state.protocol, {:send, option})
-    end)
-
-    Enum.each(conn.lines, fn line ->
-      send(state.protocol, {:send, line})
-    end)
-
-    Enum.each(conn.events, fn event ->
-      send(event.to_pid, event)
-    end)
+    conn
+    |> send_options(state)
+    |> send_lines(state)
+    |> send_events()
 
     session = Map.merge(state.session, conn.session)
     state = Map.put(state, :session, session)
@@ -105,6 +104,36 @@ defmodule Kalevala.Foreman do
 
             {:noreply, state, {:continue, :init_controller}}
         end
+    end
+  end
+
+  defp send_options(conn, state) do
+    Enum.each(conn.options, fn option ->
+      send(state.protocol, {:send, option})
+    end)
+
+    conn
+  end
+
+  defp send_lines(conn, state) do
+    Enum.each(conn.lines, fn line ->
+      send(state.protocol, {:send, line})
+    end)
+
+    conn
+  end
+
+  defp send_events(conn) do
+    case Conn.event_router(conn) do
+      nil ->
+        conn
+
+      event_router ->
+        Enum.each(conn.events, fn event ->
+          send(event_router, event)
+        end)
+
+        conn
     end
   end
 end

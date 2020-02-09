@@ -7,7 +7,7 @@ defmodule Kalevala.Event do
 
   @type topic() :: String.t()
 
-  defstruct [:to_pid, :from_pid, :topic, :data]
+  defstruct [:from_pid, :topic, :data]
 
   defmacro __using__(_opts) do
     quote do
