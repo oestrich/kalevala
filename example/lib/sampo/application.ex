@@ -18,7 +18,7 @@ defmodule Sampo.Application do
       foreman: [
         character_module: Sampo.Character,
         initial_controller: Sampo.LoginController,
-        quit_view: {Sampo.QuitView, "disconnected"},
+        quit_view: {Sampo.QuitView, "disconnected"}
       ]
     ]
 

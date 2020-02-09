@@ -31,6 +31,10 @@ defmodule Sampo.World.Room.Events do
     module(LookEvent) do
       event("room/look", :call)
     end
+
+    module(NotifyEvent) do
+      event("room/say", :call)
+    end
   end
 end
 
@@ -38,7 +42,7 @@ defmodule Sampo.World.Room.ForwardEvent do
   import Kalevala.World.Room.Context
 
   def call(context, event) do
-    event(context, event.from_pid, event.topic, %{})
+    event(context, event.from_pid, self(), event.topic, %{})
   end
 end
 
@@ -53,5 +57,15 @@ defmodule Sampo.World.Room.LookEvent do
     |> assign(:room, context.data)
     |> render(event.from_pid, LookView, "look", %{})
     |> prompt(event.from_pid, CommandView, "prompt", %{})
+  end
+end
+
+defmodule Sampo.World.Room.NotifyEvent do
+  import Kalevala.World.Room.Context
+
+  def call(context, event) do
+    Enum.reduce(context.characters, context, fn character, context ->
+      event(context, character.pid, event.from_pid, event.topic, event.data)
+    end)
   end
 end

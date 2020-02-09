@@ -4,6 +4,14 @@ defmodule Sampo.SayCommand do
   alias Sampo.SayView
 
   def run(conn, params) do
-    render(conn, SayView, "echo", params)
+    params = %{
+      "character_name" => character(conn).name,
+      "message" => params["message"]
+    }
+
+    conn
+    |> render(SayView, "echo", params)
+    |> event("room/say", params)
+    |> assign(:prompt, false)
   end
 end

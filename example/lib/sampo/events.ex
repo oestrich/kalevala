@@ -9,5 +9,9 @@ defmodule Sampo.Events do
       event("combat/stop", :stop)
       event("combat/tick", :tick)
     end
+
+    module(SayEvent) do
+      event("room/say", :echo)
+    end
   end
 end

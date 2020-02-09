@@ -5,7 +5,7 @@ defmodule Kalevala.World.Room.Context do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, assigns: %{}, events: [], lines: []]
+  defstruct [:data, assigns: %{}, characters: [], events: [], lines: []]
 
   defp push(context, to_pid, event = %Kalevala.Conn.Event{}, _newline) do
     Map.put(context, :lines, context.lines ++ [{to_pid, event}])
@@ -49,9 +49,9 @@ defmodule Kalevala.World.Room.Context do
   @doc """
   Send an event back to a pid
   """
-  def event(context, to_pid, topic, data) do
+  def event(context, to_pid, from_pid, topic, data) do
     event = %Kalevala.Event{
-      from_pid: self(),
+      from_pid: from_pid,
       topic: topic,
       data: data
     }
@@ -185,7 +185,7 @@ defmodule Kalevala.World.Room do
   @impl true
   def handle_info(event = %Event{}, state) do
     context =
-      %Context{data: state.data}
+      %Context{data: state.data, characters: state.private.characters}
       |> state.callback_module.event(event)
       |> send_lines()
       |> send_events()

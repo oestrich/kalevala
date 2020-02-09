@@ -109,6 +109,13 @@ defmodule Kalevala.Conn do
   end
 
   @doc """
+  Get the character out of the conn
+
+  If the character has been updated, this character will be returned
+  """
+  def character(conn), do: Private.character(conn)
+
+  @doc """
   Render text to the conn
   """
   def render(conn, view, template, assigns) do

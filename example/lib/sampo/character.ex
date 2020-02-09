@@ -1,4 +1,8 @@
 defmodule Sampo.Character do
+  @moduledoc """
+  Character callbacks for Kalevala
+  """
+
   @behaviour Kalevala.Character
 
   @impl true
