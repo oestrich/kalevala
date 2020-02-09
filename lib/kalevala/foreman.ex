@@ -14,11 +14,11 @@ defmodule Kalevala.Foreman do
 
   defstruct [
     :character,
+    :character_module,
     :controller,
     :options,
     :protocol,
     :quit_view,
-    :quit_template,
     session: %{}
   ]
 
@@ -41,6 +41,7 @@ defmodule Kalevala.Foreman do
 
     state = %__MODULE__{
       protocol: opts[:protocol],
+      character_module: opts.character_module,
       controller: opts.initial_controller,
       quit_view: opts.quit_view,
       options: %{}
@@ -49,34 +50,45 @@ defmodule Kalevala.Foreman do
     {:ok, state, {:continue, :init_controller}}
   end
 
+  @doc false
+  def new_conn(state) do
+    %Conn{
+      character: state.character,
+      session: state.session,
+      private: %Conn.Private{
+        character_module: state.character_module
+      }
+    }
+  end
+
   @impl true
   def handle_continue(:init_controller, state) do
-    %Conn{character: state.character, session: state.session}
+    new_conn(state)
     |> state.controller.init()
     |> handle_conn(state)
   end
 
   @impl true
   def handle_info({:recv, :text, data}, state) do
-    %Conn{character: state.character, session: state.session}
+    new_conn(state)
     |> state.controller.recv(data)
     |> handle_conn(state)
   end
 
   def handle_info({:recv, :option, option}, state) do
-    %Conn{character: state.character, session: state.session}
+    new_conn(state)
     |> state.controller.option(option)
     |> handle_conn(state)
   end
 
   def handle_info(event = %Event{}, state) do
-    %Conn{character: state.character, session: state.session}
+    new_conn(state)
     |> state.controller.event(event)
     |> handle_conn(state)
   end
 
   def handle_info({:route, event = %Event{}}, state) do
-    %Conn{character: state.character, session: state.session}
+    new_conn(state)
     |> Map.put(:events, [event])
     |> handle_conn(state)
   end
@@ -105,7 +117,7 @@ defmodule Kalevala.Foreman do
       room_id: state.character.room_id
     }
 
-    %Conn{character: state.character, session: state.session}
+    new_conn(state)
     |> Map.put(:events, [event])
     |> send_events()
   end

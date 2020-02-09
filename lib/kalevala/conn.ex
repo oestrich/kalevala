@@ -3,10 +3,21 @@ defmodule Kalevala.Conn.Private do
 
   alias Kalevala.World.Room
 
-  defstruct [:event_router, halt?: false]
+  defstruct [:character_module, :event_router, halt?: false]
 
   @doc false
-  def character(conn), do: conn.update_character || conn.character
+  def character(conn) do
+    character = conn.update_character || conn.character
+
+    case is_nil(character) do
+      true ->
+        nil
+
+      false ->
+        meta = conn.private.character_module.trim_meta(character.meta)
+        %{character | meta: meta}
+    end
+  end
 
   @doc false
   def default_event_router(conn) do

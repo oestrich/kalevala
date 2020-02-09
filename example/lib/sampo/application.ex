@@ -16,6 +16,7 @@ defmodule Sampo.Application do
         certfile: Path.join(:code.priv_dir(:sampo), "certs/cert.pem")
       ],
       foreman: [
+        character_module: Sampo.Character,
         initial_controller: Sampo.LoginController,
         quit_view: {Sampo.QuitView, "disconnected"},
       ]

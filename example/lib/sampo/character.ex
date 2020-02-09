@@ -1,3 +1,12 @@
+defmodule Sampo.Character do
+  @behaviour Kalevala.Character
+
+  @impl true
+  def trim_meta(meta) do
+    Map.take(meta, [:vitals])
+  end
+end
+
 defmodule Sampo.Character.Meta do
   @moduledoc """
   Specific metadata for a character in Sampo
