@@ -16,3 +16,11 @@ defmodule Kalevala.Event do
     end
   end
 end
+
+defmodule Kalevala.Event.Display do
+  @moduledoc """
+  An event to display text/data back to the user
+  """
+
+  defstruct lines: [], options: []
+end

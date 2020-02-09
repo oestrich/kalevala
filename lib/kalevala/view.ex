@@ -25,8 +25,7 @@ defmodule Kalevala.View.Macro do
   defmacro sigil_E({:<<>>, _, [expr]}, _opts) do
     EEx.compile_string(expr,
       line: __CALLER__.line + 1,
-      engine: Kalevala.View.EExKalevala,
-      trim: true
+      engine: Kalevala.View.EExKalevala
     )
   end
 

@@ -106,6 +106,14 @@ defmodule Kalevala.Controller do
   end
 
   @doc """
+  Add to the assignment map on the conn
+  """
+  def assign(conn, key, value) do
+    assigns = Map.put(conn.assigns, key, value)
+    Map.put(conn, :assigns, assigns)
+  end
+
+  @doc """
   Put a value into the session data
   """
   def put_session(conn, key, value) do

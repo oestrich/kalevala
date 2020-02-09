@@ -25,7 +25,13 @@ defmodule Sampo.CommandController do
         |> prompt(CommandView, "prompt", %{})
 
       conn ->
-        prompt(conn, CommandView, "prompt", %{})
+        case Map.get(conn.assigns, :prompt, true) do
+          true ->
+            prompt(conn, CommandView, "prompt", %{})
+
+          false ->
+            conn
+        end
     end
   end
 

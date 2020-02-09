@@ -72,6 +72,14 @@ defmodule Kalevala.Foreman do
     |> handle_conn(state)
   end
 
+  def handle_info(event = %Event.Display{}, state) do
+    event
+    |> send_options(state)
+    |> send_lines(state)
+
+    {:noreply, state}
+  end
+
   def handle_info(:terminate, state) do
     DynamicSupervisor.terminate_child(__MODULE__.Supervisor, self())
     {:noreply, state}
