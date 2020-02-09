@@ -6,11 +6,20 @@ defmodule Kalevala.View do
   defmacro __using__(_opts) do
     quote do
       import Kalevala.View.Macro
+
+      alias Kalevala.View
     end
   end
 
-  def view_module(module) do
-    String.to_atom(String.replace(to_string(module), "Command", "View"))
+  @doc """
+  "Join" an IO data list with a separator string
+
+  Similar to Enum.join, but leaves as an IO data list
+  """
+  def join([line], _separator), do: [line]
+
+  def join([line | lines], separator) do
+    [line, separator | join(lines, separator)]
   end
 end
 

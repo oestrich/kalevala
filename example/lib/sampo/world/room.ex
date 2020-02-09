@@ -55,6 +55,7 @@ defmodule Sampo.World.Room.LookEvent do
   def call(context, event) do
     context
     |> assign(:room, context.data)
+    |> assign(:characters, context.characters)
     |> render(event.from_pid, LookView, "look", %{})
     |> prompt(event.from_pid, CommandView, "prompt", %{})
   end
