@@ -3,7 +3,7 @@ defmodule Sampo.LookCommand do
 
   def run(conn, _params) do
     conn
-    |> event("room/look", %{})
+    |> event("room/look")
     |> assign(:prompt, false)
   end
 end

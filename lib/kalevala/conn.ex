@@ -118,7 +118,7 @@ defmodule Kalevala.Conn do
   @doc """
   Render text to the conn
   """
-  def render(conn, view, template, assigns) do
+  def render(conn, view, template, assigns \\ %{}) do
     assigns = merge_assigns(conn, assigns)
     data = view.render(template, assigns)
     push(conn, data, false)
@@ -127,7 +127,7 @@ defmodule Kalevala.Conn do
   @doc """
   Render a prompt to the conn
   """
-  def prompt(conn, view, template, assigns) do
+  def prompt(conn, view, template, assigns \\ %{}) do
     assigns = merge_assigns(conn, assigns)
     data = view.render(template, assigns)
     push(conn, data, true)
@@ -172,7 +172,7 @@ defmodule Kalevala.Conn do
   @doc """
   Send the foreman an in-game event
   """
-  def event(conn, topic, data) do
+  def event(conn, topic, data \\ %{}) do
     event = %Kalevala.Event{
       from_pid: self(),
       topic: topic,

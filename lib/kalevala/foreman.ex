@@ -107,6 +107,8 @@ defmodule Kalevala.Foreman do
     {:noreply, state}
   end
 
+  defp notify_disconnect(%{character: nil}), do: :ok
+
   defp notify_disconnect(state) do
     {quit_view, quit_template} = state.quit_view
 

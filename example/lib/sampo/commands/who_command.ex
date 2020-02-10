@@ -4,7 +4,8 @@ defmodule Sampo.WhoCommand do
   alias Sampo.WhoView
 
   def run(conn, _params) do
-    characters = Sampo.Presence.characters()
-    render(conn, WhoView, "list", %{characters: characters})
+    conn
+    |> assign(:characters, Sampo.Presence.characters())
+    |> render(WhoView, "list")
   end
 end

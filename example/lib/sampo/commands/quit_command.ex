@@ -3,9 +3,9 @@ defmodule Sampo.QuitCommand do
 
   alias Sampo.QuitView
 
-  def run(conn, params) do
+  def run(conn, _params) do
     conn
-    |> render(QuitView, "goodbye", params)
+    |> render(QuitView, "goodbye")
     |> halt()
   end
 end
