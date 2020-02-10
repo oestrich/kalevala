@@ -35,10 +35,6 @@ defmodule Sampo.World.Room.Events do
     module(NotifyEvent) do
       event("room/say", :call)
     end
-
-    module(CharacterEvent) do
-      event("characters/list", :call)
-    end
   end
 end
 
@@ -72,14 +68,5 @@ defmodule Sampo.World.Room.NotifyEvent do
     Enum.reduce(context.characters, context, fn character, context ->
       event(context, character.pid, event.from_pid, event.topic, event.data)
     end)
-  end
-end
-
-defmodule Sampo.World.Room.CharacterEvent do
-  import Kalevala.World.Room.Context
-
-  def call(context, event) do
-    characters = Sampo.Presence.characters()
-    event(context, event.from_pid, self(), event.topic, %{characters: characters})
   end
 end

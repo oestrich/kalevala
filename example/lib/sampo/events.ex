@@ -13,9 +13,5 @@ defmodule Sampo.Events do
     module(SayEvent) do
       event("room/say", :echo)
     end
-
-    module(WhoEvent) do
-      event("characters/list", :run)
-    end
   end
 end

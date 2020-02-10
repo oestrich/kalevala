@@ -1,9 +1,10 @@
 defmodule Sampo.WhoCommand do
   use Kalevala.Command
 
+  alias Sampo.WhoView
+
   def run(conn, _params) do
-    conn
-    |> event("characters/list", %{})
-    |> assign(:prompt, false)
+    characters = Sampo.Presence.characters()
+    render(conn, WhoView, "list", %{characters: characters})
   end
 end
