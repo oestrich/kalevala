@@ -49,7 +49,6 @@ end
 defmodule Sampo.World.Room.LookEvent do
   import Kalevala.World.Room.Context
 
-  alias Sampo.CommandView
   alias Sampo.LookView
 
   def call(context, event) do
@@ -57,7 +56,6 @@ defmodule Sampo.World.Room.LookEvent do
     |> assign(:room, context.data)
     |> assign(:characters, context.characters)
     |> render(event.from_pid, LookView, "look", %{})
-    |> prompt(event.from_pid, CommandView, "prompt", %{})
   end
 end
 
