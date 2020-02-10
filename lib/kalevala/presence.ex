@@ -37,6 +37,14 @@ defmodule Kalevala.Presence do
       def start_link(_opts) do
         unquote(__MODULE__).start_link(callback_module: __MODULE__, name: __MODULE__)
       end
+
+      @impl true
+      def online(_character), do: :ok
+
+      @impl true
+      def offline(_character), do: :ok
+
+      defoverridable online: 1, offline: 1
     end
   end
 
