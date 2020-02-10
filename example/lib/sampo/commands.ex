@@ -22,5 +22,9 @@ defmodule Sampo.Commands do
     module(SayCommand) do
       command("say :message", :run)
     end
+
+    module(WhoCommand) do
+      command("who", :run)
+    end
   end
 end

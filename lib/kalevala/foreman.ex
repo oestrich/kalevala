@@ -17,6 +17,7 @@ defmodule Kalevala.Foreman do
     :character_module,
     :controller,
     :options,
+    :presence_module,
     :protocol,
     :quit_view,
     session: %{}
@@ -43,6 +44,7 @@ defmodule Kalevala.Foreman do
       protocol: opts[:protocol],
       character_module: opts.character_module,
       controller: opts.initial_controller,
+      presence_module: opts.presence_module,
       quit_view: opts.quit_view,
       options: %{}
     }
@@ -180,6 +182,7 @@ defmodule Kalevala.Foreman do
         state
 
       false ->
+        state.presence_module.track(Conn.character(conn))
         %{state | character: conn.update_character}
     end
   end

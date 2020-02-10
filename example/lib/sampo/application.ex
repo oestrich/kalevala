@@ -16,6 +16,7 @@ defmodule Sampo.Application do
         certfile: Path.join(:code.priv_dir(:sampo), "certs/cert.pem")
       ],
       foreman: [
+        presence_module: Sampo.Presence,
         character_module: Sampo.Character,
         initial_controller: Sampo.LoginController,
         quit_view: {Sampo.QuitView, "disconnected"}
@@ -24,6 +25,7 @@ defmodule Sampo.Application do
 
     children = [
       {Sampo.Config, [name: Sampo.Config]},
+      {Sampo.Presence, []},
       {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
       {Sampo.World, []}
