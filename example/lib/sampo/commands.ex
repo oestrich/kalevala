@@ -14,6 +14,13 @@ defmodule Sampo.Commands do
       command("look", :run)
     end
 
+    module(MoveCommand) do
+      command("north", :north)
+      command("south", :south)
+      command("east", :east)
+      command("west", :west)
+    end
+
     module(QuitCommand) do
       command("quit", :run)
       command(<<4>>, :run, display: false)

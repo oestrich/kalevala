@@ -4,6 +4,14 @@ defmodule Sampo.MoveView do
   import IO.ANSI, only: [reset: 0, white: 0]
 
   def render("enter", %{character: character}) do
-    ~i"#{white()}#{character.name}#{reset()} enters."
+    ~i(#{white()}#{character.name}#{reset()} enters.)
+  end
+
+  def render("leave", %{character: character}) do
+    ~i(#{white()}#{character.name}#{reset()} leaves.)
+  end
+
+  def render("fail", %{reason: :no_exit, direction: direction}) do
+    ~i(There is no exit #{direction}.\n)
   end
 end

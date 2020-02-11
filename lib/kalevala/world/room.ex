@@ -214,7 +214,14 @@ defmodule Kalevala.World.Room do
         {:noreply, state}
 
       false ->
-        {:noreply, state}
+        case GenServer.whereis(global_name(event.room_id)) do
+          nil ->
+            {:noreply, state}
+
+          pid ->
+            send(pid, event)
+            {:noreply, state}
+        end
     end
   end
 

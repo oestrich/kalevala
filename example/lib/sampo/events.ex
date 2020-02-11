@@ -10,6 +10,11 @@ defmodule Sampo.Events do
       event("combat/tick", :tick)
     end
 
+    module(MoveEvent) do
+      event("movement/commit", :commit)
+      event("movement/fail", :fail)
+    end
+
     module(SayEvent) do
       event("room/say", :echo)
     end

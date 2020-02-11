@@ -84,6 +84,7 @@ defmodule Sampo.LoginController do
     |> move(:to, character.room_id, MoveView, "enter", %{})
     |> prompt(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
+    |> event("room/look", %{})
   end
 
   defp build_character(name) do

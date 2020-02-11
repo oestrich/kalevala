@@ -32,6 +32,10 @@ defmodule Sampo.World.Room.Events do
       event("room/look", :call)
     end
 
+    module(MoveEvent) do
+      event("movement/start", :start)
+    end
+
     module(NotifyEvent) do
       event("room/say", :call)
     end
@@ -56,6 +60,30 @@ defmodule Sampo.World.Room.LookEvent do
     |> assign(:room, context.data)
     |> assign(:characters, context.characters)
     |> render(event.from_pid, LookView, "look", %{})
+  end
+end
+
+defmodule Sampo.World.Room.MoveEvent do
+  import Kalevala.World.Room.Context
+
+  def start(context, event) do
+    room_exit =
+      Enum.find(context.data.exits, fn exit ->
+        exit.direction == event.data.direction
+      end)
+
+    case room_exit != nil do
+      true ->
+        event(context, event.from_pid, self(), "movement/commit", %{
+          room_id: room_exit.end_room_id
+        })
+
+      false ->
+        event(context, event.from_pid, self(), "movement/fail", %{
+          reason: :no_exit,
+          direction: event.data.direction
+        })
+    end
   end
 end
 

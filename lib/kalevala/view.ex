@@ -16,6 +16,8 @@ defmodule Kalevala.View do
 
   Similar to Enum.join, but leaves as an IO data list
   """
+  def join([], _separator), do: []
+
   def join([line], _separator), do: [line]
 
   def join([line | lines], separator) do
