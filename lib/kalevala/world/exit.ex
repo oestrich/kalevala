@@ -1,9 +1,9 @@
 defmodule Kalevala.World.Exit do
   @moduledoc """
-  Exits link rooms together in one direction
+  Exits link rooms together in one exit_name
 
-  To link rooms together, create exits in both directions
+  To link rooms together, create exits in both exit_names
   """
 
-  defstruct [:id, :direction, :start_room_id, :end_room_id]
+  defstruct [:id, :exit_name, :start_room_id, :end_room_id]
 end

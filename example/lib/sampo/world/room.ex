@@ -69,7 +69,7 @@ defmodule Sampo.World.Room.MoveEvent do
   def start(context, event) do
     room_exit =
       Enum.find(context.data.exits, fn exit ->
-        exit.direction == event.data.direction
+        exit.exit_name == event.data.exit_name
       end)
 
     case room_exit != nil do
@@ -81,7 +81,7 @@ defmodule Sampo.World.Room.MoveEvent do
       false ->
         event(context, event.from_pid, self(), "movement/fail", %{
           reason: :no_exit,
-          direction: event.data.direction
+          exit_name: event.data.exit_name
         })
     end
   end

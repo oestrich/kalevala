@@ -147,9 +147,9 @@ defmodule Kalevala.World.Room do
   @type t() :: %__MODULE__{}
 
   @doc """
-  Called when the zone is initializing
+  Called when the room is initializing
   """
-  @callback init(zone :: t()) :: t()
+  @callback init(room :: t()) :: t()
 
   @doc """
   Callback for when a new event is received
@@ -197,7 +197,7 @@ defmodule Kalevala.World.Room do
   @impl true
   def handle_info(event = %Event{}, state) do
     context =
-      %Context{data: state.data, characters: state.private.characters}
+      new_context(state)
       |> state.callback_module.event(event)
       |> send_lines()
       |> send_events()
@@ -223,6 +223,10 @@ defmodule Kalevala.World.Room do
             {:noreply, state}
         end
     end
+  end
+
+  defp new_context(state) do
+    %Context{data: state.data, characters: state.private.characters}
   end
 
   defp send_lines(context) do

@@ -78,7 +78,7 @@ defmodule Sampo.World.Loader do
   @doc """
   Parse exits for a zones
 
-  Dereferences the exit directions, creates structs for each direction,
+  Dereferences the exit exit_names, creates structs for each exit_name,
   and attaches them to the matching room.
   """
   def parse_exits(zone, data, zones) do
@@ -99,7 +99,7 @@ defmodule Sampo.World.Loader do
         Enum.map(room_exit, fn {key, value} ->
           %Kalevala.World.Exit{
             id: "#{room_id}:#{key}",
-            direction: to_string(key),
+            exit_name: to_string(key),
             start_room_id: room_id,
             end_room_id: value
           }

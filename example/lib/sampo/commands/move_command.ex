@@ -3,25 +3,25 @@ defmodule Sampo.MoveCommand do
 
   def north(conn, _params) do
     conn
-    |> event("movement/start", %{direction: "north"})
+    |> event("movement/start", %{exit_name: "north"})
     |> assign(:prompt, false)
   end
 
   def south(conn, _params) do
     conn
-    |> event("movement/start", %{direction: "south"})
+    |> event("movement/start", %{exit_name: "south"})
     |> assign(:prompt, false)
   end
 
   def east(conn, _params) do
     conn
-    |> event("movement/start", %{direction: "east"})
+    |> event("movement/start", %{exit_name: "east"})
     |> assign(:prompt, false)
   end
 
   def west(conn, _params) do
     conn
-    |> event("movement/start", %{direction: "west"})
+    |> event("movement/start", %{exit_name: "west"})
     |> assign(:prompt, false)
   end
 end

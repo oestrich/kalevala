@@ -11,7 +11,7 @@ defmodule Sampo.MoveView do
     ~i(#{white()}#{character.name}#{reset()} leaves.)
   end
 
-  def render("fail", %{reason: :no_exit, direction: direction}) do
-    ~i(There is no exit #{direction}.\n)
+  def render("fail", %{reason: :no_exit, exit_name: exit_name}) do
+    ~i(There is no exit #{exit_name}.\n)
   end
 end
