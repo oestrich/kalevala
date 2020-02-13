@@ -14,6 +14,38 @@ defmodule Sampo.World.Room do
   def event(context, event) do
     Events.call(context, event)
   end
+
+  @impl true
+  def movement_request(room, event) do
+    room.exits
+    |> Enum.find(fn exit ->
+      exit.exit_name == event.exit_name
+    end)
+    |> maybe_vote(room, event)
+  end
+
+  defp maybe_vote(nil, room, event) do
+    %Kalevala.Event.Movement.Voting{
+      state: :abort,
+      character: event.character,
+      from: room.id,
+      exit_name: event.exit_name,
+      reason: :no_exit
+    }
+  end
+
+  defp maybe_vote(room_exit, room, event) do
+    %Kalevala.Event.Movement.Voting{
+      state: :request,
+      character: event.character,
+      from: room.id,
+      to: room_exit.end_room_id,
+      exit_name: room_exit.exit_name
+    }
+  end
+
+  @impl true
+  def confirm_movement(context, event), do: {context, event}
 end
 
 defmodule Sampo.World.Room.Events do

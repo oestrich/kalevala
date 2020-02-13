@@ -7,8 +7,10 @@ defmodule Kalevala.World.Zone do
 
   require Logger
 
+  alias Kalevala.Event
   alias Kalevala.World
   alias Kalevala.World.RoomSupervisor
+  alias Kalevala.World.Zone.Movement
 
   defstruct [:id, :name, rooms: []]
 
@@ -20,7 +22,9 @@ defmodule Kalevala.World.Zone do
   @callback init(zone :: t()) :: t()
 
   @doc false
-  def global_name(zone), do: {:global, {__MODULE__, zone.id}}
+  def global_name(zone = %__MODULE__{}), do: global_name(zone.id)
+
+  def global_name(zone_id), do: {:global, {__MODULE__, zone_id}}
 
   @doc false
   def start_link(options) do
@@ -58,5 +62,42 @@ defmodule Kalevala.World.Zone do
     end)
 
     {:noreply, state}
+  end
+
+  @impl true
+  def handle_info(event = %Event.Movement.Voting{}, state) do
+    Movement.handle_voting(event)
+
+    {:noreply, state}
+  end
+end
+
+defmodule Kalevala.World.Zone.Movement do
+  @moduledoc """
+  Zone movement functions
+  """
+
+  require Logger
+
+  alias Kalevala.Event.Movement.Voting
+  alias Kalevala.World.Room
+
+  def handle_voting(event) do
+    Logger.debug("Handling movement voting between #{event.from} -> #{event.to}")
+
+    event
+    |> Room.confirm_movement(event.from)
+    |> Room.confirm_movement(event.to)
+    |> handle_response()
+
+    {:ok, event}
+  end
+
+  defp handle_response(event = %Voting{state: :abort}) do
+    send(event.character.pid, event)
+  end
+
+  defp handle_response(event = %Voting{state: :request}) do
+    send(event.character.pid, %{event | state: :commit})
   end
 end

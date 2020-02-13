@@ -10,6 +10,11 @@ defmodule Sampo.Events do
       event("combat/tick", :tick)
     end
 
+    module(MoveEvent) do
+      movement_voting(:commit, :commit)
+      movement_voting(:abort, :abort)
+    end
+
     module(SayEvent) do
       event("room/say", :echo)
     end

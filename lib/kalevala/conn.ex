@@ -183,10 +183,23 @@ defmodule Kalevala.Conn do
   end
 
   @doc """
+  Send a telnet option
   """
   def send_option(conn, name, value) when is_boolean(value) do
     option = %Kalevala.Conn.Option{name: name, value: value}
     Map.put(conn, :options, conn.options ++ [option])
+  end
+
+  @doc """
+  Request the room to move via the exit
+  """
+  def request_movement(conn, exit_name) do
+    event = %Kalevala.Event.Movement.Request{
+      character: Private.character(conn),
+      exit_name: exit_name
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
   end
 
   @doc """
@@ -196,7 +209,7 @@ defmodule Kalevala.Conn do
     assigns = merge_assigns(conn, assigns)
     data = view.render(template, assigns)
 
-    event = %Kalevala.Event.Move{
+    event = %Kalevala.Event.Movement{
       character: Private.character(conn),
       direction: direction,
       reason: data,

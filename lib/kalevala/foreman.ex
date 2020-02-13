@@ -89,6 +89,12 @@ defmodule Kalevala.Foreman do
     |> handle_conn(state)
   end
 
+  def handle_info(event = %Event.Movement.Voting{}, state) do
+    new_conn(state)
+    |> state.controller.event(event)
+    |> handle_conn(state)
+  end
+
   def handle_info({:route, event = %Event{}}, state) do
     new_conn(state)
     |> Map.put(:events, [event])
@@ -112,7 +118,7 @@ defmodule Kalevala.Foreman do
   defp notify_disconnect(state) do
     {quit_view, quit_template} = state.quit_view
 
-    event = %Event.Move{
+    event = %Event.Movement{
       character: state.character,
       direction: :from,
       reason: quit_view.render(quit_template, %{character: state.character}),
