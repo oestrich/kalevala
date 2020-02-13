@@ -7,6 +7,7 @@ defmodule Sampo.LookView do
     ~E"""
     <%= blue() %><%= room.name %><%= reset() %>
     <%= render("_description", %{room: room}) %>
+    <%= render("_exits", %{room: room}) %>
 
     You see:
     <%= render("_characters", %{characters: characters}) %>
@@ -20,6 +21,17 @@ defmodule Sampo.LookView do
       end)
 
     View.join([room.description] ++ features, " ")
+  end
+
+  def render("_exits", %{room: room}) do
+    exits =
+      room.exits
+      |> Enum.map(fn room_exit ->
+        ~i(#{white()}#{room_exit.exit_name}#{reset()})
+      end)
+      |> View.join(" ")
+
+    View.join(["Exits:", exits], " ")
   end
 
   def render("_characters", %{characters: characters}) do
