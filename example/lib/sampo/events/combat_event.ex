@@ -34,9 +34,24 @@ defmodule Sampo.CombatEvent do
   end
 
   def tick(conn, _event) do
+    meta = %{conn.character.meta | vitals: random_vitals(conn.character.meta.vitals)}
+    character = %{conn.character | meta: meta}
+
     conn
+    |> put_character(character)
     |> render(CombatView, "tick", %{})
     |> render(CharacterView, "vitals", %{})
     |> prompt(CommandView, "prompt", %{})
+  end
+
+  defp random_vitals(vitals) do
+    %Sampo.Character.Vitals{
+      health_points: :rand.uniform(vitals.max_health_points),
+      max_health_points: vitals.max_health_points,
+      skill_points: :rand.uniform(vitals.max_skill_points),
+      max_skill_points: vitals.max_skill_points,
+      endurance_points: :rand.uniform(vitals.max_endurance_points),
+      max_endurance_points: vitals.max_endurance_points
+    }
   end
 end

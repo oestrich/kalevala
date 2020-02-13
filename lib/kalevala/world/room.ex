@@ -122,6 +122,14 @@ defmodule Kalevala.World.Room.Private do
   defstruct characters: []
 end
 
+defmodule Kalevala.World.Room.Feature do
+  @moduledoc """
+  A room feature is a highlighted part of a room
+  """
+
+  defstruct [:id, :keyword, :short_description, :description]
+end
+
 defmodule Kalevala.World.Room do
   @moduledoc """
   Rooms are the base unit of space in Kalevala
@@ -142,7 +150,8 @@ defmodule Kalevala.World.Room do
     :zone_id,
     :name,
     :description,
-    exits: []
+    exits: [],
+    features: []
   ]
 
   @type t() :: %__MODULE__{}

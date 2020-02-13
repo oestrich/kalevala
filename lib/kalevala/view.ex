@@ -49,8 +49,11 @@ defmodule Kalevala.View.Macro do
 
   defp sigil_i_unwrap({:"::", _, interpolation}) do
     [text | _] = interpolation
-    {_, _, text} = text
-    text
+    {_, _, [text]} = text
+
+    quote do
+      to_string(unquote(text))
+    end
   end
 
   defp sigil_i_unwrap(text) when is_binary(text) do

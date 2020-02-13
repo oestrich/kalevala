@@ -25,5 +25,12 @@ defmodule Sampo.Character.Vitals do
   """
 
   @derive Jason.Encoder
-  defstruct [:health_points, :max_health_points]
+  defstruct [
+    :health_points,
+    :max_health_points,
+    :skill_points,
+    :max_skill_points,
+    :endurance_points,
+    :max_endurance_points
+  ]
 end

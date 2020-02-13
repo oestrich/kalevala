@@ -1,16 +1,25 @@
 defmodule Sampo.LookView do
   use Kalevala.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  import IO.ANSI, only: [blue: 0, reset: 0, white: 0]
 
   def render("look", %{room: room, characters: characters}) do
     ~E"""
-    <%= white() %><%= room.name %><%= reset() %>
-    <%= room.description %>
+    <%= blue() %><%= room.name %><%= reset() %>
+    <%= render("_description", %{room: room}) %>
 
     You see:
     <%= render("_characters", %{characters: characters}) %>
     """
+  end
+
+  def render("_description", %{room: room}) do
+    features =
+      Enum.map(room.features, fn feature ->
+        feature.short_description
+      end)
+
+    View.join([room.description] ++ features, " ")
   end
 
   def render("_characters", %{characters: characters}) do

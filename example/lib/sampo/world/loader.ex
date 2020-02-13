@@ -69,11 +69,25 @@ defmodule Sampo.World.Loader do
       id: "#{zone.id}:#{key}",
       zone_id: zone.id,
       name: room_data.name,
-      description: room_data.description
+      description: room_data.description,
+      features: parse_features(room_data)
     }
 
     {key, room}
   end
+
+  def parse_features(%{features: features}) when is_list(features) do
+    Enum.map(features, fn feature ->
+      %Room.Feature{
+        id: feature.keyword,
+        keyword: feature.keyword,
+        short_description: feature.short,
+        description: feature.long
+      }
+    end)
+  end
+
+  def parse_features(_), do: []
 
   @doc """
   Parse exits for a zones

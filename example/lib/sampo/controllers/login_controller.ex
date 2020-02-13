@@ -82,7 +82,7 @@ defmodule Sampo.LoginController do
     |> put_character(character)
     |> render(CharacterView, "vitals", %{})
     |> move(:to, character.room_id, MoveView, "enter", %{})
-    |> prompt(LoginView, "enter-world", %{})
+    |> render(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
     |> event("room/look", %{})
   end
@@ -106,7 +106,11 @@ defmodule Sampo.LoginController do
       meta: %Sampo.Character.Meta{
         vitals: %Sampo.Character.Vitals{
           health_points: 25,
-          max_health_points: 25
+          max_health_points: 25,
+          skill_points: 17,
+          max_skill_points: 17,
+          endurance_points: 30,
+          max_endurance_points: 30
         }
       }
     }
