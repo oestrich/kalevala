@@ -11,8 +11,8 @@ defmodule Sampo.Events do
     end
 
     module(MoveEvent) do
-      event("movement/commit", :commit)
-      event("movement/fail", :fail)
+      movement_voting(:commit, :commit)
+      movement_voting(:abort, :abort)
     end
 
     module(SayEvent) do

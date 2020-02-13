@@ -70,13 +70,13 @@ defmodule Kalevala.World.Room.Movement do
   @doc """
   Handle the movement event
   """
-  def handle_event(state, event = %Event.Move{direction: :to}) do
+  def handle_event(state, event = %Event.Movement{direction: :to}) do
     state
     |> broadcast(event)
     |> append_character(event)
   end
 
-  def handle_event(state, event = %Event.Move{direction: :from}) do
+  def handle_event(state, event = %Event.Movement{direction: :from}) do
     state
     |> reject_character(event)
     |> broadcast(event)
@@ -135,6 +135,7 @@ defmodule Kalevala.World.Room do
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
+  alias Kalevala.World.Zone
 
   defstruct [
     :id,
@@ -154,7 +155,25 @@ defmodule Kalevala.World.Room do
   @doc """
   Callback for when a new event is received
   """
-  @callback event(Context.t(), event :: Event.t()) :: t()
+  @callback event(Context.t(), event :: Event.t()) :: Context.t()
+
+  @doc """
+  Callback for the room to hook into movement between exits
+
+  The character is requesting to move via an exit, a voting response should be
+  provided to pitch up to the Zone or immediately abort if the exit isn't present
+  in the room.
+  """
+  @callback movement_request(t(), event :: Event.movement_request()) ::
+              Event.movement_voting()
+
+  @doc """
+  Callback for movement
+
+  Allows the room to reject or otherwise modify the movement
+  """
+  @callback confirm_movement(Context.t(), event :: Event.movement_voting()) ::
+              {Context.t(), Event.movement_voting()}
 
   defmacro __using__(_opts) do
     quote do
@@ -162,6 +181,16 @@ defmodule Kalevala.World.Room do
 
       @behaviour Kalevala.World.Room
     end
+  end
+
+  @doc """
+  Confirm movement for a character
+  """
+  def confirm_movement(movement_voting = %Event.Movement.Voting{state: :abort}, _room_id),
+    do: movement_voting
+
+  def confirm_movement(movement_voting, room_id) do
+    GenServer.call(global_name(room_id), movement_voting)
   end
 
   @doc false
@@ -195,6 +224,22 @@ defmodule Kalevala.World.Room do
   end
 
   @impl true
+  def handle_call(event = %Event.Movement.Voting{}, _from, state) do
+    {context, event} =
+      state
+      |> new_context()
+      |> state.callback_module.confirm_movement(event)
+
+    context
+    |> send_lines()
+    |> send_events()
+
+    state = Map.put(state, :data, context.data)
+
+    {:reply, event, state}
+  end
+
+  @impl true
   def handle_info(event = %Event{}, state) do
     context =
       new_context(state)
@@ -207,7 +252,18 @@ defmodule Kalevala.World.Room do
     {:noreply, state}
   end
 
-  def handle_info(event = %Event.Move{}, state) do
+  # Forward movement requests to the zone to handle
+  def handle_info(event = %Event.Movement.Request{}, state) do
+    movement_voting = state.callback_module.movement_request(state.data, event)
+
+    Zone.global_name(state.data.zone_id)
+    |> GenServer.whereis()
+    |> send(movement_voting)
+
+    {:noreply, state}
+  end
+
+  def handle_info(event = %Event.Movement{}, state) do
     case event.room_id == state.data.id do
       true ->
         state = Movement.handle_event(state, event)

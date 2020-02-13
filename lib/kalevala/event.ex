@@ -1,4 +1,4 @@
-defmodule Kalevala.Event.Move do
+defmodule Kalevala.Event.Movement do
   @moduledoc """
   An event to move from one room to another
   """
@@ -17,12 +17,12 @@ defmodule Kalevala.Event.Move do
   @type t() :: %__MODULE__{}
 end
 
-defmodule Kalevala.Event.Move.Voting do
+defmodule Kalevala.Event.Movement.Voting do
   @moduledoc """
   A voting event tracks the state of a character wishing to change rooms
   """
 
-  defstruct [:state, :character, :to, :from, :exit_name]
+  defstruct [:state, :character, :to, :from, :exit_name, :reason]
 
   @typedoc """
   An event to allow for rooms to abort or commit the character moving.
@@ -34,11 +34,12 @@ defmodule Kalevala.Event.Move.Voting do
   - `to` is the room the character is going towards
   - `from` is the room the character is going away from
   - `exit_name` is the name of the exit_name that the player is using
+  - `reason` is the text to display if voting is aborted
   """
   @type t() :: %__MODULE__{}
 end
 
-defmodule Kalevala.Event.Move.Request do
+defmodule Kalevala.Event.Movement.Request do
   @moduledoc """
   Character requesting to move from their current room in a exit_name
 
@@ -60,8 +61,8 @@ defmodule Kalevala.Event.Move.Request do
   %Move.Voting{
     state: :request,
     character: character,
-    to: start_room,
-    from: end_room,
+    from: start_room,
+    to: end_room,
     exit_name: "north"
   }
   ```
@@ -77,8 +78,8 @@ defmodule Kalevala.Event.Move.Request do
   %Move.Voting{
     state: :commit,
     character: character,
-    to: start_room,
-    from: end_room,
+    from: start_room,
+    to: end_room,
     exit_name: "north"
   }
   ```
@@ -89,10 +90,18 @@ defmodule Kalevala.Event.Move.Request do
   %Move.Voting{
     state: :abort,
     character: character,
-    to: start_room,
-    from: end_room,
+    from: start_room,
+    to: end_room,
     exit_name: "north",
-    reason: "The door is locked."
+    reason: :door_locked
+  }
+
+  %Move.Voting{
+    state: :abort,
+    character: character,
+    from: start_room,
+    exit_name: "north",
+    reason: :no_exit
   }
   ```
 
@@ -130,6 +139,10 @@ defmodule Kalevala.Event do
   """
 
   @type t() :: %__MODULE__{}
+
+  @type movement_request() :: %__MODULE__.Movement.Request{}
+
+  @type movement_voting() :: %__MODULE__.Movement.Voting{}
 
   @type topic() :: String.t()
 

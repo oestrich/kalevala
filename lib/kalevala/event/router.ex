@@ -14,6 +14,10 @@ defmodule Kalevala.Event.Router do
 
       @behaviour Kalevala.Event.Router
 
+      def call(conn, event = %Kalevala.Event.Movement.Voting{}) do
+        movement_voting(conn, event)
+      end
+
       def call(conn, event) do
         call(event.topic, conn, event)
       end
@@ -26,12 +30,20 @@ defmodule Kalevala.Event.Router do
   @callback call(topic :: Event.topic(), conn :: Conn.t(), event :: Event.t()) :: :ok
 
   @doc """
+  Process a movement voting event
+  """
+  @callback movement_voting(conn :: Conn.t(), event :: Event.movement_voting()) :: :ok
+
+  @doc """
   Macro to generate the receive functions
 
       scope(App) do
         module(CombatEvent) do
           event("combat/start", :start)
           event("combat/stop", :stop)
+
+          movement_voting(:commit, :commit)
+          movement_voting(:abort, :abort)
         end
       end
   """
@@ -42,6 +54,11 @@ defmodule Kalevala.Event.Router do
       @impl true
       def call(topic, _conn, _event) do
         raise "Received an unknown event - #{topic}"
+      end
+
+      @impl true
+      def movement_voting(_conn, _event) do
+        raise "Could not handle this movement voting"
       end
     end
   end
@@ -87,6 +104,17 @@ defmodule Kalevala.Event.Router do
     quote do
       @impl true
       def call(unquote(topic), conn, event) do
+        unquote(module).unquote(fun)(conn, event)
+      end
+    end
+  end
+
+  def parse_event(module, {:movement_voting, _, args}) do
+    [state, fun] = args
+
+    quote do
+      @impl true
+      def movement_voting(conn, event = %Kalevala.Event.Movement.Voting{state: unquote(state)}) do
         unquote(module).unquote(fun)(conn, event)
       end
     end
