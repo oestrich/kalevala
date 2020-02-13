@@ -34,7 +34,7 @@ defmodule Kalevala.Event.Movement.Voting do
   - `to` is the room the character is going towards
   - `from` is the room the character is going away from
   - `exit_name` is the name of the exit_name that the player is using
-  - `reason` is the text to display if voting is aborted
+  - `reason` is an atom such as `:no_exit` for why the movement is aborted
   """
   @type t() :: %__MODULE__{}
 end
@@ -61,8 +61,8 @@ defmodule Kalevala.Event.Movement.Request do
   %Move.Voting{
     state: :request,
     character: character,
-    from: start_room,
-    to: end_room,
+    from: start_room_id,
+    to: end_room_id,
     exit_name: "north"
   }
   ```
@@ -78,8 +78,8 @@ defmodule Kalevala.Event.Movement.Request do
   %Move.Voting{
     state: :commit,
     character: character,
-    from: start_room,
-    to: end_room,
+    from: start_room_id,
+    to: end_room_id,
     exit_name: "north"
   }
   ```
@@ -90,8 +90,8 @@ defmodule Kalevala.Event.Movement.Request do
   %Move.Voting{
     state: :abort,
     character: character,
-    from: start_room,
-    to: end_room,
+    from: start_room_id,
+    to: end_room_id,
     exit_name: "north",
     reason: :door_locked
   }
@@ -99,7 +99,7 @@ defmodule Kalevala.Event.Movement.Request do
   %Move.Voting{
     state: :abort,
     character: character,
-    from: start_room,
+    from: start_room_id,
     exit_name: "north",
     reason: :no_exit
   }
