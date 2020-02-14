@@ -88,16 +88,12 @@ defmodule Sampo.LoginController do
   end
 
   defp build_character(name) do
-    id =
-      :crypto.hash(:sha256, name)
-      |> Base.encode64()
-
     starting_room_id =
       Sampo.Config.get([:player, :starting_room_id])
       |> Sampo.World.dereference()
 
     %Kalevala.Character{
-      id: id,
+      id: name,
       pid: self(),
       room_id: starting_room_id,
       name: name,

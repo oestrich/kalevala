@@ -65,18 +65,39 @@ defmodule Kalevala.World.Room.Movement do
   Handle room movement
   """
 
-  alias Kalevala.Event
+  alias Kalevala.Event.Display
+  alias Kalevala.Event.Movement
+  alias Kalevala.Event.Movement.Voting
+  alias Kalevala.World.Zone
+
+  @doc """
+  Handle the movement request
+
+  Called after `Kalevala.World.Room.movement_request/2`.
+
+  - If an abort, forward to the character
+  - Otherwise, Forward to the zone
+  """
+  def handle_request(movement_voting = %Voting{state: :abort}, _state) do
+    send(movement_voting.character.pid, movement_voting)
+  end
+
+  def handle_request(movement_voting, state) do
+    Zone.global_name(state.data.zone_id)
+    |> GenServer.whereis()
+    |> send(movement_voting)
+  end
 
   @doc """
   Handle the movement event
   """
-  def handle_event(state, event = %Event.Movement{direction: :to}) do
+  def handle_event(state, event = %Movement{direction: :to}) do
     state
     |> broadcast(event)
     |> append_character(event)
   end
 
-  def handle_event(state, event = %Event.Movement{direction: :from}) do
+  def handle_event(state, event = %Movement{direction: :from}) do
     state
     |> reject_character(event)
     |> broadcast(event)
@@ -87,7 +108,7 @@ defmodule Kalevala.World.Room.Movement do
   """
   def broadcast(state, event) do
     lines = %Kalevala.Conn.Lines{data: event.reason, newline: true}
-    display_event = %Event.Display{lines: [lines]}
+    display_event = %Display{lines: [lines]}
 
     Enum.each(state.private.characters, fn character ->
       send(character.pid, display_event)
@@ -143,7 +164,6 @@ defmodule Kalevala.World.Room do
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
-  alias Kalevala.World.Zone
 
   defstruct [
     :id,
@@ -263,11 +283,10 @@ defmodule Kalevala.World.Room do
 
   # Forward movement requests to the zone to handle
   def handle_info(event = %Event.Movement.Request{}, state) do
-    movement_voting = state.callback_module.movement_request(state.data, event)
-
-    Zone.global_name(state.data.zone_id)
-    |> GenServer.whereis()
-    |> send(movement_voting)
+    state.data
+    |> state.callback_module.movement_request(event)
+    |> Map.put(:metadata, event.metadata)
+    |> Movement.handle_request(state)
 
     {:noreply, state}
   end

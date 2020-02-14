@@ -1,9 +1,17 @@
+defmodule Kalevala.Event.Metadata do
+  @moduledoc """
+  Metadata for an event, used for telemetry
+  """
+
+  defstruct [:start_time, :end_time]
+end
+
 defmodule Kalevala.Event.Movement do
   @moduledoc """
   An event to move from one room to another
   """
 
-  defstruct [:character, :direction, :reason, :room_id]
+  defstruct [:character, :direction, :reason, :room_id, metadata: %Kalevala.Event.Metadata{}]
 
   @typedoc """
   A movement event
@@ -22,7 +30,15 @@ defmodule Kalevala.Event.Movement.Voting do
   A voting event tracks the state of a character wishing to change rooms
   """
 
-  defstruct [:state, :character, :to, :from, :exit_name, :reason]
+  defstruct [
+    :state,
+    :character,
+    :to,
+    :from,
+    :exit_name,
+    :reason,
+    metadata: %Kalevala.Event.Metadata{}
+  ]
 
   @typedoc """
   An event to allow for rooms to abort or commit the character moving.
@@ -122,7 +138,7 @@ defmodule Kalevala.Event.Movement.Request do
   ```
   """
 
-  defstruct [:character, :exit_name]
+  defstruct [:character, :exit_name, metadata: %Kalevala.Event.Metadata{}]
 
   @typedoc """
   Signal that a character wishes to move to another location
@@ -152,6 +168,31 @@ defmodule Kalevala.Event do
     quote do
       import Kalevala.Conn
     end
+  end
+
+  @doc """
+  Set the start time on an event
+  """
+  def set_start_time(event) do
+    update_metadata(event, %{event.metadata | start_time: System.monotonic_time()})
+  end
+
+  @doc """
+  Set the end time on an event
+  """
+  def set_end_time(event) do
+    update_metadata(event, %{event.metadata | end_time: System.monotonic_time()})
+  end
+
+  @doc """
+  Timing for an event in microseconds
+  """
+  def timing(event) do
+    event.metadata.end_time - event.metadata.start_time
+  end
+
+  defp update_metadata(event, metadata) do
+    %{event | metadata: metadata}
   end
 end
 

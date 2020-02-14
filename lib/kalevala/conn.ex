@@ -199,6 +199,8 @@ defmodule Kalevala.Conn do
       exit_name: exit_name
     }
 
+    event = Kalevala.Event.set_start_time(event)
+
     Map.put(conn, :events, conn.events ++ [event])
   end
 

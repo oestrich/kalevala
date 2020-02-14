@@ -90,6 +90,16 @@ defmodule Kalevala.Foreman do
   end
 
   def handle_info(event = %Event.Movement.Voting{}, state) do
+    event = Event.set_end_time(event)
+
+    :telemetry.execute([:kalevala, :movement, :voting, event.state], %{
+      total_time: Event.timing(event),
+      from: event.from,
+      to: event.to,
+      character: event.character.id,
+      reason: event.reason
+    })
+
     new_conn(state)
     |> state.controller.event(event)
     |> handle_conn(state)

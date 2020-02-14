@@ -28,7 +28,8 @@ defmodule Sampo.Application do
       {Sampo.Presence, []},
       {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
-      {Sampo.World, []}
+      {Sampo.World, []},
+      {Sampo.Telemetry, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

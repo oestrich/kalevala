@@ -25,6 +25,7 @@ defmodule Kalevala.MixProject do
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21.3", only: :dev, runtime: false},
       {:ranch, "~> 1.7"},
+      {:telemetry, "~> 0.4.1"},
       {:telnet, "~> 0.1"}
     ]
   end

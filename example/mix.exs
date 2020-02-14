@@ -24,7 +24,10 @@ defmodule Sampo.MixProject do
     [
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:elias, "~> 0.1"},
-      {:kalevala, path: "../"}
+      {:kalevala, path: "../"},
+      {:telemetry_metrics, "~> 0.4.0"},
+      {:telemetry_metrics_prometheus, "~> 0.3.1"},
+      {:telemetry_poller, "~> 0.4.1"}
     ]
   end
 end

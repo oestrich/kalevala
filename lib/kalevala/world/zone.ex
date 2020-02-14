@@ -77,13 +77,16 @@ defmodule Kalevala.World.Zone.Movement do
   Zone movement functions
   """
 
-  require Logger
-
   alias Kalevala.Event.Movement.Voting
   alias Kalevala.World.Room
 
   def handle_voting(event) do
-    Logger.debug("Handling movement voting between #{event.from} -> #{event.to}")
+    :telemetry.execute([:kalevala, :movement, :voting, event.state], %{
+      from: event.from,
+      to: event.to,
+      character: event.character.id,
+      reason: event.reason
+    })
 
     event
     |> Room.confirm_movement(event.from)
