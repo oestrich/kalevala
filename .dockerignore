@@ -1,0 +1,15 @@
+README.md
+docker.sh
+.git
+tmp
+
+# Mix artifacts
+/_build
+/deps
+
+/example/_build
+/example/deps
+
+# Generate on crash by the VM
+/erl_crash.dump
+/example/erl_crash.dump
