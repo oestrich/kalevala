@@ -1,9 +1,9 @@
-defmodule Sampo.MixProject do
+defmodule Kantele.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :sampo,
+      app: :kantele,
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule Sampo.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Sampo.Application, []}
+      mod: {Kantele.Application, []}
     ]
   end
 
