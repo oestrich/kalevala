@@ -18,9 +18,9 @@ FROM alpine:3.11
 ENV LANG=C.UTF-8
 RUN apk add -U bash openssl
 WORKDIR /app
-COPY --from=releaser /app/example/_build/prod/rel/sampo /app/
+COPY --from=releaser /app/example/_build/prod/rel/kantele /app/
 COPY example/data /app/data
 EXPOSE 4443
 EXPOSE 4444
-ENTRYPOINT ["bin/sampo"]
+ENTRYPOINT ["bin/kantele"]
 CMD ["start"]
