@@ -1,0 +1,6 @@
+image:
+  repository: grapevinehaus/kantele
+  # tag:
+  pullPolicy: IfNotPresent
+
+resources: {}
