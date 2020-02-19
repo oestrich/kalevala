@@ -28,6 +28,7 @@ defmodule Kantele.Application do
       {Kantele.Presence, []},
       {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
+      {Kantele.Communication, []},
       {Kantele.World, []},
       {Kantele.Telemetry, []}
     ]
