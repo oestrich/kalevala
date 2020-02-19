@@ -1,13 +1,3 @@
-defmodule Kalevala.Communication.Message do
-  @moduledoc """
-  Struct for sending a message
-  """
-
-  @type t() :: %__MODULE__{}
-
-  defstruct [:channel_name, :character, :text, emote: false, meta: %{}]
-end
-
 defmodule Kalevala.Communication do
   @moduledoc """
   Handle communication for the game
@@ -19,7 +9,8 @@ defmodule Kalevala.Communication do
 
   alias Kalevala.Communication.Cache
   alias Kalevala.Communication.Channel
-  alias Kalevala.Communication.Message
+  alias Kalevala.Event
+  alias Kalevala.Event.Message
 
   defmacro __using__(_opts) do
     quote do
@@ -88,9 +79,9 @@ defmodule Kalevala.Communication do
         Cache.subscribers(subscriber_ets_key, channel_name)
       end
 
-      def publish(channel_name, message, options, config_overrides \\ []) do
+      def publish(channel_name, event, options, config_overrides \\ []) do
         channel_ets_key = config(config_overrides)[:channel_ets_key]
-        Kalevala.Communication.publish(channel_ets_key, channel_name, message, options)
+        Kalevala.Communication.publish(channel_ets_key, channel_name, event, options)
       end
 
       defoverridable initial_channels: 0
@@ -135,10 +126,10 @@ defmodule Kalevala.Communication do
   @doc """
   Publish a message on a channel
   """
-  def publish(channel_ets_key, channel_name, message = %Message{}, options) do
+  def publish(channel_ets_key, channel_name, event = %Event{topic: Message}, options) do
     case :ets.lookup(channel_ets_key, channel_name) do
       [{^channel_name, pid}] ->
-        Channel.publish(pid, message, options)
+        Channel.publish(pid, event, options)
 
       _ ->
         :error
@@ -148,7 +139,7 @@ defmodule Kalevala.Communication do
   def publish(_channel_ets_key, channel_name, message, _options) do
     Logger.warn("""
     Trying to publish #{inspect(message)} on `#{channel_name}`.
-    Only message structs allowed.
+    Only events with a topic of #{__MODULE__} allowed.
     """)
 
     :error

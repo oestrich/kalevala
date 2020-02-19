@@ -6,7 +6,8 @@ defmodule Kalevala.Communication.Channel do
   use GenServer
 
   alias Kalevala.Communication.Cache
-  alias Kalevala.Communication.Message
+  alias Kalevala.Event
+  alias Kalevala.Event.Message
 
   @typedoc """
   Config is saved and stored in the GenServer, passed in for each callback
@@ -48,7 +49,7 @@ defmodule Kalevala.Communication.Channel do
   @doc """
   Called before a message is allowed to publish on the channel
   """
-  @callback publish_request(channel_name(), Message.t(), options(), config()) :: :ok
+  @callback publish_request(channel_name(), Event.message(), options(), config()) :: :ok
 
   defstruct [:callback_module, :channel_name, :config, :subscriber_ets_key]
 
@@ -115,13 +116,13 @@ defmodule Kalevala.Communication.Channel do
   end
 
   @impl true
-  def handle_call({:publish, message = %Message{}, options}, _from, state) do
-    case state.callback_module.publish_request(state.channel_name, message, options, state.config) do
+  def handle_call({:publish, event = %Event{topic: Message}, options}, _from, state) do
+    case state.callback_module.publish_request(state.channel_name, event, options, state.config) do
       :ok ->
         subscribers = Cache.subscribers(state.subscriber_ets_key, state.channel_name)
 
         Enum.each(subscribers, fn {_, subscriber_pid, _} ->
-          send(subscriber_pid, message)
+          send(subscriber_pid, event)
         end)
 
         {:reply, :ok, state}

@@ -3,6 +3,8 @@ defmodule Kantele.Communication.BroadcastChannel do
 end
 
 defmodule Kantele.Communication do
+  @moduledoc false
+
   use Kalevala.Communication
 
   @impl true

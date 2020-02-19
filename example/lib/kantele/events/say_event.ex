@@ -11,7 +11,9 @@ defmodule Kantele.SayEvent do
 
       false ->
         conn
-        |> render(SayView, "listen", event.data)
+        |> assign(:character_name, event.data.character.name)
+        |> assign(:message, event.data.text)
+        |> render(SayView, "listen")
         |> prompt(CommandView, "prompt", %{})
     end
   end

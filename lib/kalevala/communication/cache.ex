@@ -56,19 +56,19 @@ defmodule Kalevala.Communication.Cache do
   end
 
   @impl true
-  def handle_call({:register, {channel_name, callback_module, options}}, _from, state) do
+  def handle_call({:register, {channel_name, callback_module, config}}, _from, state) do
     case :ets.lookup(state.channel_ets_key, channel_name) do
       [{^channel_name, _}] ->
-        {:reply, :error, state}
+        {:reply, {:error, :already_registered}, state}
 
       _ ->
-        register_channel(state, channel_name, callback_module, options)
+        register_channel(state, channel_name, callback_module, config)
         {:reply, :ok, state}
     end
   end
 
-  defp register_channel(state, channel_name, callback_module, options) do
-    options = [{:subscriber_ets_key, state.subscriber_ets_key} | options]
+  defp register_channel(state, channel_name, callback_module, config) do
+    options = [subscriber_ets_key: state.subscriber_ets_key, config: config]
     {:ok, pid} = Channels.start_child(state.channels_name, channel_name, callback_module, options)
     :ets.insert(state.channel_ets_key, {channel_name, pid})
   end

@@ -16,7 +16,7 @@ defmodule Kantele.Events do
     end
 
     module(SayEvent) do
-      event("room/say", :echo)
+      event(Kalevala.Event.Message, :echo)
     end
   end
 end

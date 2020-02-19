@@ -11,10 +11,12 @@ defmodule Kalevala.Foreman do
 
   alias Kalevala.Conn
   alias Kalevala.Event
+  alias Kalevala.Foreman.Channel
 
   defstruct [
     :character,
     :character_module,
+    :communication_module,
     :controller,
     :options,
     :presence_module,
@@ -43,6 +45,7 @@ defmodule Kalevala.Foreman do
     state = %__MODULE__{
       protocol: opts[:protocol],
       character_module: opts.character_module,
+      communication_module: opts.communication_module,
       controller: opts.initial_controller,
       presence_module: opts.presence_module,
       quit_view: opts.quit_view,
@@ -132,6 +135,7 @@ defmodule Kalevala.Foreman do
   """
   def handle_conn(conn, state) do
     conn
+    |> Channel.handle_channels(state)
     |> send_options(state)
     |> send_lines(state)
     |> send_events()
@@ -182,23 +186,23 @@ defmodule Kalevala.Foreman do
   end
 
   defp update_character(state, conn) do
-    case is_nil(conn.update_character) do
+    case is_nil(conn.private.update_character) do
       true ->
         state
 
       false ->
         state.presence_module.track(Conn.character(conn))
-        %{state | character: conn.update_character}
+        %{state | character: conn.private.update_character}
     end
   end
 
   defp update_controller(state, conn) do
-    case is_nil(conn.next_controller) do
+    case is_nil(conn.private.next_controller) do
       true ->
         {:noreply, state}
 
       false ->
-        state = %{state | controller: conn.next_controller}
+        state = %{state | controller: conn.private.next_controller}
         {:noreply, state, {:continue, :init_controller}}
     end
   end

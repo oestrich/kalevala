@@ -1,7 +1,8 @@
 defmodule Kalevala.CommunicationTest do
   use ExUnit.Case
 
-  alias Kalevala.Communication.Message
+  alias Kalevala.Event
+  alias Kalevala.Event.Message
 
   defmodule TestCommunication do
     use Kalevala.Communication
@@ -64,7 +65,9 @@ defmodule Kalevala.CommunicationTest do
       config_overrides = start_link()
 
       :ok = TestCommunication.register("general", BroadcastChannel, [], config_overrides)
-      :error = TestCommunication.register("general", BroadcastChannel, [], config_overrides)
+
+      {:error, :already_registered} =
+        TestCommunication.register("general", BroadcastChannel, [], config_overrides)
     end
   end
 
@@ -156,9 +159,9 @@ defmodule Kalevala.CommunicationTest do
       :ok = TestCommunication.register("general", BroadcastChannel, [], config_overrides)
       :ok = TestCommunication.subscribe("general", [], config_overrides)
 
-      :ok = TestCommunication.publish("general", %Message{}, [], config_overrides)
+      :ok = TestCommunication.publish("general", %Event{topic: Message}, [], config_overrides)
 
-      assert_receive %Message{}
+      assert_receive %Event{topic: Message}
     end
 
     test "allows for a callback to block the publish" do
@@ -167,11 +170,20 @@ defmodule Kalevala.CommunicationTest do
       :ok = TestCommunication.register("general", RestrictedChannel, [], config_overrides)
       :ok = TestCommunication.subscribe("general", [let_me_in: true], config_overrides)
 
-      {:error, reason} = TestCommunication.publish("general", %Message{}, [], config_overrides)
+      {:error, reason} =
+        TestCommunication.publish("general", %Event{topic: Message}, [], config_overrides)
+
       assert reason == "You're not allowed in"
 
-      :ok = TestCommunication.publish("general", %Message{}, [let_me_in: true], config_overrides)
-      assert_receive %Message{}
+      :ok =
+        TestCommunication.publish(
+          "general",
+          %Event{topic: Message},
+          [let_me_in: true],
+          config_overrides
+        )
+
+      assert_receive %Event{topic: Message}
     end
 
     test "blocks publishing non message structs" do

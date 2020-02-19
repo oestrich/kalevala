@@ -4,14 +4,14 @@ defmodule Kantele.SayCommand do
   alias Kantele.SayView
 
   def run(conn, params) do
-    params = %{
-      "character_name" => character(conn).name,
-      "message" => params["message"]
-    }
+    channel_name = "rooms:#{conn.character.room_id}"
 
     conn
-    |> render(SayView, "echo", params)
-    |> event("room/say", params)
+    |> assign(:message, params["message"])
+    |> render(SayView, "echo")
+    |> publish_message(channel_name, params["message"], [], &publish_error/2)
     |> assign(:prompt, false)
   end
+
+  def publish_error(conn, _error), do: conn
 end

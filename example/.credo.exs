@@ -99,7 +99,7 @@
         {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 120]},
         {Credo.Check.Readability.ModuleAttributeNames, []},
         {Credo.Check.Readability.ModuleDoc,
-         [ignore_names: ~r/(\.\w+Controller|\.\w+Command|\.\w+Event|\.\w+View)$/]},
+         [ignore_names: ~r/(\.\w+Channel|\.\w+Controller|\.\w+Command|\.\w+Event|\.\w+View)$/]},
         {Credo.Check.Readability.ModuleNames, []},
         {Credo.Check.Readability.ParenthesesInCondition, []},
         {Credo.Check.Readability.ParenthesesOnZeroArityDefs, []},

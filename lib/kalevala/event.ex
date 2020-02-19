@@ -6,6 +6,16 @@ defmodule Kalevala.Event.Metadata do
   defstruct [:start_time, :end_time]
 end
 
+defmodule Kalevala.Event.Message do
+  @moduledoc """
+  Struct for sending a message
+  """
+
+  @type t() :: %__MODULE__{}
+
+  defstruct [:channel_name, :character, :text, emote: false]
+end
+
 defmodule Kalevala.Event do
   @moduledoc """
   An internal event
@@ -13,9 +23,17 @@ defmodule Kalevala.Event do
 
   @type t() :: %__MODULE__{}
 
-  @type movement_request() :: %__MODULE__.Movement.Request{}
+  @type movement_request() :: %__MODULE__{
+          topic: __MODULE__.Movement.Request
+        }
 
-  @type movement_voting() :: %__MODULE__.Movement.Voting{}
+  @type movement_voting() :: %__MODULE__{
+          topic: __MODULE__.Movement.Voting
+        }
+
+  @type message() :: %__MODULE__{
+          topic: __MODULE__.Message
+        }
 
   @type topic() :: String.t()
 
