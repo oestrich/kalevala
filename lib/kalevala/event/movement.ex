@@ -108,9 +108,12 @@ defmodule Kalevala.Event.Movement.Request do
   The character requests the room to move in a exit_name.
 
   ```
-  %Move.Request{
-    character: character,
-    exit_name: "north"
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement.Request,
+    data: %Kalevala.Event.Movement.Request{
+      character: character,
+      exit_name: "north"
+    }
   }
   ```
 
@@ -118,12 +121,14 @@ defmodule Kalevala.Event.Movement.Request do
   a valid exit in this exit_name.
 
   ```
-  %Move.Voting{
-    state: :request,
-    character: character,
-    from: start_room_id,
-    to: end_room_id,
-    exit_name: "north"
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement.Voting,
+    data: %Kalevala.Event.Movement.Voting{
+      character: character,
+      from: start_room_id,
+      to: end_room_id,
+      exit_name: "north"
+    }
   }
   ```
 
@@ -131,53 +136,66 @@ defmodule Kalevala.Event.Movement.Request do
   room will be `GenServer.call`ed to block and keep this synchronous. The room `movement/2`
   callback will be called for each room, so they can vote on the movement.
 
-  `commit` - After both room's agree that the player can move, the zone sends this event to
-  the character.
+  `Kalevala.Event.Movement.Commit` - After both room's agree that the player can move,
+  the zone sends this event to the character.
 
   ```
-  %Move.Voting{
-    state: :commit,
-    character: character,
-    from: start_room_id,
-    to: end_room_id,
-    exit_name: "north"
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement.Commit,
+    data: %Movement.Commit{
+      character: character,
+      from: start_room_id,
+      to: end_room_id,
+      exit_name: "north"
+    }
   }
   ```
 
-  `abort` - If either room rejects the movement, the zone will respond with an abort.
+  `Kalevala.Event.Movement.Abort` - If either room rejects the movement, the zone will
+  respond with an abort.
 
   ```
-  %Move.Voting{
-    state: :abort,
-    character: character,
-    from: start_room_id,
-    to: end_room_id,
-    exit_name: "north",
-    reason: :door_locked
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement.Abort,
+    data: %Kalevala.Event.Movement.Abort{
+      character: character,
+      from: start_room_id,
+      to: end_room_id,
+      exit_name: "north",
+      reason: :door_locked
+    }
   }
 
-  %Move.Voting{
-    state: :abort,
-    character: character,
-    from: start_room_id,
-    exit_name: "north",
-    reason: :no_exit
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement.Abort,
+    data: %Kalevala.Event.Movement.Abort{
+      character: character,
+      from: start_room_id,
+      exit_name: "north",
+      reason: :no_exit
+    }
   }
   ```
 
   On a commit, the player leaves the old room, and enters the new one.
 
   ```
-  %Move{
-    character: character,
-    direction: :to,
-    reason: "Player enters from the south."
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement,
+    data: %Kalevala.Event.Movement{
+      character: character,
+      direction: :to,
+      reason: "Player enters from the south."
+    }
   }
 
-  %Move{
-    character: character,
-    direction: :from,
-    reason: "Player leaves to the north."
+  %Kalevala.Event{
+    topic: Kalevala.Event.Movement,
+    data: %Kalevala.Event.Movement{
+      character: character,
+      direction: :from,
+      reason: "Player leaves to the north."
+    }
   }
   ```
   """
