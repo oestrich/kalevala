@@ -89,22 +89,6 @@ defmodule Kalevala.Foreman do
     |> handle_conn(state)
   end
 
-  def handle_info(event = %Event.Movement.Voting{}, state) do
-    event = Event.set_end_time(event)
-
-    :telemetry.execute([:kalevala, :movement, :voting, event.state], %{
-      total_time: Event.timing(event),
-      from: event.from,
-      to: event.to,
-      character: event.character.id,
-      reason: event.reason
-    })
-
-    new_conn(state)
-    |> state.controller.event(event)
-    |> handle_conn(state)
-  end
-
   def handle_info({:route, event = %Event{}}, state) do
     new_conn(state)
     |> Map.put(:events, [event])
@@ -128,11 +112,14 @@ defmodule Kalevala.Foreman do
   defp notify_disconnect(state) do
     {quit_view, quit_template} = state.quit_view
 
-    event = %Event.Movement{
-      character: state.character,
-      direction: :from,
-      reason: quit_view.render(quit_template, %{character: state.character}),
-      room_id: state.character.room_id
+    event = %Event{
+      topic: Event.Movement,
+      data: %Event.Movement{
+        character: state.character,
+        direction: :from,
+        reason: quit_view.render(quit_template, %{character: state.character}),
+        room_id: state.character.room_id
+      }
     }
 
     new_conn(state)

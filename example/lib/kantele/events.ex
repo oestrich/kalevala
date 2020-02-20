@@ -11,8 +11,8 @@ defmodule Kantele.Events do
     end
 
     module(MoveEvent) do
-      movement_voting(:commit, :commit)
-      movement_voting(:abort, :abort)
+      event(Kalevala.Event.Movement.Commit, :commit)
+      event(Kalevala.Event.Movement.Abort, :abort)
     end
 
     module(SayEvent) do

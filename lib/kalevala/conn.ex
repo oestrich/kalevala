@@ -194,9 +194,12 @@ defmodule Kalevala.Conn do
   Request the room to move via the exit
   """
   def request_movement(conn, exit_name) do
-    event = %Kalevala.Event.Movement.Request{
-      character: Private.character(conn),
-      exit_name: exit_name
+    event = %Kalevala.Event{
+      topic: Kalevala.Event.Movement.Request,
+      data: %Kalevala.Event.Movement.Request{
+        character: Private.character(conn),
+        exit_name: exit_name
+      }
     }
 
     event = Kalevala.Event.set_start_time(event)
@@ -211,11 +214,14 @@ defmodule Kalevala.Conn do
     assigns = merge_assigns(conn, assigns)
     data = view.render(template, assigns)
 
-    event = %Kalevala.Event.Movement{
-      character: Private.character(conn),
-      direction: direction,
-      reason: data,
-      room_id: room_id
+    event = %Kalevala.Event{
+      topic: Kalevala.Event.Movement,
+      data: %Kalevala.Event.Movement{
+        character: Private.character(conn),
+        direction: direction,
+        reason: data,
+        room_id: room_id
+      }
     }
 
     Map.put(conn, :events, conn.events ++ [event])

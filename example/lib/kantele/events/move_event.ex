@@ -4,7 +4,7 @@ defmodule Kantele.MoveEvent do
   alias Kantele.CommandView
   alias Kantele.MoveView
 
-  def commit(conn, event) do
+  def commit(conn, %{data: event}) do
     conn
     |> move(:from, event.from, MoveView, "leave", %{})
     |> move(:to, event.to, MoveView, "enter", %{})
@@ -12,7 +12,7 @@ defmodule Kantele.MoveEvent do
     |> event("room/look")
   end
 
-  def abort(conn, event) do
+  def abort(conn, %{data: event}) do
     conn
     |> render(MoveView, "fail", event)
     |> render(CommandView, "prompt")
