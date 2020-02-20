@@ -14,10 +14,6 @@ defmodule Kalevala.Event.Router do
 
       @behaviour Kalevala.Event.Router
 
-      def call(conn, event = %Kalevala.Event.Movement.Voting{}) do
-        movement_voting(conn, event)
-      end
-
       def call(conn, event) do
         call(event.topic, conn, event)
       end
@@ -104,17 +100,6 @@ defmodule Kalevala.Event.Router do
     quote do
       @impl true
       def call(unquote(topic), conn, event) do
-        unquote(module).unquote(fun)(conn, event)
-      end
-    end
-  end
-
-  def parse_event(module, {:movement_voting, _, args}) do
-    [state, fun] = args
-
-    quote do
-      @impl true
-      def movement_voting(conn, event = %Kalevala.Event.Movement.Voting{state: unquote(state)}) do
         unquote(module).unquote(fun)(conn, event)
       end
     end

@@ -65,7 +65,7 @@ defmodule Kalevala.World.Zone do
   end
 
   @impl true
-  def handle_info(event = %Event.Movement.Voting{}, state) do
+  def handle_info(event = %Event{topic: Event.Movement.Voting}, state) do
     Movement.handle_voting(event)
 
     {:noreply, state}
@@ -77,30 +77,28 @@ defmodule Kalevala.World.Zone.Movement do
   Zone movement functions
   """
 
+  alias Kalevala.Event
   alias Kalevala.Event.Movement.Voting
   alias Kalevala.World.Room
 
   def handle_voting(event) do
-    :telemetry.execute([:kalevala, :movement, :voting, event.state], %{
-      from: event.from,
-      to: event.to,
-      character: event.character.id,
-      reason: event.reason
-    })
-
     event
-    |> Room.confirm_movement(event.from)
-    |> Room.confirm_movement(event.to)
+    |> Room.confirm_movement(event.data.from)
+    |> Room.confirm_movement(event.data.to)
     |> handle_response()
 
     {:ok, event}
   end
 
-  defp handle_response(event = %Voting{state: :abort}) do
-    send(event.character.pid, event)
+  defp handle_response(event = %Event{topic: Voting, data: %{aborted: true}}) do
+    %{character: character} = event.data
+
+    send(character.pid, Voting.abort(event))
   end
 
-  defp handle_response(event = %Voting{state: :request}) do
-    send(event.character.pid, %{event | state: :commit})
+  defp handle_response(event = %Event{topic: Voting}) do
+    %{character: character} = event.data
+
+    send(character.pid, Voting.commit(event))
   end
 end

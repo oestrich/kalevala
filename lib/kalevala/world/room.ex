@@ -65,6 +65,7 @@ defmodule Kalevala.World.Room.Movement do
   Handle room movement
   """
 
+  alias Kalevala.Event
   alias Kalevala.Event.Display
   alias Kalevala.Event.Movement
   alias Kalevala.Event.Movement.Voting
@@ -78,8 +79,9 @@ defmodule Kalevala.World.Room.Movement do
   - If an abort, forward to the character
   - Otherwise, Forward to the zone
   """
-  def handle_request(movement_voting = %Voting{state: :abort}, _state) do
-    send(movement_voting.character.pid, movement_voting)
+  def handle_request(movement_voting = %Voting{aborted: true}, _state) do
+    %{character: character} = movement_voting
+    send(character.pid, Voting.abort(movement_voting))
   end
 
   def handle_request(movement_voting, state) do
@@ -91,13 +93,13 @@ defmodule Kalevala.World.Room.Movement do
   @doc """
   Handle the movement event
   """
-  def handle_event(state, event = %Movement{direction: :to}) do
+  def handle_event(state, event = %Event{topic: Movement, data: %{direction: :to}}) do
     state
     |> broadcast(event)
     |> append_character(event)
   end
 
-  def handle_event(state, event = %Movement{direction: :from}) do
+  def handle_event(state, event = %Event{topic: Movement, data: %{direction: :from}}) do
     state
     |> reject_character(event)
     |> broadcast(event)
@@ -107,7 +109,7 @@ defmodule Kalevala.World.Room.Movement do
   Broadcast the event to characters in the room
   """
   def broadcast(state, event) do
-    lines = %Kalevala.Conn.Lines{data: event.reason, newline: true}
+    lines = %Kalevala.Conn.Lines{data: event.data.reason, newline: true}
     display_event = %Display{lines: [lines]}
 
     Enum.each(state.private.characters, fn character ->
@@ -118,7 +120,7 @@ defmodule Kalevala.World.Room.Movement do
   end
 
   defp append_character(state, event) do
-    characters = [event.character | state.private.characters]
+    characters = [event.data.character | state.private.characters]
     private = Map.put(state.private, :characters, characters)
 
     Map.put(state, :private, private)
@@ -127,7 +129,7 @@ defmodule Kalevala.World.Room.Movement do
   defp reject_character(state, event) do
     characters =
       Enum.reject(state.private.characters, fn character ->
-        character.id == event.character.id
+        character.id == event.data.character.id
       end)
 
     private = Map.put(state.private, :characters, characters)
@@ -215,11 +217,14 @@ defmodule Kalevala.World.Room do
   @doc """
   Confirm movement for a character
   """
-  def confirm_movement(movement_voting = %Event.Movement.Voting{state: :abort}, _room_id),
-    do: movement_voting
+  def confirm_movement(
+        event = %Event{topic: Event.Movement.Voting, data: %{aborted: true}},
+        _room_id
+      ),
+      do: event
 
-  def confirm_movement(movement_voting, room_id) do
-    GenServer.call(global_name(room_id), movement_voting)
+  def confirm_movement(event, room_id) do
+    GenServer.call(global_name(room_id), event)
   end
 
   @doc false
@@ -253,7 +258,7 @@ defmodule Kalevala.World.Room do
   end
 
   @impl true
-  def handle_call(event = %Event.Movement.Voting{}, _from, state) do
+  def handle_call(event = %Event{topic: Event.Movement.Voting}, _from, state) do
     {context, event} =
       state
       |> new_context()
@@ -269,6 +274,31 @@ defmodule Kalevala.World.Room do
   end
 
   @impl true
+  # Forward movement requests to the zone to handle
+  def handle_info(event = %Event{topic: Event.Movement.Request}, state) do
+    state.data
+    |> state.callback_module.movement_request(event)
+    |> Map.put(:metadata, event.metadata)
+    |> Movement.handle_request(state)
+
+    {:noreply, state}
+  end
+
+  def handle_info(event = %Event{topic: Event.Movement}, state) do
+    case event.data.room_id == state.data.id do
+      true ->
+        state = Movement.handle_event(state, event)
+        {:noreply, state}
+
+      false ->
+        global_name(event.data.room_id)
+        |> GenServer.whereis()
+        |> send(event)
+
+        {:noreply, state}
+    end
+  end
+
   def handle_info(event = %Event{}, state) do
     context =
       new_context(state)
@@ -279,31 +309,6 @@ defmodule Kalevala.World.Room do
     state = Map.put(state, :data, context.data)
 
     {:noreply, state}
-  end
-
-  # Forward movement requests to the zone to handle
-  def handle_info(event = %Event.Movement.Request{}, state) do
-    state.data
-    |> state.callback_module.movement_request(event)
-    |> Map.put(:metadata, event.metadata)
-    |> Movement.handle_request(state)
-
-    {:noreply, state}
-  end
-
-  def handle_info(event = %Event.Movement{}, state) do
-    case event.room_id == state.data.id do
-      true ->
-        state = Movement.handle_event(state, event)
-        {:noreply, state}
-
-      false ->
-        global_name(event.room_id)
-        |> GenServer.whereis()
-        |> send(event)
-
-        {:noreply, state}
-    end
   end
 
   defp new_context(state) do
