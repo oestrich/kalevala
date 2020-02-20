@@ -60,11 +60,3 @@ defmodule Kalevala.Event.Display do
 
   defstruct lines: [], options: []
 end
-
-defmodule Kalevala.Event.CharacterUpdate do
-  @moduledoc """
-  Update the character in local lists
-  """
-
-  defstruct [:character]
-end
