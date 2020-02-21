@@ -4,7 +4,7 @@ Kalevala is a world building toolkit for text based games, written in Elixir.
 
 ## Example Game
 
-There is an example game, Sampo, in the `example/` folder.
+There is an example game, Kantele, in the `example/` folder.
 
 To start the game:
 
@@ -36,13 +36,13 @@ A `Kalevala.Controller` is the largest building block of handling texting. When 
 Controllers act as a simple state machine, only allowing transitioning to the next one you set in the `Conn`. For instance, you can contain all login logic in a `LoginController`, and handle game commands in its own controller, any paging can be handled in a `PagerController` which can suppress any outgoing text to prevent scrolling while reading, etc.
 
 ```elixir
-defmodule Sampo.CommandController do
+defmodule Kantele.CommandController do
   use Kalevala.Controller
 
   require Logger
 
-  alias Sampo.Commands
-  alias Sampo.CommandView
+  alias Kantele.Commands
+  alias Kantele.CommandView
 
   @impl true
   def init(conn), do: prompt(conn, CommandView, "prompt", %{})
@@ -70,20 +70,20 @@ end
 
 A `Kalevala.Command` is similar to a `Controller`, but should be called from a `Controller` through a `Command.Router`. Incoming text can be pattern matched in the router and be processed.
 
-In the example below, you can `Sampo.Commands.call(conn, "say hello")` to run the `SayCommand.run/2` function.
+In the example below, you can `Kantele.Commands.call(conn, "say hello")` to run the `SayCommand.run/2` function.
 
 ```elixir
-defmodule Sampo.Commands do
+defmodule Kantele.Commands do
   use Kalevala.Commands.Router
 
-  scope(Sampo) do
+  scope(Kantele) do
     module(SayCommand) do
       command("say :message", :run)
     end
   end
 end
 
-defmodule Sampo.SayCommand do
+defmodule Kantele.SayCommand do
   use Kalevala.Command
 
   def run(conn, params) do
@@ -106,7 +106,7 @@ A `Kalevala.View` renders text and out of band events to the player. These are s
 The sigil `~i` keeps a string as an IO data list, which is faster for processing and should be used if any interpolation is needed. Larger views can use the sigil `~E` to use EEx.
 
 ```elixir
-defmodule Sampo.SayView do
+defmodule Kantele.SayView do
   use Kalevala.View
 
   import IO.ANSI, only: [reset: 0, white: 0]
@@ -127,28 +127,53 @@ A `Kalevala.Event` is an internal event passed between processes. Events have th
 
 The `Kalevala.World.Room` process handles the event by running the event through a similar router to command processing. The `Foreman` process handles events with its own event router.
 
-In the example below, you can call the event router with an event of topic `room/say` to run the `Sampo.World.Room.NotifyEvent.call/2` function.
+In the example below, you can call the event router with an event of topic `room/say` to run the `Kantele.World.Room.NotifyEvent.call/2` function.
 
 ```elixir
-defmodule Sampo.World.Room.Events do
+defmodule Kantele.World.Room.Events do
   @moduledoc false
 
   use Kalevala.Event.Router
 
-  scope(Sampo.World.Room) do
+  scope(Kantele.World.Room) do
     module(NotifyEvent) do
       event("room/say", :call)
     end
   end
 end
 
-defmodule Sampo.World.Room.NotifyEvent do
+defmodule Kantele.World.Room.NotifyEvent do
   import Kalevala.World.Room.Context
 
   def call(context, event) do
     Enum.reduce(context.characters, context, fn character, context ->
       event(context, character.pid, event.from_pid, event.topic, event.data)
     end)
+  end
+end
+```
+
+### Communication & Channels
+
+A `Kalevala.Communication.Channel` is a pub/sub for sending chat messages between characters. Channels are registered with a callback module, allowing for callbacks before subscriptions/unsubscriptions/publishes.
+
+For instance, rooms can register a channel for themselves, and as characters move around they can change room subscriptions. A `say` command can then publish to this room, with every other character in the room receiving the event via their subscription. Another example might be a global channel that all characters are subscribed to, or one for a set of characters.
+
+By default, the `use` macro will fill in default implementations that allow all.
+
+```elixir
+defmodule Kantele.Communication.BroadcastChannel do
+  use Kalevala.Communication.Channel
+end
+
+defmodule Kantele.Communication do
+  @moduledoc false
+
+  use Kalevala.Communication
+
+  @impl true
+  def initial_channels() do
+    [{"general", Kantele.Communication.BroadcastChannel, []}]
   end
 end
 ```
