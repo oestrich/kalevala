@@ -3,11 +3,18 @@ defmodule Kalevala.Conn.Private do
 
   alias Kalevala.World.Room
 
-  defstruct [:character_module, :event_router, halt?: false]
+  defstruct [
+    :character_module,
+    :event_router,
+    :next_controller,
+    :update_character,
+    channel_changes: [],
+    halt?: false
+  ]
 
   @doc false
   def character(conn) do
-    character = conn.update_character || conn.character
+    character = conn.private.update_character || conn.character
 
     case is_nil(character) do
       true ->
@@ -70,9 +77,7 @@ defmodule Kalevala.Conn do
 
   defstruct [
     :character,
-    :next_controller,
     :params,
-    :update_character,
     assigns: %{},
     events: [],
     lines: [],
@@ -158,7 +163,7 @@ defmodule Kalevala.Conn do
   Put the new controller that the foreman should swap to
   """
   def put_controller(conn, controller) do
-    Map.put(conn, :next_controller, controller)
+    put_private(conn, :next_controller, controller)
   end
 
   @doc """
@@ -215,6 +220,7 @@ defmodule Kalevala.Conn do
     data = view.render(template, assigns)
 
     event = %Kalevala.Event{
+      from_pid: self(),
       topic: Kalevala.Event.Movement,
       data: %Kalevala.Event.Movement{
         character: Private.character(conn),
@@ -231,6 +237,60 @@ defmodule Kalevala.Conn do
   Update the character in state
   """
   def put_character(conn, character) do
-    Map.put(conn, :update_character, character)
+    put_private(conn, :update_character, character)
+  end
+
+  @doc """
+  Request to subscribe to a channel
+  """
+  def subscribe(conn, channel_name, options, error_fun) do
+    options = Keyword.merge([character: Private.character(conn)], options)
+
+    channel_changes = [
+      {:subscribe, channel_name, options, error_fun} | conn.private.channel_changes
+    ]
+
+    put_private(conn, :channel_changes, channel_changes)
+  end
+
+  @doc """
+  Request to unsubscribe from a channel
+  """
+  def unsubscribe(conn, channel_name, options, error_fun) do
+    options = Keyword.merge([character: Private.character(conn)], options)
+
+    channel_changes = [
+      {:unsubscribe, channel_name, options, error_fun} | conn.private.channel_changes
+    ]
+
+    put_private(conn, :channel_changes, channel_changes)
+  end
+
+  @doc """
+  Request to publish text to a channel
+  """
+  def publish_message(conn, channel_name, text, options, error_fun) do
+    options = Keyword.merge([character: Private.character(conn)], options)
+
+    event = %Kalevala.Event{
+      from_pid: self(),
+      topic: Kalevala.Event.Message,
+      data: %Kalevala.Event.Message{
+        channel_name: channel_name,
+        character: Private.character(conn),
+        text: text
+      }
+    }
+
+    channel_changes = [
+      {:publish, channel_name, event, options, error_fun} | conn.private.channel_changes
+    ]
+
+    put_private(conn, :channel_changes, channel_changes)
+  end
+
+  defp put_private(conn, key, value) do
+    private = Map.put(conn.private, key, value)
+    Map.put(conn, :private, private)
   end
 end

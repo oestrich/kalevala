@@ -5,10 +5,25 @@ defmodule Kantele.World.Room do
 
   use Kalevala.World.Room
 
+  require Logger
+
+  alias Kantele.Communication
+  alias Kantele.RoomChannel
   alias Kantele.World.Room.Events
 
   @impl true
   def init(room), do: room
+
+  @impl true
+  def initialized(room) do
+    options = [room_id: room.id]
+
+    with {:error, _reason} <- Communication.register("rooms:#{room.id}", RoomChannel, options) do
+      Logger.warn("Failed to register the room's channel, did the room restart?")
+
+      :ok
+    end
+  end
 
   @impl true
   def event(context, event) do
@@ -67,10 +82,6 @@ defmodule Kantele.World.Room.Events do
 
     module(LookEvent) do
       event("room/look", :call)
-    end
-
-    module(NotifyEvent) do
-      event("room/say", :call)
     end
   end
 end

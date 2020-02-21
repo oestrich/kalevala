@@ -27,7 +27,11 @@ defmodule Kantele.Commands do
     end
 
     module(SayCommand) do
-      command("say :message", :run)
+      command("say :text", :run)
+    end
+
+    module(ChannelCommand) do
+      command("general :text", :general)
     end
 
     module(WhoCommand) do

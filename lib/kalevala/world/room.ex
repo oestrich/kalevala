@@ -163,6 +163,7 @@ defmodule Kalevala.World.Room do
   require Logger
 
   alias Kalevala.Event
+  alias Kalevala.Event.Message
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
@@ -182,6 +183,13 @@ defmodule Kalevala.World.Room do
   Called when the room is initializing
   """
   @callback init(room :: t()) :: t()
+
+  @doc """
+  Called after the room process is started
+
+  Directly after `init` is completed.
+  """
+  @callback initialized(room :: t()) :: :ok
 
   @doc """
   Callback for when a new event is received
@@ -254,7 +262,13 @@ defmodule Kalevala.World.Room do
       private: %Private{}
     }
 
-    {:ok, state}
+    {:ok, state, {:continue, :initialized}}
+  end
+
+  @impl true
+  def handle_continue(:initialized, state) do
+    state.callback_module.initialized(state.data)
+    {:noreply, state}
   end
 
   @impl true
@@ -303,8 +317,18 @@ defmodule Kalevala.World.Room do
     context =
       new_context(state)
       |> state.callback_module.event(event)
-      |> send_lines()
-      |> send_events()
+      |> handle_context()
+
+    state = Map.put(state, :data, context.data)
+
+    {:noreply, state}
+  end
+
+  def handle_info(message = %Message{}, state) do
+    context =
+      new_context(state)
+      |> state.callback_module.event(message)
+      |> handle_context()
 
     state = Map.put(state, :data, context.data)
 
@@ -313,6 +337,12 @@ defmodule Kalevala.World.Room do
 
   defp new_context(state) do
     %Context{data: state.data, characters: state.private.characters}
+  end
+
+  defp handle_context(context) do
+    context
+    |> send_lines()
+    |> send_events()
   end
 
   defp send_lines(context) do

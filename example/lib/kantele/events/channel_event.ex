@@ -1,11 +1,11 @@
-defmodule Kantele.SayEvent do
+defmodule Kantele.ChannelEvent do
   use Kalevala.Event
 
+  alias Kantele.ChannelView
   alias Kantele.CommandView
-  alias Kantele.SayView
 
   def interested?(event) do
-    match?("rooms:" <> _, event.data.channel_name)
+    match?("general", event.data.channel_name)
   end
 
   def echo(conn, event) do
@@ -15,10 +15,13 @@ defmodule Kantele.SayEvent do
 
       false ->
         conn
+        |> assign(:channel_name, "general")
         |> assign(:character_name, event.data.character.name)
         |> assign(:text, event.data.text)
-        |> render(SayView, "listen")
+        |> render(ChannelView, "listen")
         |> prompt(CommandView, "prompt", %{})
     end
   end
+
+  def subscribe_error(conn, _error), do: conn
 end

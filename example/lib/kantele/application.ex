@@ -18,6 +18,7 @@ defmodule Kantele.Application do
       foreman: [
         presence_module: Kantele.Presence,
         character_module: Kantele.Character,
+        communication_module: Kantele.Communication,
         initial_controller: Kantele.LoginController,
         quit_view: {Kantele.QuitView, "disconnected"}
       ]
@@ -28,6 +29,7 @@ defmodule Kantele.Application do
       {Kantele.Presence, []},
       {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
+      {Kantele.Communication, []},
       {Kantele.World, []},
       {Kantele.Telemetry, []}
     ]

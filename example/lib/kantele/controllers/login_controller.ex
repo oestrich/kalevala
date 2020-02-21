@@ -3,9 +3,11 @@ defmodule Kantele.LoginController do
 
   require Logger
 
+  alias Kantele.ChannelEvent
   alias Kantele.CharacterView
   alias Kantele.CommandController
   alias Kantele.LoginView
+  alias Kantele.MoveEvent
   alias Kantele.MoveView
   alias Kantele.QuitView
 
@@ -82,6 +84,8 @@ defmodule Kantele.LoginController do
     |> put_character(character)
     |> render(CharacterView, "vitals", %{})
     |> move(:to, character.room_id, MoveView, "enter", %{})
+    |> subscribe("rooms:#{character.room_id}", [], &MoveEvent.subscribe_error/2)
+    |> subscribe("general", [], &ChannelEvent.subscribe_error/2)
     |> render(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
     |> event("room/look", %{})
