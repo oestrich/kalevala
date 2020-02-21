@@ -24,7 +24,7 @@ defmodule Kalevala.Telnet.Listener do
 
     opts = %{
       socket_opts: [{:port, port}],
-      max_connections: 4096
+      max_connections: 102_400
     }
 
     foreman_options = Map.get(state.config, :foreman, [])
