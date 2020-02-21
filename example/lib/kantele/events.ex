@@ -16,7 +16,11 @@ defmodule Kantele.Events do
     end
 
     module(SayEvent) do
-      event(Kalevala.Event.Message, :echo)
+      event(Kalevala.Event.Message, :echo, interested?: &Kantele.SayEvent.interested?/1)
+    end
+
+    module(ChannelEvent) do
+      event(Kalevala.Event.Message, :echo, interested?: &Kantele.ChannelEvent.interested?/1)
     end
   end
 end

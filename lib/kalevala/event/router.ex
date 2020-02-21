@@ -14,8 +14,25 @@ defmodule Kalevala.Event.Router do
 
       @behaviour Kalevala.Event.Router
 
+      Module.register_attribute(__MODULE__, :events, accumulate: true)
+
+      @before_compile Kalevala.Event.Router
+    end
+  end
+
+  @doc false
+  defmacro __before_compile__(_env) do
+    quote do
       def call(conn, event) do
-        call(event.topic, conn, event)
+        Enum.filter(@events, fn {topic, _module, _fun} ->
+          match?(^topic, event.topic)
+        end)
+        |> Enum.filter(fn {topic, module, fun} ->
+          call_interested?(topic, module, fun, event)
+        end)
+        |> Enum.reduce(conn, fn {topic, module, fun}, conn ->
+          apply(module, fun, [conn, event])
+        end)
       end
     end
   end
@@ -26,20 +43,12 @@ defmodule Kalevala.Event.Router do
   @callback call(topic :: Event.topic(), conn :: Conn.t(), event :: Event.t()) :: :ok
 
   @doc """
-  Process a movement voting event
-  """
-  @callback movement_voting(conn :: Conn.t(), event :: Event.movement_voting()) :: :ok
-
-  @doc """
   Macro to generate the receive functions
 
       scope(App) do
         module(CombatEvent) do
           event("combat/start", :start)
           event("combat/stop", :stop)
-
-          movement_voting(:commit, :commit)
-          movement_voting(:abort, :abort)
         end
       end
   """
@@ -50,11 +59,6 @@ defmodule Kalevala.Event.Router do
       @impl true
       def call(topic, _conn, _event) do
         raise "Received an unknown event - #{topic}"
-      end
-
-      @impl true
-      def movement_voting(_conn, _event) do
-        raise "Could not handle this movement voting"
       end
     end
   end
@@ -95,12 +99,22 @@ defmodule Kalevala.Event.Router do
 
   @doc false
   def parse_event(module, {:event, _, args}) do
-    [topic, fun] = args
+    [topic, fun, options] = parse_event_args(args)
+
+    default_interested_fun =
+      quote do
+        fn _event ->
+          true
+        end
+      end
+
+    interested_fun = Keyword.get(options, :interested?, default_interested_fun)
 
     quote do
-      @impl true
-      def call(unquote(topic), conn, event) do
-        unquote(module).unquote(fun)(conn, event)
+      @events {unquote(topic), unquote(module), unquote(fun)}
+
+      def call_interested?(unquote(topic), unquote(module), unquote(fun), event) do
+        unquote(interested_fun).(event)
       end
     end
   end
@@ -108,4 +122,8 @@ defmodule Kalevala.Event.Router do
   def parse_event(_module, _) do
     raise "Unknown function encountered"
   end
+
+  defp parse_event_args([topic, fun]), do: [topic, fun, []]
+
+  defp parse_event_args([topic, fun, options]), do: [topic, fun, options]
 end

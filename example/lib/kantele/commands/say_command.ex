@@ -7,9 +7,9 @@ defmodule Kantele.SayCommand do
     channel_name = "rooms:#{conn.character.room_id}"
 
     conn
-    |> assign(:message, params["message"])
+    |> assign(:text, params["text"])
     |> render(SayView, "echo")
-    |> publish_message(channel_name, params["message"], [], &publish_error/2)
+    |> publish_message(channel_name, params["text"], [], &publish_error/2)
     |> assign(:prompt, false)
   end
 

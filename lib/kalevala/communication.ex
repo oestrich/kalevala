@@ -132,7 +132,7 @@ defmodule Kalevala.Communication do
         Channel.publish(pid, event, options)
 
       _ ->
-        :error
+        {:error, :channel_not_found}
     end
   end
 
