@@ -7,12 +7,12 @@ defmodule Kalevala.World.Room.Context do
 
   defstruct [:data, assigns: %{}, characters: [], events: [], lines: []]
 
-  defp push(context, to_pid, event = %Kalevala.Conn.Event{}, _newline) do
+  defp push(context, to_pid, event = %Kalevala.Character.Conn.Event{}, _newline) do
     Map.put(context, :lines, context.lines ++ [{to_pid, event}])
   end
 
   defp push(context, to_pid, data, newline) do
-    lines = %Kalevala.Conn.Lines{
+    lines = %Kalevala.Character.Conn.Lines{
       data: data,
       newline: newline
     }
@@ -109,7 +109,7 @@ defmodule Kalevala.World.Room.Movement do
   Broadcast the event to characters in the room
   """
   def broadcast(state, event) do
-    lines = %Kalevala.Conn.Lines{data: event.data.reason, newline: true}
+    lines = %Kalevala.Character.Conn.Lines{data: event.data.reason, newline: true}
     display_event = %Display{lines: [lines]}
 
     Enum.each(state.private.characters, fn character ->

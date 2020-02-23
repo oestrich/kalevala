@@ -97,7 +97,7 @@ end
 defmodule Kantele.World.Room.LookEvent do
   import Kalevala.World.Room.Context
 
-  alias Kantele.LookView
+  alias Kantele.Character.LookView
 
   def call(context, event) do
     context

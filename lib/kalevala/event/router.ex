@@ -5,7 +5,7 @@ defmodule Kalevala.Event.Router do
   Locates the appropriate module and function for a `Kalevala.Event`
   """
 
-  alias Kalevala.Conn
+  alias Kalevala.Character.Conn
   alias Kalevala.Event
 
   defmacro __using__(_opts) do

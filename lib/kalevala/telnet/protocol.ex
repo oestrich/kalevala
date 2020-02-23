@@ -3,10 +3,10 @@ defmodule Kalevala.Telnet.Protocol do
   ranch protocol for handling telnet connection
   """
 
-  alias Kalevala.Conn.Event
-  alias Kalevala.Conn.Lines
-  alias Kalevala.Conn.Option
-  alias Kalevala.Foreman
+  alias Kalevala.Character.Conn.Event
+  alias Kalevala.Character.Conn.Lines
+  alias Kalevala.Character.Conn.Option
+  alias Kalevala.Character.Foreman
   alias Telnet.Options
 
   require Logger

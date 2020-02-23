@@ -1,8 +1,8 @@
 defmodule Kalevala.ForemanTest do
   use ExUnit.Case
 
-  alias Kalevala.Conn
-  alias Kalevala.Foreman
+  alias Kalevala.Character.Conn
+  alias Kalevala.Character.Foreman
 
   describe "handling the conn" do
     test "prints lines" do
@@ -48,6 +48,6 @@ defmodule Kalevala.ForemanTest do
   end
 
   defp setup_state() do
-    %Kalevala.Foreman{protocol: self()}
+    %Foreman{protocol: self()}
   end
 end

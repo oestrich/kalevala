@@ -39,12 +39,6 @@ defmodule Kalevala.Event do
 
   defstruct [:from_pid, :topic, :data, metadata: %__MODULE__.Metadata{}]
 
-  defmacro __using__(_opts) do
-    quote do
-      import Kalevala.Conn
-    end
-  end
-
   @doc """
   Set the start time on an event
   """

@@ -16,18 +16,19 @@ defmodule Kantele.Application do
         certfile: Path.join(:code.priv_dir(:kantele), "certs/cert.pem")
       ],
       foreman: [
-        presence_module: Kantele.Presence,
+        presence_module: Kantele.Character.Presence,
         character_module: Kantele.Character,
         communication_module: Kantele.Communication,
-        initial_controller: Kantele.LoginController,
-        quit_view: {Kantele.QuitView, "disconnected"}
+        initial_controller: Kantele.Character.LoginController,
+        quit_view: {Kantele.Character.QuitView, "disconnected"},
+        supervisor_name: Kantele.Character.Foreman.Supervisor
       ]
     ]
 
     children = [
       {Kantele.Config, [name: Kantele.Config]},
-      {Kantele.Presence, []},
-      {Kalevala.Foreman.Supervisor, [name: Kalevala.Foreman.Supervisor]},
+      {Kantele.Character.Presence, []},
+      {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
       {Kantele.Communication, []},
       {Kantele.World, []},
