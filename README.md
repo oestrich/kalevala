@@ -25,24 +25,24 @@ When you connect, a new `Kalevala.Character.Actor` process is started. This proc
 
 ### Conn
 
-A `Kalevala.Conn` is the context token for controllers and commands. This is similar to a `Plug.Conn`. The main difference being it bundles up multiple renders and events to fire all at once, instead of being used for a single request.
+A `Kalevala.Character.Conn` is the context token for controllers and commands. This is similar to a `Plug.Conn`. The main difference being it bundles up multiple renders and events to fire all at once, instead of being used for a single request.
 
 The actor will generate new `Conn`s before each event or incoming text. After processing the `Conn`, it is processed by sending text to the player and events sent to their router (more on this in a bit).
 
 ### Controllers
 
-A `Kalevala.Controller` is the largest building block of handling texting. When starting the actor, an initial controller is given. This controller is initialized and used from then on. The callbacks required will be called at the appropriate time with a new `Conn`.
+A `Kalevala.Character.Controller` is the largest building block of handling texting. When starting the actor, an initial controller is given. This controller is initialized and used from then on. The callbacks required will be called at the appropriate time with a new `Conn`.
 
 Controllers act as a simple state machine, only allowing transitioning to the next one you set in the `Conn`. For instance, you can contain all login logic in a `LoginController`, and handle game commands in its own controller, any paging can be handled in a `PagerController` which can suppress any outgoing text to prevent scrolling while reading, etc.
 
 ```elixir
-defmodule Kantele.CommandController do
-  use Kalevala.Controller
+defmodule Kantele.Character.CommandController do
+  use Kalevala.Character.Controller
 
   require Logger
 
-  alias Kantele.Commands
-  alias Kantele.CommandView
+  alias Kantele.Character.Commands
+  alias Kantele.Character.CommandView
 
   @impl true
   def init(conn), do: prompt(conn, CommandView, "prompt", %{})
@@ -68,13 +68,13 @@ end
 
 ### Commands
 
-A `Kalevala.Command` is similar to a `Controller`, but should be called from a `Controller` through a `Command.Router`. Incoming text can be pattern matched in the router and be processed.
+A `Kalevala.Character.Command` is similar to a `Controller`, but should be called from a `Controller` through a `Command.Router`. Incoming text can be pattern matched in the router and be processed.
 
-In the example below, you can `Kantele.Commands.call(conn, "say hello")` to run the `SayCommand.run/2` function.
+In the example below, you can `Kantele.Character.Commands.call(conn, "say hello")` to run the `SayCommand.run/2` function.
 
 ```elixir
-defmodule Kantele.Commands do
-  use Kalevala.Commands.Router
+defmodule Kantele.Character.Commands do
+  use Kalevala.Character.Commands.Router
 
   scope(Kantele) do
     module(SayCommand) do
@@ -83,8 +83,8 @@ defmodule Kantele.Commands do
   end
 end
 
-defmodule Kantele.SayCommand do
-  use Kalevala.Command
+defmodule Kantele.Character.SayCommand do
+  use Kalevala.Character.Command
 
   def run(conn, params) do
     params = %{
@@ -101,13 +101,13 @@ end
 
 ### Views
 
-A `Kalevala.View` renders text and out of band events to the player. These are strings, IO data lists, or `Kalevala.Conn.Event` structs (which are used for GMCP in telnet.)
+A `Kalevala.Character.View` renders text and out of band events to the player. These are strings, IO data lists, or `Kalevala.Character.Conn.Event` structs (which are used for GMCP in telnet.)
 
 The sigil `~i` keeps a string as an IO data list, which is faster for processing and should be used if any interpolation is needed. Larger views can use the sigil `~E` to use EEx.
 
 ```elixir
-defmodule Kantele.SayView do
-  use Kalevala.View
+defmodule Kantele.Character.SayView do
+  use Kalevala.Character.View
 
   import IO.ANSI, only: [reset: 0, white: 0]
 
@@ -180,6 +180,6 @@ end
 
 ### The World
 
-The world in Kalevala consists of `Kalevala.Zone`s and `Kalevala.Room`s. A zone contains many rooms, and rooms are the basic block of traversing the world. Rooms also act as the primary point of work (processing events) as all events will go through the room that characters are in.
+The world in Kalevala consists of `Kalevala.World.Zone`s and `Kalevala.World.Room`s. A zone contains many rooms, and rooms are the basic block of traversing the world. Rooms also act as the primary point of work (processing events) as all events will go through the room that characters are in.
 
 The example game boots the world from flat files, but world data can come from any source as long as the structures can be created. For instance, you might load a simple zone struct with a database ID and hydrate the zone after the process started.
