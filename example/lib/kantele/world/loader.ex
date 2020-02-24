@@ -209,6 +209,15 @@ defmodule Kantele.World.Loader do
   defp match_character({_key, character}, character_id), do: character.id == character_id
 
   @doc """
+  Strip a zone of extra information that Kalevala doesn't care about
+  """
+  def strip_zone(zone) do
+    zone
+    |> Map.put(:characters, [])
+    |> Map.put(:rooms, [])
+  end
+
+  @doc """
   Dereference a variable to it's value
 
   If a known key is found, use the current zone

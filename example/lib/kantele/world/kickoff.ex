@@ -19,9 +19,12 @@ defmodule Kantele.World.Kickoff do
   def handle_continue(:load, state) do
     world = Loader.load_world()
 
-    world.zones
-    |> Enum.map(&Cache.cache_zone/1)
-    |> Enum.each(&start_zone/1)
+    Enum.each(world.zones, fn zone ->
+      zone
+      |> Cache.cache_zone()
+      |> Loader.strip_zone()
+      |> start_zone()
+    end)
 
     Enum.each(world.rooms, &start_room/1)
     Enum.each(world.characters, &start_character/1)
