@@ -22,6 +22,20 @@ room_exits "town_square" {
   east = rooms.inn.id
 }
 
+cast "town_square" {
+  room_id = rooms.town_square.id
+
+  characters = [
+    {
+      id = characters.town_crier.id
+    },
+    {
+      id = characters.villager.id
+      name = "Tapio"
+    }
+  ]
+}
+
 rooms "marketplace" {
   name = "Marketplace"
   description = "There are sellers hawking their wares all around you."
@@ -44,6 +58,12 @@ room_exits "inn" {
   west = rooms.town_square.id
 }
 
-npc "town_crier" {
+characters "town_crier" {
   name = "Town Crier"
+  description = "A small man with a loud voice."
+}
+
+characters "villager" {
+  name = "Villager"
+  description = "A villager of Sammatti."
 }

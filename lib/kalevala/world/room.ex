@@ -164,6 +164,8 @@ defmodule Kalevala.World.Room do
 
   alias Kalevala.Event
   alias Kalevala.Event.Message
+  alias Kalevala.World
+  alias Kalevala.World.CharacterSupervisor
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
@@ -173,6 +175,7 @@ defmodule Kalevala.World.Room do
     :zone_id,
     :name,
     :description,
+    cast: [],
     exits: [],
     features: []
   ]
@@ -242,18 +245,18 @@ defmodule Kalevala.World.Room do
 
   @doc false
   def start_link(options) do
-    otp_options = options.otp
-    options = Map.delete(options, :otp)
+    genserver_options = options.genserver_options
+    options = Map.delete(options, :genserver_options)
 
-    GenServer.start_link(__MODULE__, options, otp_options)
+    GenServer.start_link(__MODULE__, options, genserver_options)
   end
 
   @impl true
-  def init(state) do
-    Logger.info("Room starting - #{state.room.id}")
+  def init(options) do
+    Logger.info("Room starting - #{options.room.id}")
 
-    config = state.config
-    room = config.callback_module.init(state.room)
+    config = options.config
+    room = config.callback_module.init(options.room)
 
     state = %{
       data: room,
@@ -262,10 +265,23 @@ defmodule Kalevala.World.Room do
       private: %Private{}
     }
 
-    {:ok, state, {:continue, :initialized}}
+    {:ok, state, {:continue, {:start_cast, config}}}
   end
 
   @impl true
+  def handle_continue({:start_cast, config}, state) do
+    character_config = %{
+      supervisor: CharacterSupervisor.global_name(state.data),
+      callback_module: config.characters.callback_module
+    }
+
+    Enum.each(state.data.cast, fn character ->
+      World.start_cast(character, character_config)
+    end)
+
+    {:noreply, state, {:continue, :initialized}}
+  end
+
   def handle_continue(:initialized, state) do
     state.callback_module.initialized(state.data)
     {:noreply, state}

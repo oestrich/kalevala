@@ -3,6 +3,7 @@ defmodule Kantele.World.Loader do
   Load the world from data files
   """
 
+  alias Kalevala.Character
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
 
@@ -25,6 +26,7 @@ defmodule Kantele.World.Loader do
 
     zones
     |> Enum.map(&parse_exits(&1, data, zones))
+    |> Enum.map(&parse_cast(&1, data, zones))
     |> Enum.map(&zone_rooms_to_list/1)
   end
 
@@ -56,7 +58,14 @@ defmodule Kantele.World.Loader do
         parse_room(zone, key, room_data)
       end)
 
-    %{zone | rooms: rooms}
+    characters = Map.get(zone_data, :characters, [])
+
+    characters =
+      Enum.into(characters, %{}, fn {key, character_data} ->
+        parse_character(zone, key, character_data)
+      end)
+
+    %{zone | rooms: rooms, characters: characters}
   end
 
   @doc """
@@ -90,7 +99,25 @@ defmodule Kantele.World.Loader do
   def parse_features(_), do: []
 
   @doc """
-  Parse exits for a zones
+  Parse character data
+
+  ID is the zone's id concatenated with the character's key
+  """
+  def parse_character(zone, key, character_data) do
+    character = %Character{
+      id: "#{zone.id}:#{key}",
+      name: character_data.name,
+      description: character_data.description,
+      meta: %Kantele.World.Character.Meta{
+        zone_id: zone.id
+      }
+    }
+
+    {key, character}
+  end
+
+  @doc """
+  Parse exits for zones
 
   Dereferences the exit exit_names, creates structs for each exit_name,
   and attaches them to the matching room.
@@ -134,6 +161,53 @@ defmodule Kantele.World.Loader do
   end
 
   @doc """
+  Parse cast for zones
+
+  Dereferences the cast characters, creates structs and attachs them to the
+  matching room.
+  """
+  def parse_cast(zone, data, zones) do
+    zone_data = Map.get(data, zone.id)
+
+    cast = Map.get(zone_data, :cast, [])
+
+    characters =
+      Enum.flat_map(cast, fn {_key, cast} ->
+        room_id = dereference(zones, zone, cast.room_id)
+
+        cast.characters
+        |> Enum.with_index()
+        |> Enum.map(fn {character_data, index} ->
+          character_id = dereference(zones, zone, character_data.id)
+
+          {_key, character} =
+            Enum.find(zone.characters, fn {_key, character} ->
+              character.id == character_id
+            end)
+
+          %Character{
+            character
+            | id: "#{room_id}:#{character.id}:#{index}",
+              name: Map.get(character_data, :name, character.name),
+              room_id: room_id
+          }
+        end)
+      end)
+
+    Enum.reduce(characters, zone, fn character, zone ->
+      {room_key, room} =
+        Enum.find(zone.rooms, fn {_key, room} ->
+          room.id == character.room_id
+        end)
+
+      room = %{room | cast: [character | room.cast]}
+
+      rooms = Map.put(zone.rooms, room_key, room)
+      %{zone | rooms: rooms}
+    end)
+  end
+
+  @doc """
   Dereference a variable to it's value
 
   If a known key is found, use the current zone
@@ -141,9 +215,10 @@ defmodule Kantele.World.Loader do
   def dereference(zones, zone, reference) do
     [key | reference] = String.split(reference, ".")
 
-    case key in ["rooms"] do
+    case key in ["characters", "rooms"] do
       true ->
         zone
+        |> flatten_characters()
         |> flatten_rooms()
         |> dereference([key | reference])
 
@@ -154,9 +229,15 @@ defmodule Kantele.World.Loader do
           end)
 
         zone
+        |> flatten_characters()
         |> flatten_rooms()
         |> dereference(reference)
     end
+  end
+
+  defp flatten_characters(zone) do
+    characters = Map.values(zone.characters)
+    Map.put(zone, :characters, characters)
   end
 
   defp flatten_rooms(zone) do
@@ -169,6 +250,13 @@ defmodule Kantele.World.Loader do
   """
   def dereference(zone, reference) when is_list(reference) do
     case reference do
+      ["characters" | character] ->
+        [character_name, character_key] = character
+
+        zone.characters
+        |> find_character(zone, character_name)
+        |> Map.get(String.to_atom(character_key))
+
       ["rooms" | room] ->
         [room_name, room_key] = room
 
@@ -176,6 +264,12 @@ defmodule Kantele.World.Loader do
         |> find_room(zone, room_name)
         |> Map.get(String.to_atom(room_key))
     end
+  end
+
+  defp find_character(characters, zone, character_name) do
+    Enum.find(characters, fn character ->
+      character.id == "#{zone.id}:#{character_name}"
+    end)
   end
 
   defp find_room(rooms, zone, room_name) do

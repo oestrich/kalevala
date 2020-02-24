@@ -1,0 +1,20 @@
+defmodule Kantele.World.Character.Meta do
+  @moduledoc """
+  Specific metadata for a cast character in Kantele
+  """
+
+  defstruct [:vitals, :zone_id]
+end
+
+defmodule Kantele.World.Character do
+  @behaviour Kalevala.World.Character
+
+  @impl true
+  def init(character), do: character
+
+  @impl true
+  def initialized(character), do: character
+
+  @impl true
+  def event(conn, _event), do: conn
+end

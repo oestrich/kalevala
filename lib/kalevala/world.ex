@@ -7,6 +7,7 @@ defmodule Kalevala.World do
 
   use DynamicSupervisor
 
+  alias Kalevala.World.Character
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
   alias Kalevala.World.ZoneSupervisor
@@ -18,7 +19,7 @@ defmodule Kalevala.World do
     options = %{
       zone: zone,
       config: config,
-      otp: [name: Zone.global_name(zone)]
+      genserver_options: [name: Zone.global_name(zone)]
     }
 
     DynamicSupervisor.start_child(config.supervisor, {ZoneSupervisor, options})
@@ -31,10 +32,23 @@ defmodule Kalevala.World do
     options = %{
       room: room,
       config: config,
-      otp: [name: Room.global_name(room)]
+      genserver_options: [name: Room.global_name(room)]
     }
 
     DynamicSupervisor.start_child(config.supervisor, {Room, options})
+  end
+
+  @doc """
+  Start a cast character into the world
+  """
+  def start_cast(character, config) do
+    options = %{
+      character: character,
+      config: config,
+      genserver_options: [name: Character.global_name(character)]
+    }
+
+    DynamicSupervisor.start_child(config.supervisor, {Character, options})
   end
 
   @doc false

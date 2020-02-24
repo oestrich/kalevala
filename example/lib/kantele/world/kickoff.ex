@@ -32,6 +32,9 @@ defmodule Kantele.World.Kickoff do
       callback_module: Kantele.World.Zone,
       rooms: %{
         callback_module: Kantele.World.Room
+      },
+      characters: %{
+        callback_module: Kantele.World.Character
       }
     }
 
