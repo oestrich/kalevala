@@ -49,7 +49,7 @@ defmodule Kalevala.Character.Presence do
   end
 
   @doc """
-  Start tracking a character (and it's foreman process)
+  Start tracking a character (and it's actor process)
   """
   def track(pid, character) do
     GenServer.call(pid, {:track, character})

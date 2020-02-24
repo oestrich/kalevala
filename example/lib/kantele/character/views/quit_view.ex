@@ -3,7 +3,7 @@ defmodule Kantele.Character.QuitView do
 
   import IO.ANSI, only: [reset: 0, white: 0]
 
-  # passed to foreman disconnect
+  # passed to actor disconnect
   def render("disconnected", %{character: character}) do
     ~i"#{white()}#{character.name}#{reset()} has left the game."
   end

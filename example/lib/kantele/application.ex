@@ -15,20 +15,20 @@ defmodule Kantele.Application do
         keyfile: Path.join(:code.priv_dir(:kantele), "certs/key.pem"),
         certfile: Path.join(:code.priv_dir(:kantele), "certs/cert.pem")
       ],
-      foreman: [
+      actor: [
         presence_module: Kantele.Character.Presence,
         character_module: Kantele.Character,
         communication_module: Kantele.Communication,
         initial_controller: Kantele.Character.LoginController,
         quit_view: {Kantele.Character.QuitView, "disconnected"},
-        supervisor_name: Kantele.Character.Foreman.Supervisor
+        supervisor_name: Kantele.Character.Actor.Supervisor
       ]
     ]
 
     children = [
       {Kantele.Config, [name: Kantele.Config]},
       {Kantele.Character.Presence, []},
-      {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
+      {Kalevala.Character.Actor.Supervisor, [name: Kantele.Character.Actor.Supervisor]},
       {Kalevala.Telnet.Listener, listener_config},
       {Kantele.Communication, []},
       {Kantele.World, []},

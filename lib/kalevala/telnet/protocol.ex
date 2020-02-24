@@ -6,7 +6,7 @@ defmodule Kalevala.Telnet.Protocol do
   alias Kalevala.Character.Conn.Event
   alias Kalevala.Character.Conn.Lines
   alias Kalevala.Character.Conn.Option
-  alias Kalevala.Character.Foreman
+  alias Kalevala.Character.Actor
   alias Telnet.Options
 
   require Logger
@@ -22,7 +22,7 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   @doc false
-  def init(ref, transport, foreman_options) do
+  def init(ref, transport, actor_options) do
     # See deadlock comment above
     {:ok, socket} = :ranch.handshake(ref)
     :ok = transport.setopts(socket, active: true)
@@ -32,8 +32,8 @@ defmodule Kalevala.Telnet.Protocol do
       socket: socket,
       transport: transport,
       buffer: <<>>,
-      foreman_pid: nil,
-      foreman_options: foreman_options,
+      actor_pid: nil,
+      actor_options: actor_options,
       options: %{
         newline: false
       }
@@ -43,8 +43,8 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   def handle_info(:init, state) do
-    {:ok, foreman_pid} = Foreman.start(self(), state.foreman_options)
-    state = Map.put(state, :foreman_pid, foreman_pid)
+    {:ok, actor_pid} = Actor.start(self(), state.actor_options)
+    state = Map.put(state, :actor_pid, actor_pid)
     {:noreply, state, {:continue, :initial_iacs}}
   end
 
@@ -66,7 +66,7 @@ defmodule Kalevala.Telnet.Protocol do
 
   def handle_info(:terminate, state) do
     Logger.info("Session terminating")
-    send(state.foreman_pid, :terminate)
+    send(state.actor_pid, :terminate)
     {:stop, :normal, state}
   end
 
@@ -134,10 +134,10 @@ defmodule Kalevala.Telnet.Protocol do
     state = %{state | buffer: buffer}
 
     Enum.each(options, fn option ->
-      send(state.foreman_pid, {:recv, :option, option})
+      send(state.actor_pid, {:recv, :option, option})
     end)
 
-    send(state.foreman_pid, {:recv, :text, string})
+    send(state.actor_pid, {:recv, :text, string})
 
     {:noreply, update_newline(state, String.length(string) == 0)}
   end

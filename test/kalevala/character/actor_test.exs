@@ -1,15 +1,15 @@
-defmodule Kalevala.ForemanTest do
+defmodule Kalevala.ActorTest do
   use ExUnit.Case
 
   alias Kalevala.Character.Conn
-  alias Kalevala.Character.Foreman
+  alias Kalevala.Character.Actor
 
   describe "handling the conn" do
     test "prints lines" do
       conn = setup_conn(["Text"])
       state = setup_state()
 
-      {:noreply, _state} = Foreman.handle_conn(conn, state)
+      {:noreply, _state} = Actor.handle_conn(conn, state)
 
       assert_receive {:send, %Conn.Lines{data: ["Text"]}}
     end
@@ -20,7 +20,7 @@ defmodule Kalevala.ForemanTest do
 
       conn = Conn.halt(conn)
 
-      {:noreply, _state} = Foreman.handle_conn(conn, state)
+      {:noreply, _state} = Actor.handle_conn(conn, state)
 
       assert_receive :terminate
     end
@@ -31,7 +31,7 @@ defmodule Kalevala.ForemanTest do
 
       conn = Conn.put_controller(conn, ExampleController)
 
-      {:noreply, state, {:continue, :init_controller}} = Foreman.handle_conn(conn, state)
+      {:noreply, state, {:continue, :init_controller}} = Actor.handle_conn(conn, state)
 
       assert state.controller == ExampleController
     end
@@ -48,6 +48,6 @@ defmodule Kalevala.ForemanTest do
   end
 
   defp setup_state() do
-    %Foreman{protocol: self()}
+    %Actor{protocol: self()}
   end
 end

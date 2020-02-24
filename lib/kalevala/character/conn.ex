@@ -160,7 +160,7 @@ defmodule Kalevala.Character.Conn do
   def get_session(conn, key), do: Map.get(conn.session, key)
 
   @doc """
-  Put the new controller that the foreman should swap to
+  Put the new controller that the actor should swap to
   """
   def put_controller(conn, controller) do
     put_private(conn, :next_controller, controller)
@@ -175,7 +175,7 @@ defmodule Kalevala.Character.Conn do
   end
 
   @doc """
-  Send the foreman an in-game event
+  Send the actor an in-game event
   """
   def event(conn, topic, data \\ %{}) do
     event = %Kalevala.Event{

@@ -1,4 +1,4 @@
-defmodule Kalevala.Character.Foreman.Channel do
+defmodule Kalevala.Character.Actor.Channel do
   @moduledoc """
   Helpers for dealing with communication channels
   """

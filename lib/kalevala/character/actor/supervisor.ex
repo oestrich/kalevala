@@ -1,6 +1,6 @@
-defmodule Kalevala.Character.Foreman.Supervisor do
+defmodule Kalevala.Character.Actor.Supervisor do
   @moduledoc """
-  Supervisor for foreman processes
+  Supervisor for actor processes
   """
 
   use DynamicSupervisor
