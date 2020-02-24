@@ -3,8 +3,13 @@ defmodule Kalevala.World.RoomSupervisor do
 
   use DynamicSupervisor
 
+  alias Kalevala.World.Room
+  alias Kalevala.World.Zone
+
   @doc false
-  def global_name(zone), do: {:global, {__MODULE__, zone.id}}
+  def global_name(zone = %Zone{}), do: {:global, {__MODULE__, zone.id}}
+
+  def global_name(room = %Room{}), do: {:global, {__MODULE__, room.zone_id}}
 
   @doc false
   def start_link(opts) do

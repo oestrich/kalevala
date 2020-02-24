@@ -15,12 +15,12 @@ defmodule Kalevala.World.Character do
   alias Kalevala.Event
 
   @doc """
-  Called when the cast character is initializing
+  Called when the world character is initializing
   """
   @callback init(character :: Character.t()) :: Character.t()
 
   @doc """
-  Called after the cast character is started
+  Called after the world character is started
 
   Directly after `init` is completed.
   """

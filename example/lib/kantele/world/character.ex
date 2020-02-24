@@ -1,12 +1,14 @@
 defmodule Kantele.World.Character.Meta do
   @moduledoc """
-  Specific metadata for a cast character in Kantele
+  Specific metadata for a world character in Kantele
   """
 
   defstruct [:vitals, :zone_id]
 end
 
 defmodule Kantele.World.Character do
+  @moduledoc "Callbacks for world run characters"
+
   @behaviour Kalevala.World.Character
 
   @impl true

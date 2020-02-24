@@ -22,7 +22,7 @@ room_exits "town_square" {
   east = rooms.inn.id
 }
 
-cast "town_square" {
+room_characters "town_square" {
   room_id = rooms.town_square.id
 
   characters = [

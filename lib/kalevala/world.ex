@@ -39,9 +39,9 @@ defmodule Kalevala.World do
   end
 
   @doc """
-  Start a cast character into the world
+  Start a world character into the world
   """
-  def start_cast(character, config) do
+  def start_character(character, config) do
     options = %{
       character: character,
       config: config,

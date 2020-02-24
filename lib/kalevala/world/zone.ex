@@ -8,8 +8,6 @@ defmodule Kalevala.World.Zone do
   require Logger
 
   alias Kalevala.Event
-  alias Kalevala.World
-  alias Kalevala.World.RoomSupervisor
   alias Kalevala.World.Zone.Movement
 
   defstruct [:id, :name, characters: [], rooms: []]
@@ -47,24 +45,7 @@ defmodule Kalevala.World.Zone do
       callback_module: config.callback_module
     }
 
-    {:ok, state, {:continue, {:start_rooms, config}}}
-  end
-
-  @impl true
-  def handle_continue({:start_rooms, config}, state) do
-    room_config = %{
-      supervisor: RoomSupervisor.global_name(state.data),
-      callback_module: config.rooms.callback_module,
-      characters: %{
-        callback_module: config.characters.callback_module
-      }
-    }
-
-    Enum.each(state.data.rooms, fn room ->
-      World.start_room(room, room_config)
-    end)
-
-    {:noreply, state}
+    {:ok, state}
   end
 
   @impl true

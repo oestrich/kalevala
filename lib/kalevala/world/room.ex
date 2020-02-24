@@ -164,8 +164,6 @@ defmodule Kalevala.World.Room do
 
   alias Kalevala.Event
   alias Kalevala.Event.Message
-  alias Kalevala.World
-  alias Kalevala.World.CharacterSupervisor
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
@@ -175,7 +173,6 @@ defmodule Kalevala.World.Room do
     :zone_id,
     :name,
     :description,
-    cast: [],
     exits: [],
     features: []
   ]
@@ -265,23 +262,10 @@ defmodule Kalevala.World.Room do
       private: %Private{}
     }
 
-    {:ok, state, {:continue, {:start_cast, config}}}
+    {:ok, state, {:continue, :initialized}}
   end
 
   @impl true
-  def handle_continue({:start_cast, config}, state) do
-    character_config = %{
-      supervisor: CharacterSupervisor.global_name(state.data),
-      callback_module: config.characters.callback_module
-    }
-
-    Enum.each(state.data.cast, fn character ->
-      World.start_cast(character, character_config)
-    end)
-
-    {:noreply, state, {:continue, :initialized}}
-  end
-
   def handle_continue(:initialized, state) do
     state.callback_module.initialized(state.data)
     {:noreply, state}
