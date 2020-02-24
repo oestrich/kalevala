@@ -1,6 +1,6 @@
-defmodule Kalevala.Character.Actor do
+defmodule Kalevala.Character.Foreman do
   @moduledoc """
-  Session Actor
+  Session Foreman
 
   Manages data flowing from the player into the game.
   """
@@ -11,7 +11,7 @@ defmodule Kalevala.Character.Actor do
 
   alias Kalevala.Character.Conn
   alias Kalevala.Event
-  alias Kalevala.Character.Actor.Channel
+  alias Kalevala.Character.Foreman.Channel
 
   defstruct [
     :character,
@@ -27,7 +27,7 @@ defmodule Kalevala.Character.Actor do
   ]
 
   @doc """
-  Start a new actor for a connecting player
+  Start a new foreman for a connecting player
   """
   def start(protocol_pid, options) do
     options = Keyword.merge(options, protocol: protocol_pid)

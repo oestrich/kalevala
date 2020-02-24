@@ -26,12 +26,12 @@ defmodule Kalevala.Character.Controller do
   @callback option(Conn.t(), any()) :: Conn.t()
 
   @doc """
-  Called when a `Kalevala.Character.Event` is sent to the actor process
+  Called when a `Kalevala.Character.Event` is sent to the foreman process
   """
   @callback event(Conn.t(), Event.t()) :: Conn.t()
 
   @doc """
-  Called when a `Kalevala.Character.Event.Display` is sent to the actor process
+  Called when a `Kalevala.Character.Event.Display` is sent to the foreman process
   """
   @callback display(Conn.t(), Event.t()) :: Conn.t()
 

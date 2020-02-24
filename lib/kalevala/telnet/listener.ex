@@ -27,9 +27,9 @@ defmodule Kalevala.Telnet.Listener do
       max_connections: 102_400
     }
 
-    actor_options = Map.get(state.config, :actor, [])
+    foreman_options = Map.get(state.config, :foreman, [])
 
-    case :ranch.start_listener({__MODULE__, :tcp}, :ranch_tcp, opts, Protocol, actor_options) do
+    case :ranch.start_listener({__MODULE__, :tcp}, :ranch_tcp, opts, Protocol, foreman_options) do
       {:ok, listener} ->
         set_listener(state, listener)
 
@@ -51,9 +51,9 @@ defmodule Kalevala.Telnet.Listener do
       max_connections: 4096
     }
 
-    actor_options = Map.get(state.config, :actor, [])
+    foreman_options = Map.get(state.config, :foreman, [])
 
-    case :ranch.start_listener({__MODULE__, :tls}, :ranch_ssl, opts, Protocol, actor_options) do
+    case :ranch.start_listener({__MODULE__, :tls}, :ranch_ssl, opts, Protocol, foreman_options) do
       {:ok, listener} ->
         set_tls_listener(state, listener)
 

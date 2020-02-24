@@ -19,19 +19,19 @@ A telnet listener will start on `4444` and a TLS listener will start on `4443` w
 
 ## Components of Kalevala
 
-### Actor
+### Foreman
 
-When you connect, a new `Kalevala.Character.Actor` process is started. This process handles incoming text from the player, sending out going text and events, and other orchestration.
+When you connect, a new `Kalevala.Foreman` process is started. This process handles incoming text from the player, sending out going text and events, and other orchestration.
 
 ### Conn
 
 A `Kalevala.Character.Conn` is the context token for controllers and commands. This is similar to a `Plug.Conn`. The main difference being it bundles up multiple renders and events to fire all at once, instead of being used for a single request.
 
-The actor will generate new `Conn`s before each event or incoming text. After processing the `Conn`, it is processed by sending text to the player and events sent to their router (more on this in a bit).
+The foreman will generate new `Conn`s before each event or incoming text. After processing the `Conn`, it is processed by sending text to the player and events sent to their router (more on this in a bit).
 
 ### Controllers
 
-A `Kalevala.Character.Controller` is the largest building block of handling texting. When starting the actor, an initial controller is given. This controller is initialized and used from then on. The callbacks required will be called at the appropriate time with a new `Conn`.
+A `Kalevala.Character.Controller` is the largest building block of handling texting. When starting the foreman, an initial controller is given. This controller is initialized and used from then on. The callbacks required will be called at the appropriate time with a new `Conn`.
 
 Controllers act as a simple state machine, only allowing transitioning to the next one you set in the `Conn`. For instance, you can contain all login logic in a `LoginController`, and handle game commands in its own controller, any paging can be handled in a `PagerController` which can suppress any outgoing text to prevent scrolling while reading, etc.
 
@@ -125,7 +125,7 @@ end
 
 A `Kalevala.Event` is an internal event passed between processes. Events have three fields, which pid is generating the event, the topic (e.g. `room/say`), and a map of data. Controllers and commands can generate events which will get sent to an event router process, which is typically the room they are in.
 
-The `Kalevala.World.Room` process handles the event by running the event through a similar router to command processing. The `Actor` process handles events with its own event router.
+The `Kalevala.World.Room` process handles the event by running the event through a similar router to command processing. The `Foreman` process handles events with its own event router.
 
 In the example below, you can call the event router with an event of topic `room/say` to run the `Kantele.World.Room.NotifyEvent.call/2` function.
 
