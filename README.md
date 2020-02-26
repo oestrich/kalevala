@@ -21,7 +21,7 @@ A telnet listener will start on `4444` and a TLS listener will start on `4443` w
 
 ### Foreman
 
-When you connect, a new `Kalevala.Foreman` process is started. This process handles incoming text from the player, sending out going text and events, and other orchestration.
+When you connect, a new `Kalevala.Character.Foreman` process is started. This process handles incoming text from the player, sending out going text and events, and other orchestration.
 
 ### Conn
 
