@@ -16,12 +16,12 @@ defmodule Kantele.Application do
         certfile: Path.join(:code.priv_dir(:kantele), "certs/cert.pem")
       ],
       foreman: [
-        presence_module: Kantele.Character.Presence,
+        supervisor_name: Kantele.Character.Foreman.Supervisor,
         character_module: Kantele.Character,
         communication_module: Kantele.Communication,
         initial_controller: Kantele.Character.LoginController,
-        quit_view: {Kantele.Character.QuitView, "disconnected"},
-        supervisor_name: Kantele.Character.Foreman.Supervisor
+        presence_module: Kantele.Character.Presence,
+        quit_view: {Kantele.Character.QuitView, "disconnected"}
       ]
     ]
 

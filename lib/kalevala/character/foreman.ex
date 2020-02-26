@@ -13,24 +13,37 @@ defmodule Kalevala.Character.Foreman do
   alias Kalevala.Event
   alias Kalevala.Character.Foreman.Channel
 
+  @type t() :: %__MODULE__{}
+
   defstruct [
+    :callback_module,
     :character,
     :character_module,
     :communication_module,
     :controller,
-    :options,
-    :presence_module,
-    :protocol,
-    :quit_view,
     :supervisor_name,
+    private: %{},
     session: %{}
   ]
 
   @doc """
   Start a new foreman for a connecting player
   """
-  def start(protocol_pid, options) do
-    options = Keyword.merge(options, protocol: protocol_pid)
+  def start_player(protocol_pid, options) do
+    options =
+      Keyword.merge(options,
+        callback_module: Kalevala.Character.Foreman.Player,
+        protocol: protocol_pid
+      )
+
+    DynamicSupervisor.start_child(options[:supervisor_name], {__MODULE__, options})
+  end
+
+  @doc """
+  Start a new foreman for a non-player (character run by the world)
+  """
+  def start_non_player(options) do
+    options = Keyword.merge(options, callback_module: Kalevala.Character.Foreman.NonPlayer)
     DynamicSupervisor.start_child(options[:supervisor_name], {__MODULE__, options})
   end
 
@@ -44,15 +57,14 @@ defmodule Kalevala.Character.Foreman do
     opts = Enum.into(opts, %{})
 
     state = %__MODULE__{
-      protocol: opts[:protocol],
+      callback_module: opts.callback_module,
       character_module: opts.character_module,
       communication_module: opts.communication_module,
       controller: opts.initial_controller,
-      presence_module: opts.presence_module,
-      quit_view: opts.quit_view,
-      supervisor_name: opts.supervisor_name,
-      options: %{}
+      supervisor_name: opts.supervisor_name
     }
+
+    state = opts.callback_module.init(state, opts)
 
     {:ok, state, {:continue, :init_controller}}
   end
@@ -107,29 +119,9 @@ defmodule Kalevala.Character.Foreman do
   end
 
   def handle_info(:terminate, state) do
-    notify_disconnect(state)
+    state.callback_module.terminating(state)
     DynamicSupervisor.terminate_child(state.supervisor_name, self())
     {:noreply, state}
-  end
-
-  defp notify_disconnect(%{character: nil}), do: :ok
-
-  defp notify_disconnect(state) do
-    {quit_view, quit_template} = state.quit_view
-
-    event = %Event{
-      topic: Event.Movement,
-      data: %Event.Movement{
-        character: state.character,
-        direction: :from,
-        reason: quit_view.render(quit_template, %{character: state.character}),
-        room_id: state.character.room_id
-      }
-    }
-
-    new_conn(state)
-    |> Map.put(:events, [event])
-    |> send_events()
   end
 
   @doc """
@@ -147,7 +139,7 @@ defmodule Kalevala.Character.Foreman do
 
     case conn.private.halt? do
       true ->
-        send(state.protocol, :terminate)
+        state.callback_module.terminate(state)
         {:noreply, state}
 
       false ->
@@ -158,22 +150,19 @@ defmodule Kalevala.Character.Foreman do
   end
 
   defp send_options(conn, state) do
-    Enum.each(conn.options, fn option ->
-      send(state.protocol, {:send, option})
-    end)
+    state.callback_module.send_options(state, conn.options)
 
     conn
   end
 
   defp send_lines(conn, state) do
-    Enum.each(conn.lines, fn line ->
-      send(state.protocol, {:send, line})
-    end)
+    state.callback_module.send_lines(state, conn.lines)
 
     conn
   end
 
-  defp send_events(conn) do
+  @doc false
+  def send_events(conn) do
     case Conn.event_router(conn) do
       nil ->
         conn
@@ -193,7 +182,7 @@ defmodule Kalevala.Character.Foreman do
         state
 
       false ->
-        state.presence_module.track(Conn.character(conn))
+        state.callback_module.track_presence(state, conn)
         %{state | character: conn.private.update_character}
     end
   end
@@ -208,4 +197,153 @@ defmodule Kalevala.Character.Foreman do
         {:noreply, state, {:continue, :init_controller}}
     end
   end
+end
+
+defmodule Kalevala.Character.Foreman.Callbacks do
+  @moduledoc """
+  Callbacks for a integrating with the character foreman process
+  """
+
+  alias Kalevala.Character.Conn
+  alias Kalevala.Character.Foreman
+
+  @type state() :: Foreman.t()
+
+  @typedoc "Options for starting the foreman process"
+  @type opts() :: Keyword.t()
+
+  @doc """
+  Fill in state with any passed in options
+  """
+  @callback init(state(), opts()) :: state()
+
+  @doc """
+  Called when the foreman process is halted through a conn
+
+  Perform whatever actions are required to start terminating.
+  """
+  @callback terminate(state()) :: :ok
+
+  @doc """
+  The process is terminating from a `:terminate` message
+
+  Perform whatever is required before terminating.
+  """
+  @callback terminating(state()) :: :ok
+
+  @doc """
+  Send options to a connection process
+  """
+  @callback send_options(state(), list()) :: :ok
+
+  @doc """
+  Send text to a connection process
+  """
+  @callback send_lines(state(), list()) :: :ok
+
+  @doc """
+  The character updated and presence should be tracked
+  """
+  @callback track_presence(state, Conn.t()) :: :ok
+end
+
+defmodule Kalevala.Character.Foreman.Player do
+  @moduledoc """
+  Callbacks for a player character
+  """
+
+  alias Kalevala.Character.Conn
+  alias Kalevala.Character.Foreman
+  alias Kalevala.Event
+
+  @behaviour Kalevala.Character.Foreman.Callbacks
+
+  defstruct [:protocol, :presence_module, :quit_view]
+
+  @impl true
+  def init(state, opts) do
+    private = %__MODULE__{
+      protocol: opts.protocol,
+      presence_module: opts.presence_module,
+      quit_view: opts.quit_view
+    }
+
+    %{state | private: private}
+  end
+
+  @impl true
+  def terminate(state) do
+    send(state.private.protocol, :terminate)
+  end
+
+  @impl true
+  def terminating(%{character: nil}), do: :ok
+
+  def terminating(state) do
+    {quit_view, quit_template} = state.private.quit_view
+
+    event = %Event{
+      topic: Event.Movement,
+      data: %Event.Movement{
+        character: state.character,
+        direction: :from,
+        reason: quit_view.render(quit_template, %{character: state.character}),
+        room_id: state.character.room_id
+      }
+    }
+
+    Foreman.new_conn(state)
+    |> Map.put(:events, [event])
+    |> Foreman.send_events()
+  end
+
+  @impl true
+  def send_options(state, options) do
+    Enum.each(options, fn option ->
+      send(state.private.protocol, {:send, option})
+    end)
+  end
+
+  @impl true
+  def send_lines(state, lines) do
+    Enum.each(lines, fn line ->
+      send(state.private.protocol, {:send, line})
+    end)
+  end
+
+  @impl true
+  def track_presence(state, conn) do
+    state.private.presence_module.track(Conn.character(conn))
+  end
+end
+
+defmodule Kalevala.Character.Foreman.NonPlayer do
+  @moduledoc """
+  Callbacks for a non-player character
+  """
+
+  require Logger
+
+  @behaviour Kalevala.Character.Foreman.Callbacks
+
+  @impl true
+  def init(state, opts) do
+    Logger.info("Character starting - #{opts.character.id}")
+    %{state | character: %{opts.character | pid: self()}}
+  end
+
+  @impl true
+  def terminate(state), do: state
+
+  @impl true
+  def terminating(state), do: state
+
+  @impl true
+  def send_options(_state, _options), do: :ok
+
+  @impl true
+  def send_lines(_state, _lines), do: :ok
+
+  @impl true
+  def track_presence(_state, _conn), do: :ok
 end

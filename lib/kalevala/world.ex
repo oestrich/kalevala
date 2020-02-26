@@ -7,7 +7,7 @@ defmodule Kalevala.World do
 
   use DynamicSupervisor
 
-  alias Kalevala.World.Character
+  alias Kalevala.Character.Foreman
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
   alias Kalevala.World.ZoneSupervisor
@@ -42,13 +42,8 @@ defmodule Kalevala.World do
   Start a world character into the world
   """
   def start_character(character, config) do
-    options = %{
-      character: character,
-      config: config,
-      genserver_options: [name: Character.global_name(character)]
-    }
-
-    DynamicSupervisor.start_child(config.supervisor_name, {Character, options})
+    options = Keyword.merge(config, character: character)
+    Foreman.start_non_player(options)
   end
 
   @doc false

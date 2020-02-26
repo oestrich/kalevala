@@ -51,12 +51,12 @@ defmodule Kantele.World.Kickoff do
   end
 
   defp start_character(character) do
-    config = %{
+    config = [
       supervisor_name: Kalevala.World.CharacterSupervisor.global_name(character.meta.zone_id),
       character_module: Kantele.Character,
-      callback_module: Kantele.World.Character,
-      communication_module: Kantele.Communication
-    }
+      communication_module: Kantele.Communication,
+      initial_controller: Kantele.Character.SpawnController
+    ]
 
     Kalevala.World.start_character(character, config)
   end

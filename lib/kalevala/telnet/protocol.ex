@@ -43,7 +43,7 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   def handle_info(:init, state) do
-    {:ok, foreman_pid} = Foreman.start(self(), state.foreman_options)
+    {:ok, foreman_pid} = Foreman.start_player(self(), state.foreman_options)
     state = Map.put(state, :foreman_pid, foreman_pid)
     {:noreply, state, {:continue, :initial_iacs}}
   end

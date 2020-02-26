@@ -11,12 +11,20 @@ defmodule Kantele.Character do
   end
 end
 
-defmodule Kantele.Character.Meta do
+defmodule Kantele.Character.PlayerMeta do
   @moduledoc """
   Specific metadata for a character in Kantele
   """
 
   defstruct [:vitals]
+end
+
+defmodule Kantele.Character.NonPlayerMeta do
+  @moduledoc """
+  Specific metadata for a world character in Kantele
+  """
+
+  defstruct [:vitals, :zone_id]
 end
 
 defmodule Kantele.Character.Vitals do

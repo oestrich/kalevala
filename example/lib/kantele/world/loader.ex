@@ -109,7 +109,7 @@ defmodule Kantele.World.Loader do
       id: "#{zone.id}:#{key}",
       name: character_data.name,
       description: character_data.description,
-      meta: %Kantele.World.Character.Meta{
+      meta: %Kantele.Character.NonPlayerMeta{
         zone_id: zone.id
       }
     }
