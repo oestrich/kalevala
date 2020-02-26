@@ -34,7 +34,7 @@ defmodule Kantele.World.Kickoff do
 
   defp start_zone(zone) do
     config = %{
-      supervisor: Kantele.World,
+      supervisor_name: Kantele.World,
       callback_module: Kantele.World.Zone
     }
 
@@ -43,7 +43,7 @@ defmodule Kantele.World.Kickoff do
 
   defp start_room(room) do
     config = %{
-      supervisor: Kalevala.World.RoomSupervisor.global_name(room),
+      supervisor_name: Kalevala.World.RoomSupervisor.global_name(room),
       callback_module: Kantele.World.Room
     }
 
@@ -52,8 +52,10 @@ defmodule Kantele.World.Kickoff do
 
   defp start_character(character) do
     config = %{
-      supervisor: Kalevala.World.CharacterSupervisor.global_name(character.meta.zone_id),
-      callback_module: Kantele.World.Character
+      supervisor_name: Kalevala.World.CharacterSupervisor.global_name(character.meta.zone_id),
+      character_module: Kantele.Character,
+      callback_module: Kantele.World.Character,
+      communication_module: Kantele.Communication
     }
 
     Kalevala.World.start_character(character, config)

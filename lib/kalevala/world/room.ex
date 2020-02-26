@@ -257,7 +257,7 @@ defmodule Kalevala.World.Room do
 
     state = %{
       data: room,
-      supervisor: config.supervisor,
+      supervisor_name: config.supervisor_name,
       callback_module: config.callback_module,
       private: %Private{}
     }

@@ -22,7 +22,7 @@ defmodule Kalevala.World do
       genserver_options: [name: Zone.global_name(zone)]
     }
 
-    DynamicSupervisor.start_child(config.supervisor, {ZoneSupervisor, options})
+    DynamicSupervisor.start_child(config.supervisor_name, {ZoneSupervisor, options})
   end
 
   @doc """
@@ -35,7 +35,7 @@ defmodule Kalevala.World do
       genserver_options: [name: Room.global_name(room)]
     }
 
-    DynamicSupervisor.start_child(config.supervisor, {Room, options})
+    DynamicSupervisor.start_child(config.supervisor_name, {Room, options})
   end
 
   @doc """
@@ -48,7 +48,7 @@ defmodule Kalevala.World do
       genserver_options: [name: Character.global_name(character)]
     }
 
-    DynamicSupervisor.start_child(config.supervisor, {Character, options})
+    DynamicSupervisor.start_child(config.supervisor_name, {Character, options})
   end
 
   @doc false
