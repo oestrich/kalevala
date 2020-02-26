@@ -28,10 +28,6 @@ room_characters "town_square" {
   characters = [
     {
       id = characters.town_crier.id
-    },
-    {
-      id = characters.villager.id
-      name = "Tapio"
     }
   ]
 }
@@ -56,6 +52,17 @@ room_exits "inn" {
   room_id = rooms.inn.id
 
   west = rooms.town_square.id
+}
+
+room_characters "inn" {
+  room_id = rooms.inn.id
+
+  characters = [
+    {
+      id = characters.villager.id
+      name = "Tapio"
+    }
+  ]
 }
 
 characters "town_crier" {

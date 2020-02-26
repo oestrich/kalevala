@@ -110,7 +110,15 @@ defmodule Kantele.World.Loader do
       name: character_data.name,
       description: character_data.description,
       meta: %Kantele.Character.NonPlayerMeta{
-        zone_id: zone.id
+        zone_id: zone.id,
+        vitals: %Kantele.Character.Vitals{
+          health_points: 25,
+          max_health_points: 25,
+          skill_points: 17,
+          max_skill_points: 17,
+          endurance_points: 30,
+          max_endurance_points: 30
+        }
       }
     }
 

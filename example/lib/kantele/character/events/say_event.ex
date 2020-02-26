@@ -21,4 +21,16 @@ defmodule Kantele.Character.SayEvent do
         |> prompt(CommandView, "prompt", %{})
     end
   end
+
+  def echo_chamber(conn, event) do
+    case event.from_pid == self() do
+      true ->
+        conn
+
+      false ->
+        publish_message(conn, event.data.channel_name, event.data.text, [], &publish_error/2)
+    end
+  end
+
+  def publish_error(conn, _error), do: conn
 end
