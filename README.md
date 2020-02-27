@@ -1,3 +1,5 @@
+![Elixir CI Status](https://github.com/oestrich/kalevala/workflows/Elixir%20CI/badge.svg)
+
 # Kalevala
 
 ![Kalevala logo](kalevala.png)
