@@ -7,6 +7,7 @@ defmodule Kalevala.World do
 
   use DynamicSupervisor
 
+  alias Kalevala.Character.Foreman
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
   alias Kalevala.World.ZoneSupervisor
@@ -18,10 +19,10 @@ defmodule Kalevala.World do
     options = %{
       zone: zone,
       config: config,
-      otp: [name: Zone.global_name(zone)]
+      genserver_options: [name: Zone.global_name(zone)]
     }
 
-    DynamicSupervisor.start_child(config.supervisor, {ZoneSupervisor, options})
+    DynamicSupervisor.start_child(config.supervisor_name, {ZoneSupervisor, options})
   end
 
   @doc """
@@ -31,10 +32,18 @@ defmodule Kalevala.World do
     options = %{
       room: room,
       config: config,
-      otp: [name: Room.global_name(room)]
+      genserver_options: [name: Room.global_name(room)]
     }
 
-    DynamicSupervisor.start_child(config.supervisor, {Room, options})
+    DynamicSupervisor.start_child(config.supervisor_name, {Room, options})
+  end
+
+  @doc """
+  Start a world character into the world
+  """
+  def start_character(character, config) do
+    options = Keyword.merge(config, character: character)
+    Foreman.start_non_player(options)
   end
 
   @doc false

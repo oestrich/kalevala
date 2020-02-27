@@ -17,24 +17,47 @@ defmodule Kantele.World.Kickoff do
   end
 
   def handle_continue(:load, state) do
-    zones = Loader.load_zones()
+    world = Loader.load_world()
 
-    zones
-    |> Enum.map(&Cache.cache_zone/1)
-    |> Enum.each(&start_zone/1)
+    Enum.each(world.zones, fn zone ->
+      zone
+      |> Cache.cache_zone()
+      |> Loader.strip_zone()
+      |> start_zone()
+    end)
+
+    Enum.each(world.rooms, &start_room/1)
+    Enum.each(world.characters, &start_character/1)
 
     {:noreply, state}
   end
 
   defp start_zone(zone) do
     config = %{
-      supervisor: Kantele.World,
-      callback_module: Kantele.World.Zone,
-      rooms: %{
-        callback_module: Kantele.World.Room
-      }
+      supervisor_name: Kantele.World,
+      callback_module: Kantele.World.Zone
     }
 
     Kalevala.World.start_zone(zone, config)
+  end
+
+  defp start_room(room) do
+    config = %{
+      supervisor_name: Kalevala.World.RoomSupervisor.global_name(room),
+      callback_module: Kantele.World.Room
+    }
+
+    Kalevala.World.start_room(room, config)
+  end
+
+  defp start_character(character) do
+    config = [
+      supervisor_name: Kalevala.World.CharacterSupervisor.global_name(character.meta.zone_id),
+      character_module: Kantele.Character,
+      communication_module: Kantele.Communication,
+      initial_controller: Kantele.Character.SpawnController
+    ]
+
+    Kalevala.World.start_character(character, config)
   end
 end

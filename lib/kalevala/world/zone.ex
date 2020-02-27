@@ -8,11 +8,9 @@ defmodule Kalevala.World.Zone do
   require Logger
 
   alias Kalevala.Event
-  alias Kalevala.World
-  alias Kalevala.World.RoomSupervisor
   alias Kalevala.World.Zone.Movement
 
-  defstruct [:id, :name, rooms: []]
+  defstruct [:id, :name, characters: [], rooms: []]
 
   @type t() :: %__MODULE__{}
 
@@ -28,40 +26,26 @@ defmodule Kalevala.World.Zone do
 
   @doc false
   def start_link(options) do
-    otp_options = options.otp
-    options = Map.delete(options, :otp)
+    genserver_options = options.genserver_options
+    options = Map.delete(options, :genserver_options)
 
-    GenServer.start_link(__MODULE__, options, otp_options)
+    GenServer.start_link(__MODULE__, options, genserver_options)
   end
 
   @impl true
-  def init(state) do
-    Logger.info("Zone starting - #{state.zone.id}")
+  def init(options) do
+    Logger.info("Zone starting - #{options.zone.id}")
 
-    config = state.config
-    zone = config.callback_module.init(state.zone)
+    config = options.config
+    zone = config.callback_module.init(options.zone)
 
     state = %{
       data: zone,
-      supervisor: config.supervisor,
+      supervisor_name: config.supervisor_name,
       callback_module: config.callback_module
     }
 
-    {:ok, state, {:continue, {:start_rooms, config}}}
-  end
-
-  @impl true
-  def handle_continue({:start_rooms, config}, state) do
-    room_config = %{
-      supervisor: RoomSupervisor.global_name(state.data),
-      callback_module: config.rooms.callback_module
-    }
-
-    Enum.each(state.data.rooms, fn room ->
-      World.start_room(room, room_config)
-    end)
-
-    {:noreply, state}
+    {:ok, state}
   end
 
   @impl true

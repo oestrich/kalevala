@@ -29,3 +29,18 @@ defmodule Kantele.Character.Events do
     end
   end
 end
+
+defmodule Kantele.Character.NonPlayerEvents do
+  @moduledoc false
+
+  use Kalevala.Event.Router
+
+  alias Kalevala.Event.Message
+  alias Kantele.Character.SayEvent
+
+  scope(Kantele.Character) do
+    module(SayEvent) do
+      event(Message, :echo_chamber, interested?: &SayEvent.interested?/1)
+    end
+  end
+end

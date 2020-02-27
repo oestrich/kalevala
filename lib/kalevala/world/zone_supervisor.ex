@@ -3,6 +3,7 @@ defmodule Kalevala.World.ZoneSupervisor do
 
   use Supervisor
 
+  alias Kalevala.World.CharacterSupervisor
   alias Kalevala.World.RoomSupervisor
   alias Kalevala.World.Zone
 
@@ -15,6 +16,7 @@ defmodule Kalevala.World.ZoneSupervisor do
   def init(config) do
     children = [
       {RoomSupervisor, [name: RoomSupervisor.global_name(config.zone)]},
+      {CharacterSupervisor, [name: CharacterSupervisor.global_name(config.zone)]},
       {Zone, config}
     ]
 

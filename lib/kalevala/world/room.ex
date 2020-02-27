@@ -242,22 +242,22 @@ defmodule Kalevala.World.Room do
 
   @doc false
   def start_link(options) do
-    otp_options = options.otp
-    options = Map.delete(options, :otp)
+    genserver_options = options.genserver_options
+    options = Map.delete(options, :genserver_options)
 
-    GenServer.start_link(__MODULE__, options, otp_options)
+    GenServer.start_link(__MODULE__, options, genserver_options)
   end
 
   @impl true
-  def init(state) do
-    Logger.info("Room starting - #{state.room.id}")
+  def init(options) do
+    Logger.info("Room starting - #{options.room.id}")
 
-    config = state.config
-    room = config.callback_module.init(state.room)
+    config = options.config
+    room = config.callback_module.init(options.room)
 
     state = %{
       data: room,
-      supervisor: config.supervisor,
+      supervisor_name: config.supervisor_name,
       callback_module: config.callback_module,
       private: %Private{}
     }

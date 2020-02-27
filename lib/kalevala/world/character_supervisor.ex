@@ -1,5 +1,5 @@
-defmodule Kalevala.World.RoomSupervisor do
-  @moduledoc "Supervisor to watch over Rooms"
+defmodule Kalevala.World.CharacterSupervisor do
+  @moduledoc "Supervisor to watch over Residents"
 
   use DynamicSupervisor
 
@@ -10,6 +10,8 @@ defmodule Kalevala.World.RoomSupervisor do
   def global_name(zone = %Zone{}), do: {:global, {__MODULE__, zone.id}}
 
   def global_name(room = %Room{}), do: {:global, {__MODULE__, room.zone_id}}
+
+  def global_name(zone_id), do: {:global, {__MODULE__, zone_id}}
 
   @doc false
   def start_link(opts) do

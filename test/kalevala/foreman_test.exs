@@ -48,6 +48,11 @@ defmodule Kalevala.ForemanTest do
   end
 
   defp setup_state() do
-    %Foreman{protocol: self()}
+    %Foreman{
+      callback_module: Foreman.Player,
+      private: %Foreman.Player{
+        protocol: self()
+      }
+    }
   end
 end

@@ -103,7 +103,7 @@ defmodule Kantele.Character.LoginController do
       name: name,
       status: "#{name} is here.",
       description: "#{name} is a person.",
-      meta: %Kantele.Character.Meta{
+      meta: %Kantele.Character.PlayerMeta{
         vitals: %Kantele.Character.Vitals{
           health_points: 25,
           max_health_points: 25,
