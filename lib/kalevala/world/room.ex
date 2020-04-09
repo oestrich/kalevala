@@ -5,7 +5,7 @@ defmodule Kalevala.World.Room.Context do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, assigns: %{}, characters: [], events: [], lines: []]
+  defstruct [:data, assigns: %{}, characters: [], items: [], events: [], lines: []]
 
   defp push(context, to_pid, event = %Kalevala.Character.Conn.Event{}, _newline) do
     Map.put(context, :lines, context.lines ++ [{to_pid, event}])
@@ -174,7 +174,8 @@ defmodule Kalevala.World.Room do
     :name,
     :description,
     exits: [],
-    features: []
+    features: [],
+    items: []
   ]
 
   @type t() :: %__MODULE__{}

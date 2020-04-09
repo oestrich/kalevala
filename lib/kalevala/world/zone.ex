@@ -10,7 +10,7 @@ defmodule Kalevala.World.Zone do
   alias Kalevala.Event
   alias Kalevala.World.Zone.Movement
 
-  defstruct [:id, :name, characters: [], rooms: []]
+  defstruct [:id, :name, characters: [], rooms: [], items: []]
 
   @type t() :: %__MODULE__{}
 
