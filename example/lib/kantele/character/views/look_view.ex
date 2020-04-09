@@ -11,6 +11,7 @@ defmodule Kantele.Character.LookView do
 
     You see:
     <%= render("_characters", %{characters: characters}) %>
+    <%= render("_items", %{items: room.items}) %>
     """
   end
 
@@ -42,5 +43,15 @@ defmodule Kantele.Character.LookView do
 
   def render("_character", %{character: character}) do
     ~i(- #{white()}#{character.name}#{reset()})
+  end
+
+  def render("_items", %{items: items}) do
+    items
+    |> Enum.map(&render("_item", %{item: &1}))
+    |> View.join("\n")
+  end
+
+  def render("_item", %{item: item}) do
+    ~i(- #{white()}#{item.name}#{reset()})
   end
 end

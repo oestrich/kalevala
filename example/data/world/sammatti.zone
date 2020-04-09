@@ -74,3 +74,18 @@ characters "villager" {
   name = "Villager"
   description = "A villager of Sammatti."
 }
+
+items "sword" {
+  name = "Sword of Destiny"
+  description = "A radiant sword"
+}
+
+room_items "town_square" {
+  room_id = rooms.town_square.id
+
+  items = [
+    {
+      id = items.sword.id
+    }
+  ]
+}
