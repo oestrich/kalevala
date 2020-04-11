@@ -6,7 +6,7 @@ defmodule Kantele.World.Loader do
   alias Kalevala.Character
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
-  alias Kantele.Item
+  alias Kalevala.Item
 
   @doc """
   Load zone files into Kalevala structs

@@ -1,4 +1,4 @@
-defmodule Kantele.Item do
+defmodule Kalevala.Item do
   @moduledoc """
   Item struct
 
