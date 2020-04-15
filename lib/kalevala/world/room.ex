@@ -226,18 +226,26 @@ defmodule Kalevala.World.Room do
   @doc """
   Callback for the room to hook into movement between exits
 
-  The character is requesting to move via an exit, a voting response should be
-  provided to pitch up to the Zone or immediately abort if the exit isn't present
-  in the room.
+  The character is requesting to move via an exit, a tuple allowing or rejecting
+  the movement before being pitched up to the Zone should be returned.
+
+  Can immediately terminate a room before being checked in a more detailed fashion
+  with `confirm_movement/2` below.
   """
   @callback movement_request(t(), event :: Event.movement_request(), room_exit :: Exit.t() | nil) ::
               {:abort, event :: Event.t(), reason :: atom()}
               | {:proceed, event :: Event.t(), room_exit :: Exit.t()}
 
   @doc """
-  Callback for movement
+  Callback for confirming or aborting character movement
 
-  Allows the room to reject or otherwise modify the movement
+  Called while the Zone is checking each side of the exit to know if the movement
+  is indeed allowed. Returning the original event allows movement to proceed, otherwise
+  return an aborted event to prevent movement.
+
+  Hook to allow for the room to reject movement for custom reasons, e.g. an NPC
+  is blocking the exit and needs to be convinced first, or there is a trap blocking
+  the exit.
   """
   @callback confirm_movement(Context.t(), event :: Event.movement_voting()) ::
               {Context.t(), Event.movement_voting()}
