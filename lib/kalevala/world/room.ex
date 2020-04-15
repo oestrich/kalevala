@@ -247,6 +247,19 @@ defmodule Kalevala.World.Room do
       import Kalevala.World.Room.Context
 
       @behaviour Kalevala.World.Room
+
+      @impl true
+      def init(room), do: room
+
+      @impl true
+      def movement_request(_room, event, nil), do: {:abort, event, :no_exit}
+
+      def movement_request(_room, event, room_exit), do: {:proceed, event, room_exit}
+
+      @impl true
+      def confirm_movement(context, event), do: {context, event}
+
+      defoverridable confirm_movement: 2, init: 1, movement_request: 3
     end
   end
 

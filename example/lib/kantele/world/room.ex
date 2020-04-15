@@ -12,9 +12,6 @@ defmodule Kantele.World.Room do
   alias Kantele.World.Room.Events
 
   @impl true
-  def init(room), do: room
-
-  @impl true
   def initialized(room) do
     options = [room_id: room.id]
 
@@ -29,14 +26,6 @@ defmodule Kantele.World.Room do
   def event(context, event) do
     Events.call(context, event)
   end
-
-  @impl true
-  def movement_request(_room, event, nil), do: {:abort, event, :no_exit}
-
-  def movement_request(_room, event, room_exit), do: {:proceed, event, room_exit}
-
-  @impl true
-  def confirm_movement(context, event), do: {context, event}
 end
 
 defmodule Kantele.World.Room.Events do
