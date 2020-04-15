@@ -179,6 +179,7 @@ defmodule Kalevala.Character.Conn do
   """
   def event(conn, topic, data \\ %{}) do
     event = %Kalevala.Event{
+      acting_character: Private.character(conn),
       from_pid: self(),
       topic: topic,
       data: data
@@ -200,6 +201,8 @@ defmodule Kalevala.Character.Conn do
   """
   def request_movement(conn, exit_name) do
     event = %Kalevala.Event{
+      acting_character: Private.character(conn),
+      from_pid: self(),
       topic: Kalevala.Event.Movement.Request,
       data: %Kalevala.Event.Movement.Request{
         character: Private.character(conn),
@@ -220,6 +223,7 @@ defmodule Kalevala.Character.Conn do
     data = view.render(template, assigns)
 
     event = %Kalevala.Event{
+      acting_character: Private.character(conn),
       from_pid: self(),
       topic: Kalevala.Event.Movement,
       data: %Kalevala.Event.Movement{
@@ -273,6 +277,7 @@ defmodule Kalevala.Character.Conn do
     options = Keyword.merge([character: Private.character(conn)], options)
 
     event = %Kalevala.Event{
+      acting_character: Private.character(conn),
       from_pid: self(),
       topic: Kalevala.Event.Message,
       data: %Kalevala.Event.Message{

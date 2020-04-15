@@ -37,7 +37,7 @@ defmodule Kalevala.Event do
 
   @type topic() :: String.t()
 
-  defstruct [:from_pid, :topic, :data, metadata: %__MODULE__.Metadata{}]
+  defstruct [:acting_character, :from_pid, :topic, :data, metadata: %__MODULE__.Metadata{}]
 
   @doc """
   Set the start time on an event

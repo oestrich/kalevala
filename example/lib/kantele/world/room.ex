@@ -60,9 +60,14 @@ defmodule Kantele.World.Room.LookEvent do
   alias Kantele.Character.LookView
 
   def call(context, event) do
+    characters =
+      Enum.reject(context.characters, fn character ->
+        character.id == event.acting_character.id
+      end)
+
     context
     |> assign(:room, context.data)
-    |> assign(:characters, context.characters)
+    |> assign(:characters, characters)
     |> render(event.from_pid, LookView, "look", %{})
   end
 end
