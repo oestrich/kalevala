@@ -31,38 +31,9 @@ defmodule Kantele.World.Room do
   end
 
   @impl true
-  def movement_request(room, event) do
-    room.exits
-    |> Enum.find(fn exit ->
-      exit.exit_name == event.data.exit_name
-    end)
-    |> maybe_vote(room, event)
-  end
+  def movement_request(_room, event, nil), do: {:abort, event, :no_exit}
 
-  defp maybe_vote(nil, room, event) do
-    %Kalevala.Event{
-      topic: Kalevala.Event.Movement.Voting,
-      data: %Kalevala.Event.Movement.Voting{
-        aborted: true,
-        character: event.data.character,
-        from: room.id,
-        exit_name: event.data.exit_name,
-        reason: :no_exit
-      }
-    }
-  end
-
-  defp maybe_vote(room_exit, room, event) do
-    %Kalevala.Event{
-      topic: Kalevala.Event.Movement.Voting,
-      data: %Kalevala.Event.Movement.Voting{
-        character: event.data.character,
-        from: room.id,
-        to: room_exit.end_room_id,
-        exit_name: room_exit.exit_name
-      }
-    }
-  end
+  def movement_request(_room, event, room_exit), do: {:proceed, event, room_exit}
 
   @impl true
   def confirm_movement(context, event), do: {context, event}

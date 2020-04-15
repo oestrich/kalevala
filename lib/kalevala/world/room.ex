@@ -79,12 +79,38 @@ defmodule Kalevala.World.Room.Movement do
   - If an abort, forward to the character
   - Otherwise, Forward to the zone
   """
-  def handle_request(event = %Event{topic: Voting, data: %{aborted: true}}, _state) do
+  def handle_request({:abort, event, reason}, state, metadata) do
     %{character: character} = event.data
+
+    event = %Event{
+      topic: Voting,
+      metadata: metadata,
+      data: %Voting{
+        aborted: true,
+        character: character,
+        from: state.data.id,
+        exit_name: event.data.exit_name,
+        reason: reason
+      }
+    }
+
     send(character.pid, Voting.abort(event))
   end
 
-  def handle_request(event, state) do
+  def handle_request({:proceed, event, room_exit}, state, metadata) do
+    %{character: character} = event.data
+
+    event = %Event{
+      topic: Voting,
+      metadata: metadata,
+      data: %Voting{
+        character: character,
+        from: state.data.id,
+        to: room_exit.end_room_id,
+        exit_name: room_exit.exit_name
+      }
+    }
+
     Zone.global_name(state.data.zone_id)
     |> GenServer.whereis()
     |> send(event)
@@ -165,6 +191,7 @@ defmodule Kalevala.World.Room do
   alias Kalevala.Event
   alias Kalevala.Event.Message
   alias Kalevala.World.Room.Context
+  alias Kalevala.World.Room.Exit
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
 
@@ -203,8 +230,9 @@ defmodule Kalevala.World.Room do
   provided to pitch up to the Zone or immediately abort if the exit isn't present
   in the room.
   """
-  @callback movement_request(t(), event :: Event.movement_request()) ::
-              Event.movement_voting()
+  @callback movement_request(t(), event :: Event.movement_request(), room_exit :: Exit.t() | nil) ::
+              {:abort, event :: Event.t(), reason :: atom()}
+              | {:proceed, event :: Event.t(), room_exit :: Exit.t()}
 
   @doc """
   Callback for movement
@@ -225,11 +253,9 @@ defmodule Kalevala.World.Room do
   @doc """
   Confirm movement for a character
   """
-  def confirm_movement(
-        event = %Event{topic: Event.Movement.Voting, data: %{aborted: true}},
-        _room_id
-      ),
-      do: event
+  def confirm_movement(event = %Event{topic: Voting, data: %{aborted: true}}, _room_id) do
+    event
+  end
 
   def confirm_movement(event, room_id) do
     GenServer.call(global_name(room_id), event)
@@ -290,10 +316,14 @@ defmodule Kalevala.World.Room do
   @impl true
   # Forward movement requests to the zone to handle
   def handle_info(event = %Event{topic: Event.Movement.Request}, state) do
+    room_exit =
+      Enum.find(state.data.exits, fn exit ->
+        exit.exit_name == event.data.exit_name
+      end)
+
     state.data
-    |> state.callback_module.movement_request(event)
-    |> Map.put(:metadata, event.metadata)
-    |> Movement.handle_request(state)
+    |> state.callback_module.movement_request(event, room_exit)
+    |> Movement.handle_request(state, event.metadata)
 
     {:noreply, state}
   end
