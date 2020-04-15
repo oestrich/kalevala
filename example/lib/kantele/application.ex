@@ -29,15 +29,32 @@ defmodule Kantele.Application do
       {Kantele.Config, [name: Kantele.Config]},
       {Kantele.Character.Presence, []},
       {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
-      {Kalevala.Telnet.Listener, listener_config},
+      listener(listener_config),
       {Kantele.Communication, []},
       {Kantele.World, []},
       {Kantele.Telemetry, []}
     ]
 
+    children =
+      Enum.reject(children, fn child ->
+        is_nil(child)
+      end)
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Kantele.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  def listener(listener_config) do
+    config = Application.get_env(:kantele, :listener, [])
+
+    case Keyword.get(config, :start, true) do
+      true ->
+        {Kalevala.Telnet.Listener, listener_config}
+
+      false ->
+        nil
+    end
   end
 end
