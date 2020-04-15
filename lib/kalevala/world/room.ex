@@ -79,15 +79,15 @@ defmodule Kalevala.World.Room.Movement do
   - If an abort, forward to the character
   - Otherwise, Forward to the zone
   """
-  def handle_request(movement_voting = %Voting{aborted: true}, _state) do
-    %{character: character} = movement_voting
-    send(character.pid, Voting.abort(movement_voting))
+  def handle_request(event = %Event{topic: Voting, data: %{aborted: true}}, _state) do
+    %{character: character} = event.data
+    send(character.pid, Voting.abort(event))
   end
 
-  def handle_request(movement_voting, state) do
+  def handle_request(event, state) do
     Zone.global_name(state.data.zone_id)
     |> GenServer.whereis()
-    |> send(movement_voting)
+    |> send(event)
   end
 
   @doc """
