@@ -5,7 +5,7 @@ defmodule Kalevala.World.Room.Context do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, assigns: %{}, characters: [], items: [], events: [], lines: []]
+  defstruct [:data, assigns: %{}, characters: [], events: [], lines: []]
 
   defp push(context, to_pid, event = %Kalevala.Character.Conn.Event{}, _newline) do
     Map.put(context, :lines, context.lines ++ [{to_pid, event}])
@@ -388,7 +388,12 @@ defmodule Kalevala.World.Room do
   end
 
   defp new_context(state) do
-    %Context{data: state.data, characters: state.private.characters}
+    data = trim_items(state.data)
+
+    %Context{
+      data: data,
+      characters: state.private.characters
+    }
   end
 
   defp handle_context(context) do
@@ -420,5 +425,14 @@ defmodule Kalevala.World.Room do
     end)
 
     context
+  end
+
+  defp trim_items(data) do
+    items =
+      Enum.map(data.items, fn item ->
+        Map.put(item, :meta, item.callback_module.trim_meta(item))
+      end)
+
+    %{data | items: items}
   end
 end

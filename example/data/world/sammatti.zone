@@ -86,6 +86,9 @@ room_items "town_square" {
   items = [
     {
       id = items.sword.id
+    },
+    {
+      id = items.sword.id
     }
   ]
 }

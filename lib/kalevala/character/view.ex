@@ -23,6 +23,21 @@ defmodule Kalevala.Character.View do
   def join([line | lines], separator) do
     [line, separator | join(lines, separator)]
   end
+
+  @doc """
+  Trim empty lines from io data
+
+  Detects empty lines in io data (for example when rendered via EEx templating),
+  and removes them. This way the template string works as expected, returning an
+  empty string from a sub-render will strip the line.
+  """
+  def trim_lines([]), do: []
+
+  def trim_lines(["\n", "", "\n" | segments]), do: ["\n" | trim_lines(segments)]
+
+  def trim_lines(["\n", nil, "\n" | segments]), do: ["\n" | trim_lines(segments)]
+
+  def trim_lines([segment | segments]), do: [segment | trim_lines(segments)]
 end
 
 defmodule Kalevala.Character.View.Macro do
@@ -30,14 +45,22 @@ defmodule Kalevala.Character.View.Macro do
   Imported into views
   """
 
+  alias Kalevala.Character.View
+
   @doc """
   Creates ~E which runs through EEx templating
   """
-  defmacro sigil_E({:<<>>, _, [expr]}, _opts) do
-    EEx.compile_string(expr,
-      line: __CALLER__.line + 1,
-      engine: Kalevala.Character.View.EExKalevala
-    )
+  defmacro sigil_E({:<<>>, _, [expr]}, opts) do
+    string =
+      EEx.compile_string(expr,
+        line: __CALLER__.line + 1,
+        sigil_opts: opts,
+        engine: Kalevala.Character.View.EExKalevala
+      )
+
+    quote do
+      View.trim_lines(unquote(string))
+    end
   end
 
   @doc """

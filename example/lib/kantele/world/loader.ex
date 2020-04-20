@@ -4,9 +4,9 @@ defmodule Kantele.World.Loader do
   """
 
   alias Kalevala.Character
+  alias Kalevala.World.Item
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
-  alias Kalevala.Item
 
   @doc """
   Load zone files into Kalevala structs
@@ -261,14 +261,13 @@ defmodule Kantele.World.Loader do
         |> Enum.with_index()
         |> Enum.map(fn {item_data, index} ->
           item_id = dereference(zones, zone, item_data.id)
-
           {_key, item} = Enum.find(zone.items, &match_item(&1, item_id))
 
           %Item{
             item
             | id: "#{room_id}:#{item.id}:#{index}",
-              name: Map.get(item_data, :name, item.name),
-              room_id: room_id
+              room_id: room_id,
+              callback_module: Kantele.World.Item
           }
         end)
       end)
