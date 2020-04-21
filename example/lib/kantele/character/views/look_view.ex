@@ -3,11 +3,11 @@ defmodule Kantele.Character.LookView do
 
   import IO.ANSI, only: [blue: 0, reset: 0, white: 0]
 
-  def render("look", %{room: room, characters: characters}) do
+  def render("look", %{room: room, characters: characters, items: items}) do
     ~E"""
     <%= blue() %><%= room.name %><%= reset() %>
     <%= render("_description", %{room: room}) %>
-    <%= render("_items", %{items: room.items}) %>
+    <%= render("_items", %{items: items}) %>
     <%= render("_exits", %{room: room}) %>
     <%= render("_characters", %{characters: characters}) %>
     """

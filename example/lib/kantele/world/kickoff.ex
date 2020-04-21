@@ -28,6 +28,7 @@ defmodule Kantele.World.Kickoff do
 
     Enum.each(world.rooms, &start_room/1)
     Enum.each(world.characters, &start_character/1)
+    Enum.each(world.items, &cache_item/1)
 
     {:noreply, state}
   end
@@ -47,7 +48,10 @@ defmodule Kantele.World.Kickoff do
       callback_module: Kantele.World.Room
     }
 
-    Kalevala.World.start_room(room, config)
+    item_instances = Map.get(room, :item_instances, [])
+    room = Map.delete(room, :item_instances)
+
+    Kalevala.World.start_room(room, item_instances, config)
   end
 
   defp start_character(character) do
@@ -59,5 +63,9 @@ defmodule Kantele.World.Kickoff do
     ]
 
     Kalevala.World.start_character(character, config)
+  end
+
+  defp cache_item(item) do
+    Kantele.World.Items.put(item.id, item)
   end
 end

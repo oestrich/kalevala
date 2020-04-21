@@ -28,9 +28,10 @@ defmodule Kalevala.World do
   @doc """
   Start the room into the world
   """
-  def start_room(room, config) do
+  def start_room(room, item_instances, config) do
     options = %{
       room: room,
+      item_instances: item_instances,
       config: config,
       genserver_options: [name: Room.global_name(room)]
     }

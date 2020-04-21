@@ -29,6 +29,7 @@ defmodule Kantele.World.Loader do
     |> Enum.map(&parse_exits(&1, data, zones))
     |> Enum.map(&parse_characters(&1, data, zones))
     |> Enum.map(&parse_items(&1, data, zones))
+    |> Enum.map(&zone_items_to_list/1)
     |> Enum.map(&zone_rooms_to_list/1)
     |> parse_world()
   end
@@ -36,6 +37,11 @@ defmodule Kantele.World.Loader do
   defp merge_zone_data(zone_data) do
     [key] = Map.keys(zone_data.zones)
     {to_string(key), zone_data}
+  end
+
+  defp zone_items_to_list(zone) do
+    items = Map.values(zone.items)
+    %{zone | items: items}
   end
 
   defp zone_rooms_to_list(zone) do
@@ -89,8 +95,7 @@ defmodule Kantele.World.Loader do
       zone_id: zone.id,
       name: room_data.name,
       description: room_data.description,
-      features: parse_features(room_data),
-      items: []
+      features: parse_features(room_data)
     }
 
     {key, room}
@@ -145,6 +150,7 @@ defmodule Kantele.World.Loader do
       id: "#{zone.id}:#{key}",
       name: item_data.name,
       description: item_data.description,
+      callback_module: Kantele.World.Item,
       meta: %{}
     }
 
@@ -253,37 +259,38 @@ defmodule Kantele.World.Loader do
 
     room_items = Map.get(zone_data, :room_items, [])
 
-    items =
-      Enum.flat_map(room_items, fn {_key, room_item} ->
-        room_id = dereference(zones, zone, room_item.room_id)
+    Enum.reduce(room_items, zone, fn {_key, room_item}, zone ->
+      room_id = dereference(zones, zone, room_item.room_id)
 
-        room_item.items
-        |> Enum.with_index()
-        |> Enum.map(fn {item_data, index} ->
-          item_id = dereference(zones, zone, item_data.id)
-          {_key, item} = Enum.find(zone.items, &match_item(&1, item_id))
+      room_item.items
+      |> Enum.with_index()
+      |> Enum.reduce(zone, fn {item_data, index}, zone ->
+        item_id = dereference(zones, zone, item_data.id)
+        {_key, item} = Enum.find(zone.items, &match_item(&1, item_id))
 
-          %Item{
-            item
-            | id: "#{room_id}:#{item.id}:#{index}",
-              room_id: room_id,
-              callback_module: Kantele.World.Item
-          }
-        end)
+        parse_room_item(zone, room_id, item, index)
+      end)
+    end)
+  end
+
+  defp parse_room_item(zone, room_id, item, index) do
+    instance = %Item.Instance{
+      id: "#{room_id}:#{item.id}:#{index}",
+      item_id: item.id,
+      created_at: DateTime.utc_now(),
+      callback_module: Kantele.World.Item.Instance
+    }
+
+    {room_key, room} =
+      Enum.find(zone.rooms, fn {_key, room} ->
+        room.id == room_id
       end)
 
-    Enum.reduce(items, zone, fn item, zone ->
-      {room_key, room} =
-        Enum.find(zone.rooms, fn {_key, room} ->
-          room.id == item.room_id
-        end)
+    item_instances = Map.get(room, :item_instances, [])
+    room = Map.put(room, :item_instances, [instance | item_instances])
 
-      items = Map.get(room, :items, [])
-      room = Map.put(room, :items, [item | items])
-
-      rooms = Map.put(zone.rooms, room_key, room)
-      %{zone | rooms: rooms}
-    end)
+    rooms = Map.put(zone.rooms, room_key, room)
+    %{zone | rooms: rooms}
   end
 
   defp match_item({_key, item}, item_id), do: item.id == item_id
@@ -381,12 +388,7 @@ defmodule Kantele.World.Loader do
 
   defp split_out_items(world) do
     Enum.reduce(world.zones, world, fn zone, world ->
-      items =
-        Enum.flat_map(zone.rooms, fn room ->
-          Map.get(room, :items, [])
-        end)
-
-      Map.put(world, :items, items ++ world.items)
+      Map.put(world, :items, zone.items ++ world.items)
     end)
   end
 

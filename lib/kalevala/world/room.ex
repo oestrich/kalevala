@@ -5,7 +5,7 @@ defmodule Kalevala.World.Room.Context do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, assigns: %{}, characters: [], events: [], lines: []]
+  defstruct [:data, assigns: %{}, characters: [], events: [], item_instances: [], lines: []]
 
   defp push(context, to_pid, event = %Kalevala.Character.Conn.Event{}, _newline) do
     Map.put(context, :lines, context.lines ++ [{to_pid, event}])
@@ -168,7 +168,7 @@ defmodule Kalevala.World.Room.Private do
   Store private information for a room, e.g. characters in the room
   """
 
-  defstruct characters: []
+  defstruct characters: [], item_instances: []
 end
 
 defmodule Kalevala.World.Room.Feature do
@@ -201,8 +201,7 @@ defmodule Kalevala.World.Room do
     :name,
     :description,
     exits: [],
-    features: [],
-    items: []
+    features: []
   ]
 
   @type t() :: %__MODULE__{}
@@ -307,7 +306,9 @@ defmodule Kalevala.World.Room do
       data: room,
       supervisor_name: config.supervisor_name,
       callback_module: config.callback_module,
-      private: %Private{}
+      private: %Private{
+        item_instances: options.item_instances
+      }
     }
 
     {:ok, state, {:continue, :initialized}}
@@ -388,11 +389,16 @@ defmodule Kalevala.World.Room do
   end
 
   defp new_context(state) do
-    data = trim_items(state.data)
+    item_instances =
+      Enum.map(state.private.item_instances, fn item_instance ->
+        meta = item_instance.callback_module.trim_meta(item_instance)
+        %{item_instance | meta: meta}
+      end)
 
     %Context{
-      data: data,
-      characters: state.private.characters
+      data: state.data,
+      characters: state.private.characters,
+      item_instances: item_instances
     }
   end
 
@@ -425,14 +431,5 @@ defmodule Kalevala.World.Room do
     end)
 
     context
-  end
-
-  defp trim_items(data) do
-    items =
-      Enum.map(data.items, fn item ->
-        Map.put(item, :meta, item.callback_module.trim_meta(item))
-      end)
-
-    %{data | items: items}
   end
 end

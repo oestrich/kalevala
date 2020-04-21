@@ -58,6 +58,7 @@ defmodule Kantele.World.Room.LookEvent do
   import Kalevala.World.Room.Context
 
   alias Kantele.Character.LookView
+  alias Kantele.World.Items
 
   def call(context, event) do
     characters =
@@ -65,9 +66,15 @@ defmodule Kantele.World.Room.LookEvent do
         character.id == event.acting_character.id
       end)
 
+    items =
+      Enum.map(context.item_instances, fn item_instance ->
+        Items.get!(item_instance.item_id)
+      end)
+
     context
     |> assign(:room, context.data)
     |> assign(:characters, characters)
+    |> assign(:items, items)
     |> render(event.from_pid, LookView, "look", %{})
   end
 end
