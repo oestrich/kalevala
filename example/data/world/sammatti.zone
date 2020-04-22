@@ -80,6 +80,11 @@ items "sword" {
   description = "A radiant sword"
 }
 
+items "potion" {
+  name = "Healing Potion"
+  description = "A potion to heal what ails you."
+}
+
 room_items "town_square" {
   room_id = rooms.town_square.id
 
@@ -88,7 +93,7 @@ room_items "town_square" {
       id = items.sword.id
     },
     {
-      id = items.sword.id
+      id = items.potion.id
     }
   ]
 }

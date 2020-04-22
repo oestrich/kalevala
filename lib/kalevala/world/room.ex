@@ -395,9 +395,14 @@ defmodule Kalevala.World.Room do
         %{item_instance | meta: meta}
       end)
 
+    characters =
+      Enum.map(state.private.characters, fn character ->
+        %{character | inventory: []}
+      end)
+
     %Context{
       data: state.data,
-      characters: state.private.characters,
+      characters: characters,
       item_instances: item_instances
     }
   end

@@ -262,20 +262,18 @@ defmodule Kantele.World.Loader do
     Enum.reduce(room_items, zone, fn {_key, room_item}, zone ->
       room_id = dereference(zones, zone, room_item.room_id)
 
-      room_item.items
-      |> Enum.with_index()
-      |> Enum.reduce(zone, fn {item_data, index}, zone ->
+      Enum.reduce(room_item.items, zone, fn item_data, zone ->
         item_id = dereference(zones, zone, item_data.id)
         {_key, item} = Enum.find(zone.items, &match_item(&1, item_id))
 
-        parse_room_item(zone, room_id, item, index)
+        parse_room_item(zone, room_id, item)
       end)
     end)
   end
 
-  defp parse_room_item(zone, room_id, item, index) do
+  defp parse_room_item(zone, room_id, item) do
     instance = %Item.Instance{
-      id: "#{room_id}:#{item.id}:#{index}",
+      id: Item.Instance.generate_id(),
       item_id: item.id,
       created_at: DateTime.utc_now(),
       callback_module: Kantele.World.Item.Instance

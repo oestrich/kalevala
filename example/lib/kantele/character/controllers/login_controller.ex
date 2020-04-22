@@ -103,6 +103,14 @@ defmodule Kantele.Character.LoginController do
       name: name,
       status: "#{name} is here.",
       description: "#{name} is a person.",
+      inventory: [
+        %Kalevala.World.Item.Instance{
+          id: Kalevala.World.Item.Instance.generate_id(),
+          item_id: "sammatti:potion",
+          created_at: DateTime.utc_now(),
+          callback_module: Kantele.World.Item.Instance
+        }
+      ],
       meta: %Kantele.Character.PlayerMeta{
         vitals: %Kantele.Character.Vitals{
           health_points: 25,

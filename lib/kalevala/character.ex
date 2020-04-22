@@ -5,7 +5,16 @@ defmodule Kalevala.Character do
   Common data that all characters will have
   """
 
-  defstruct [:id, :pid, :room_id, :name, :status, :description, meta: %{}]
+  defstruct [
+    :description,
+    :id,
+    :name,
+    :pid,
+    :room_id,
+    :status,
+    inventory: [],
+    meta: %{}
+  ]
 
   @doc """
   Reduce the size of the meta map before sending in an event

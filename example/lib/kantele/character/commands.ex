@@ -14,6 +14,12 @@ defmodule Kantele.Character.Commands do
       command("look", :run)
     end
 
+    module(InventoryCommand) do
+      command("i", :run)
+      command("inv", :run)
+      command("inventory", :run)
+    end
+
     module(MoveCommand) do
       command("north", :north)
       command("south", :south)
