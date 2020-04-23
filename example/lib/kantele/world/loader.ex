@@ -264,17 +264,15 @@ defmodule Kantele.World.Loader do
 
       Enum.reduce(room_item.items, zone, fn item_data, zone ->
         item_id = dereference(zones, zone, item_data.id)
-        {_key, item} = Enum.find(zone.items, &match_item(&1, item_id))
-
-        parse_room_item(zone, room_id, item)
+        parse_room_item(zone, room_id, item_id)
       end)
     end)
   end
 
-  defp parse_room_item(zone, room_id, item) do
+  defp parse_room_item(zone, room_id, item_id) do
     instance = %Item.Instance{
       id: Item.Instance.generate_id(),
-      item_id: item.id,
+      item_id: item_id,
       created_at: DateTime.utc_now(),
       callback_module: Kantele.World.Item.Instance
     }
@@ -290,8 +288,6 @@ defmodule Kantele.World.Loader do
     rooms = Map.put(zone.rooms, room_key, room)
     %{zone | rooms: rooms}
   end
-
-  defp match_item({_key, item}, item_id), do: item.id == item_id
 
   @doc """
   Strip a zone of extra information that Kalevala doesn't care about

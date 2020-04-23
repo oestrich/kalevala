@@ -75,25 +75,15 @@ characters "villager" {
   description = "A villager of Sammatti."
 }
 
-items "sword" {
-  name = "Sword of Destiny"
-  description = "A radiant sword"
-}
-
-items "potion" {
-  name = "Healing Potion"
-  description = "A potion to heal what ails you."
-}
-
 room_items "town_square" {
   room_id = rooms.town_square.id
 
   items = [
     {
-      id = items.sword.id
+      id = global.items.longsword.id
     },
     {
-      id = items.potion.id
+      id = global.items.potion.id
     }
   ]
 }

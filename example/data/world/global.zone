@@ -1,0 +1,19 @@
+zones "global" {
+  name = "Global Resources"
+  description = "Resources that are used across multiple zones"
+}
+
+items "longsword" {
+  name = "Longsword"
+  description = "A dual edged sword, with a silver hilt."
+}
+
+items "dagger" {
+  name = "Dagger"
+  description = "A small curved dagger."
+}
+
+items "potion" {
+  name = "Healing Potion"
+  description = "A potion to heal what ails you."
+}

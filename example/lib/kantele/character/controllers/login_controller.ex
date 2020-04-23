@@ -106,7 +106,7 @@ defmodule Kantele.Character.LoginController do
       inventory: [
         %Kalevala.World.Item.Instance{
           id: Kalevala.World.Item.Instance.generate_id(),
-          item_id: "sammatti:potion",
+          item_id: "global:potion",
           created_at: DateTime.utc_now(),
           callback_module: Kantele.World.Item.Instance
         }
