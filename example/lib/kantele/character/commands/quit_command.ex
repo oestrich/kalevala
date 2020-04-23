@@ -5,6 +5,7 @@ defmodule Kantele.Character.QuitCommand do
 
   def run(conn, _params) do
     conn
+    |> assign(:prompt, false)
     |> render(QuitView, "goodbye")
     |> halt()
   end
