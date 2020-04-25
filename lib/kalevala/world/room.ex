@@ -60,6 +60,66 @@ defmodule Kalevala.World.Room.Context do
   end
 end
 
+defmodule Kalevala.World.Room.Item do
+  @moduledoc """
+  Handle item pickup
+  """
+
+  alias Kalevala.Event
+  alias Kalevala.Event.ItemPickUp
+
+  @doc """
+  Handle a request for picking up an item
+  """
+  def handle_request({:abort, event, reason}, state, metadata) do
+    character = event.acting_character
+
+    event = %Event{
+      from_pid: self(),
+      topic: ItemPickUp.Abort,
+      metadata: metadata,
+      data: %ItemPickUp.Abort{
+        item_name: event.data.item_name,
+        from: state.data.id,
+        reason: reason
+      }
+    }
+
+    send(character.pid, event)
+
+    state
+  end
+
+  def handle_request({:proceed, event, item_instance}, state, metadata) do
+    character = event.acting_character
+
+    event = %Event{
+      from_pid: self(),
+      topic: ItemPickUp.Commit,
+      metadata: metadata,
+      data: %ItemPickUp.Commit{
+        from: state.data.id,
+        item_name: event.data.item_name,
+        item_instance: item_instance
+      }
+    }
+
+    send(character.pid, event)
+
+    remove_item_instance(state, item_instance)
+  end
+
+  defp remove_item_instance(state, item_instance) do
+    item_instances =
+      Enum.reject(state.private.item_instances, fn room_item_instance ->
+        room_item_instance.id == item_instance.id
+      end)
+
+    private = Map.put(state.private, :item_instances, item_instances)
+    Map.put(state, :private, private)
+  end
+end
+
 defmodule Kalevala.World.Room.Movement do
   @moduledoc """
   Handle room movement
@@ -83,6 +143,7 @@ defmodule Kalevala.World.Room.Movement do
     %{character: character} = event.data
 
     event = %Event{
+      from_pid: self(),
       topic: Voting,
       metadata: metadata,
       data: %Voting{
@@ -101,6 +162,7 @@ defmodule Kalevala.World.Room.Movement do
     %{character: character} = event.data
 
     event = %Event{
+      from_pid: self(),
       topic: Voting,
       metadata: metadata,
       data: %Voting{
@@ -190,8 +252,10 @@ defmodule Kalevala.World.Room do
 
   alias Kalevala.Event
   alias Kalevala.Event.Message
+  alias Kalevala.World
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Exit
+  alias Kalevala.World.Room.Item
   alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
 
@@ -232,7 +296,7 @@ defmodule Kalevala.World.Room do
   Can immediately terminate a room before being checked in a more detailed fashion
   with `confirm_movement/2` below.
   """
-  @callback movement_request(t(), event :: Event.movement_request(), room_exit :: Exit.t() | nil) ::
+  @callback movement_request(Context.t(), Event.movement_request(), Exit.t() | nil) ::
               {:abort, event :: Event.t(), reason :: atom()}
               | {:proceed, event :: Event.t(), room_exit :: Exit.t()}
 
@@ -250,6 +314,21 @@ defmodule Kalevala.World.Room do
   @callback confirm_movement(Context.t(), event :: Event.movement_voting()) ::
               {Context.t(), Event.movement_voting()}
 
+  @doc """
+  Convert item instances into items
+  """
+  @callback load_item(World.Item.Instance.t()) :: World.Item.t()
+
+  @doc """
+  Callback for allowing an item pick up
+
+  A character is requesting to pick up an item, this let's the room
+  accept or reject the request.
+  """
+  @callback item_request_pickup(Context.t(), Event.item_request_pickup(), World.Item.Instance.t()) ::
+              {:abort, event :: Event.item_request_pickup(), reason :: atom()}
+              | {:proceed, event :: Event.item_request_pickup(), World.Item.Instance.t()}
+
   defmacro __using__(_opts) do
     quote do
       import Kalevala.World.Room.Context
@@ -260,12 +339,18 @@ defmodule Kalevala.World.Room do
       def init(room), do: room
 
       @impl true
-      def movement_request(_room, event, nil), do: {:abort, event, :no_exit}
+      def movement_request(_context, event, nil), do: {:abort, event, :no_exit}
 
-      def movement_request(_room, event, room_exit), do: {:proceed, event, room_exit}
+      def movement_request(_context, event, room_exit), do: {:proceed, event, room_exit}
 
       @impl true
       def confirm_movement(context, event), do: {context, event}
+
+      @impl true
+      def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item}
+
+      def item_request_pickup(_context, event, item_instance),
+        do: {:proceed, event, item_instance}
 
       defoverridable confirm_movement: 2, init: 1, movement_request: 3
     end
@@ -344,7 +429,7 @@ defmodule Kalevala.World.Room do
         exit.exit_name == event.data.exit_name
       end)
 
-    state.data
+    new_context(state)
     |> state.callback_module.movement_request(event, room_exit)
     |> Movement.handle_request(state, event.metadata)
 
@@ -364,6 +449,23 @@ defmodule Kalevala.World.Room do
 
         {:noreply, state}
     end
+  end
+
+  def handle_info(event = %Event{topic: Event.ItemPickUp.Request}, state) do
+    %{item_name: item_name} = event.data
+
+    item_instance =
+      Enum.find(state.private.item_instances, fn item_instance ->
+        item = state.callback_module.load_item(item_instance)
+        item.callback_module.matches?(item, item_name)
+      end)
+
+    state =
+      new_context(state)
+      |> state.callback_module.item_request_pickup(event, item_instance)
+      |> Item.handle_request(state, event.metadata)
+
+    {:noreply, state}
   end
 
   def handle_info(event = %Event{}, state) do

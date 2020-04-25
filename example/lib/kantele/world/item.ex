@@ -9,7 +9,7 @@ defmodule Kantele.World.Item do
   Local callbacks for `Kalevala.World.Item`
   """
 
-  @behaviour Kalevala.World.Item
+  use Kalevala.World.Item
 
   @impl true
   def trim_meta(_meta), do: %{}

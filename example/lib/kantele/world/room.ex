@@ -9,6 +9,7 @@ defmodule Kantele.World.Room do
 
   alias Kantele.Communication
   alias Kantele.RoomChannel
+  alias Kantele.World.Items
   alias Kantele.World.Room.Events
 
   @impl true
@@ -26,6 +27,9 @@ defmodule Kantele.World.Room do
   def event(context, event) do
     Events.call(context, event)
   end
+
+  @impl true
+  def load_item(item_instance), do: Items.get!(item_instance.item_id)
 end
 
 defmodule Kantele.World.Room.Events do
