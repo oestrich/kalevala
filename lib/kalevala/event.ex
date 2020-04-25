@@ -23,6 +23,10 @@ defmodule Kalevala.Event do
 
   @type t() :: %__MODULE__{}
 
+  @type item_request_drop() :: %__MODULE__{
+          topic: __MODULE__.ItemDrop.Request
+        }
+
   @type item_request_pickup() :: %__MODULE__{
           topic: __MODULE__.ItemPickUp.Request
         }
