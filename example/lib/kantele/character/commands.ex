@@ -10,8 +10,9 @@ defmodule Kantele.Character.Commands do
       command("combat tick", :tick)
     end
 
-    module(GetCommand) do
-      command("get :item_name", :run)
+    module(ItemCommand) do
+      command("drop :item_name", :drop)
+      command("get :item_name", :get)
     end
 
     module(LookCommand) do

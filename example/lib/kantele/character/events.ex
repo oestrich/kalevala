@@ -3,6 +3,7 @@ defmodule Kantele.Character.Events do
 
   use Kalevala.Event.Router
 
+  alias Kalevala.Event.ItemDrop
   alias Kalevala.Event.ItemPickUp
   alias Kalevala.Event.Message
   alias Kalevala.Event.Movement
@@ -17,8 +18,11 @@ defmodule Kantele.Character.Events do
     end
 
     module(ItemEvent) do
-      event(ItemPickUp.Commit, :commit)
-      event(ItemPickUp.Abort, :abort)
+      event(ItemDrop.Abort, :drop_abort)
+      event(ItemDrop.Commit, :drop_commit)
+
+      event(ItemPickUp.Abort, :pickup_abort)
+      event(ItemPickUp.Commit, :pickup_commit)
     end
 
     module(MoveEvent) do
