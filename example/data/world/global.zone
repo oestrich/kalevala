@@ -3,15 +3,29 @@ zones "global" {
   description = "Resources that are used across multiple zones"
 }
 
-items "longsword" {
-  name = "Longsword"
-  description = "A dual edged sword, with a silver hilt."
+# Weapons
+
+items "axe" {
+  name = "Axe"
+  description = "A single bladed axe with a long metal handle."
+}
+
+items "club" {
+  name = "Club"
+  description = "A large piece of wood, maybe a branch."
 }
 
 items "dagger" {
   name = "Dagger"
   description = "A small curved dagger."
 }
+
+items "longsword" {
+  name = "Longsword"
+  description = "A dual edged sword, with a silver hilt."
+}
+
+# Healing
 
 items "potion" {
   name = "Healing Potion"
