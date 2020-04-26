@@ -30,6 +30,8 @@ defmodule Mix.Tasks.Kalevala.Gen.Command do
     defmodule #{main_module}.Character.#{command}Command do
       use Kalevala.Character.Command
 
+      alias #{main_module}.Character.#{command}View
+
       def run(conn, params) do
         conn
       end
@@ -41,6 +43,8 @@ defmodule Mix.Tasks.Kalevala.Gen.Command do
     """
     defmodule #{main_module}.Character.#{command}Event do
       use Kalevala.Character.Event
+
+      alias #{main_module}.Character.#{command}View
     end
     """
   end
