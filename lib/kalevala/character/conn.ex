@@ -22,7 +22,7 @@ defmodule Kalevala.Character.Conn.Private do
 
       false ->
         meta = conn.private.character_module.trim_meta(character.meta)
-        %{character | meta: meta}
+        %{character | inventory: :trimmed, meta: meta}
     end
   end
 
@@ -231,6 +231,38 @@ defmodule Kalevala.Character.Conn do
         direction: direction,
         reason: data,
         room_id: room_id
+      }
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
+  end
+
+  @doc """
+  Sends a request to drop an item into the room
+  """
+  def request_item_drop(conn, item_instance) do
+    event = %Kalevala.Event{
+      acting_character: Private.character(conn),
+      from_pid: self(),
+      topic: Kalevala.Event.ItemDrop.Request,
+      data: %Kalevala.Event.ItemDrop.Request{
+        item_instance: item_instance
+      }
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
+  end
+
+  @doc """
+  Sends a request to get an item from the room
+  """
+  def request_item_pickup(conn, item_name) do
+    event = %Kalevala.Event{
+      acting_character: Private.character(conn),
+      from_pid: self(),
+      topic: Kalevala.Event.ItemPickUp.Request,
+      data: %Kalevala.Event.ItemPickUp.Request{
+        item_name: item_name
       }
     }
 

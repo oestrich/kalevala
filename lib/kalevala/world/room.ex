@@ -1,168 +1,3 @@
-defmodule Kalevala.World.Room.Context do
-  @moduledoc """
-  Context for performing work for an event in a room
-  """
-
-  @type t() :: %__MODULE__{}
-
-  defstruct [:data, assigns: %{}, characters: [], events: [], item_instances: [], lines: []]
-
-  defp push(context, to_pid, event = %Kalevala.Character.Conn.Event{}, _newline) do
-    Map.put(context, :lines, context.lines ++ [{to_pid, event}])
-  end
-
-  defp push(context, to_pid, data, newline) do
-    lines = %Kalevala.Character.Conn.Lines{
-      data: data,
-      newline: newline
-    }
-
-    Map.put(context, :lines, context.lines ++ [{to_pid, lines}])
-  end
-
-  @doc """
-  Render text back to a pid
-  """
-  def render(context, to_pid, view, template, assigns) do
-    assigns = Map.merge(context.assigns, assigns)
-    data = view.render(template, assigns)
-    push(context, to_pid, data, false)
-  end
-
-  @doc """
-  Render a prompt back to a pid
-  """
-  def prompt(context, to_pid, view, template, assigns) do
-    assigns = Map.merge(context.assigns, assigns)
-    data = view.render(template, assigns)
-    push(context, to_pid, data, true)
-  end
-
-  @doc """
-  Add to the assignment map on the context
-  """
-  def assign(context, key, value) do
-    assigns = Map.put(context.assigns, key, value)
-    Map.put(context, :assigns, assigns)
-  end
-
-  @doc """
-  Send an event back to a pid
-  """
-  def event(context, to_pid, from_pid, topic, data) do
-    event = %Kalevala.Event{
-      from_pid: from_pid,
-      topic: topic,
-      data: data
-    }
-
-    Map.put(context, :events, context.events ++ [{to_pid, event}])
-  end
-end
-
-defmodule Kalevala.World.Room.Movement do
-  @moduledoc """
-  Handle room movement
-  """
-
-  alias Kalevala.Event
-  alias Kalevala.Event.Display
-  alias Kalevala.Event.Movement
-  alias Kalevala.Event.Movement.Voting
-  alias Kalevala.World.Zone
-
-  @doc """
-  Handle the movement request
-
-  Called after `Kalevala.World.Room.movement_request/2`.
-
-  - If an abort, forward to the character
-  - Otherwise, Forward to the zone
-  """
-  def handle_request({:abort, event, reason}, state, metadata) do
-    %{character: character} = event.data
-
-    event = %Event{
-      topic: Voting,
-      metadata: metadata,
-      data: %Voting{
-        aborted: true,
-        character: character,
-        from: state.data.id,
-        exit_name: event.data.exit_name,
-        reason: reason
-      }
-    }
-
-    send(character.pid, Voting.abort(event))
-  end
-
-  def handle_request({:proceed, event, room_exit}, state, metadata) do
-    %{character: character} = event.data
-
-    event = %Event{
-      topic: Voting,
-      metadata: metadata,
-      data: %Voting{
-        character: character,
-        from: state.data.id,
-        to: room_exit.end_room_id,
-        exit_name: room_exit.exit_name
-      }
-    }
-
-    Zone.global_name(state.data.zone_id)
-    |> GenServer.whereis()
-    |> send(event)
-  end
-
-  @doc """
-  Handle the movement event
-  """
-  def handle_event(state, event = %Event{topic: Movement, data: %{direction: :to}}) do
-    state
-    |> broadcast(event)
-    |> append_character(event)
-  end
-
-  def handle_event(state, event = %Event{topic: Movement, data: %{direction: :from}}) do
-    state
-    |> reject_character(event)
-    |> broadcast(event)
-  end
-
-  @doc """
-  Broadcast the event to characters in the room
-  """
-  def broadcast(state, event) do
-    lines = %Kalevala.Character.Conn.Lines{data: event.data.reason, newline: true}
-    display_event = %Display{lines: [lines]}
-
-    Enum.each(state.private.characters, fn character ->
-      send(character.pid, display_event)
-    end)
-
-    state
-  end
-
-  defp append_character(state, event) do
-    characters = [event.data.character | state.private.characters]
-    private = Map.put(state.private, :characters, characters)
-
-    Map.put(state, :private, private)
-  end
-
-  defp reject_character(state, event) do
-    characters =
-      Enum.reject(state.private.characters, fn character ->
-        character.id == event.data.character.id
-      end)
-
-    private = Map.put(state.private, :characters, characters)
-    Map.put(state, :private, private)
-  end
-end
-
 defmodule Kalevala.World.Room.Private do
   @moduledoc """
   Store private information for a room, e.g. characters in the room
@@ -190,9 +25,10 @@ defmodule Kalevala.World.Room do
 
   alias Kalevala.Event
   alias Kalevala.Event.Message
+  alias Kalevala.World
   alias Kalevala.World.Room.Context
+  alias Kalevala.World.Room.Events
   alias Kalevala.World.Room.Exit
-  alias Kalevala.World.Room.Movement
   alias Kalevala.World.Room.Private
 
   defstruct [
@@ -232,7 +68,7 @@ defmodule Kalevala.World.Room do
   Can immediately terminate a room before being checked in a more detailed fashion
   with `confirm_movement/2` below.
   """
-  @callback movement_request(t(), event :: Event.movement_request(), room_exit :: Exit.t() | nil) ::
+  @callback movement_request(Context.t(), Event.movement_request(), Exit.t() | nil) ::
               {:abort, event :: Event.t(), reason :: atom()}
               | {:proceed, event :: Event.t(), room_exit :: Exit.t()}
 
@@ -250,6 +86,31 @@ defmodule Kalevala.World.Room do
   @callback confirm_movement(Context.t(), event :: Event.movement_voting()) ::
               {Context.t(), Event.movement_voting()}
 
+  @doc """
+  Convert item instances into items
+  """
+  @callback load_item(World.Item.Instance.t()) :: World.Item.t()
+
+  @doc """
+  Callback for allowing an item drop off
+
+  A character is requesting to pick up an item, this let's the room
+  accept or reject the request.
+  """
+  @callback item_request_drop(Context.t(), Event.item_request_drop(), World.Item.Instance.t()) ::
+              {:abort, event :: Event.item_request_drop(), reason :: atom()}
+              | {:proceed, event :: Event.item_request_drop(), World.Item.Instance.t()}
+
+  @doc """
+  Callback for allowing an item pick up
+
+  A character is requesting to pick up an item, this let's the room
+  accept or reject the request.
+  """
+  @callback item_request_pickup(Context.t(), Event.item_request_pickup(), World.Item.Instance.t()) ::
+              {:abort, event :: Event.item_request_pickup(), reason :: atom()}
+              | {:proceed, event :: Event.item_request_pickup(), World.Item.Instance.t()}
+
   defmacro __using__(_opts) do
     quote do
       import Kalevala.World.Room.Context
@@ -260,12 +121,22 @@ defmodule Kalevala.World.Room do
       def init(room), do: room
 
       @impl true
-      def movement_request(_room, event, nil), do: {:abort, event, :no_exit}
+      def movement_request(_context, event, nil), do: {:abort, event, :no_exit}
 
-      def movement_request(_room, event, room_exit), do: {:proceed, event, room_exit}
+      def movement_request(_context, event, room_exit), do: {:proceed, event, room_exit}
 
       @impl true
       def confirm_movement(context, event), do: {context, event}
+
+      @impl true
+      def item_request_drop(_context, event, item_instance),
+        do: {:proceed, event, item_instance}
+
+      @impl true
+      def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item}
+
+      def item_request_pickup(_context, event, item_instance),
+        do: {:proceed, event, item_instance}
 
       defoverridable confirm_movement: 2, init: 1, movement_request: 3
     end
@@ -324,12 +195,10 @@ defmodule Kalevala.World.Room do
   def handle_call(event = %Event{topic: Event.Movement.Voting}, _from, state) do
     {context, event} =
       state
-      |> new_context()
+      |> Context.new()
       |> state.callback_module.confirm_movement(event)
 
-    context
-    |> send_lines()
-    |> send_events()
+    Context.handle_context(context)
 
     state = Map.put(state, :data, context.data)
 
@@ -337,104 +206,18 @@ defmodule Kalevala.World.Room do
   end
 
   @impl true
-  # Forward movement requests to the zone to handle
-  def handle_info(event = %Event{topic: Event.Movement.Request}, state) do
-    room_exit =
-      Enum.find(state.data.exits, fn exit ->
-        exit.exit_name == event.data.exit_name
-      end)
-
-    state.data
-    |> state.callback_module.movement_request(event, room_exit)
-    |> Movement.handle_request(state, event.metadata)
-
-    {:noreply, state}
-  end
-
-  def handle_info(event = %Event{topic: Event.Movement}, state) do
-    case event.data.room_id == state.data.id do
-      true ->
-        state = Movement.handle_event(state, event)
-        {:noreply, state}
-
-      false ->
-        global_name(event.data.room_id)
-        |> GenServer.whereis()
-        |> send(event)
-
-        {:noreply, state}
-    end
-  end
-
   def handle_info(event = %Event{}, state) do
-    context =
-      new_context(state)
-      |> state.callback_module.event(event)
-      |> handle_context()
-
-    state = Map.put(state, :data, context.data)
-
-    {:noreply, state}
+    Events.handle_event(event, state)
   end
 
   def handle_info(message = %Message{}, state) do
     context =
-      new_context(state)
+      Context.new(state)
       |> state.callback_module.event(message)
-      |> handle_context()
+      |> Context.handle_context()
 
     state = Map.put(state, :data, context.data)
 
     {:noreply, state}
-  end
-
-  defp new_context(state) do
-    item_instances =
-      Enum.map(state.private.item_instances, fn item_instance ->
-        meta = item_instance.callback_module.trim_meta(item_instance)
-        %{item_instance | meta: meta}
-      end)
-
-    characters =
-      Enum.map(state.private.characters, fn character ->
-        %{character | inventory: []}
-      end)
-
-    %Context{
-      data: state.data,
-      characters: characters,
-      item_instances: item_instances
-    }
-  end
-
-  defp handle_context(context) do
-    context
-    |> send_lines()
-    |> send_events()
-  end
-
-  defp send_lines(context) do
-    context.lines
-    |> Enum.group_by(
-      fn {to_pid, _line} ->
-        to_pid
-      end,
-      fn {_to_pid, line} ->
-        line
-      end
-    )
-    |> Enum.each(fn {to_pid, lines} ->
-      send(to_pid, %Event.Display{lines: lines})
-    end)
-
-    context
-  end
-
-  defp send_events(context) do
-    Enum.each(context.events, fn {to_pid, event} ->
-      send(to_pid, event)
-    end)
-
-    context
   end
 end

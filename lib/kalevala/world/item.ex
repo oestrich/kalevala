@@ -7,10 +7,30 @@ defmodule Kalevala.World.Item do
 
   defstruct [:id, :name, :description, :callback_module, meta: %{}]
 
+  @type t() :: %__MODULE__{}
+
   @doc """
   Reduce the size of the meta map before sending in an event
   """
   @callback trim_meta(meta :: map()) :: map()
+
+  @doc """
+  Match a string against the item
+  """
+  @callback matches?(item :: t(), keyword :: String.t()) :: boolean()
+
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour unquote(__MODULE__)
+
+      @impl true
+      def matches?(item, keyword) do
+        String.downcase(item.name) == String.downcase(keyword)
+      end
+
+      defoverridable matches?: 2
+    end
+  end
 end
 
 defmodule Kalevala.World.Item.Instance do
@@ -21,6 +41,8 @@ defmodule Kalevala.World.Item.Instance do
   """
 
   defstruct [:id, :item_id, :created_at, :callback_module, meta: %{}]
+
+  @type t() :: %__MODULE__{}
 
   @doc """
   Reduce the size of the meta map before sending in an event
