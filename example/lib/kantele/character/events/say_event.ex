@@ -5,7 +5,7 @@ defmodule Kantele.Character.SayEvent do
   alias Kantele.Character.SayView
 
   def interested?(event) do
-    match?("rooms:" <> _, event.data.channel_name)
+    !event.data.emote && match?("rooms:" <> _, event.data.channel_name)
   end
 
   def echo(conn, event) do

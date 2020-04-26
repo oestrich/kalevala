@@ -303,11 +303,9 @@ defmodule Kalevala.Character.Conn do
   end
 
   @doc """
-  Request to publish text to a channel
+  Request to publish a message to a channel
   """
   def publish_message(conn, channel_name, text, options, error_fun) do
-    options = Keyword.merge([character: Private.character(conn)], options)
-
     event = %Kalevala.Event{
       acting_character: Private.character(conn),
       from_pid: self(),
@@ -318,6 +316,31 @@ defmodule Kalevala.Character.Conn do
         text: text
       }
     }
+
+    publish_channel_message(conn, channel_name, event, options, error_fun)
+  end
+
+  @doc """
+  Request to publish an emote to a channel
+  """
+  def publish_emote(conn, channel_name, text, options, error_fun) do
+    event = %Kalevala.Event{
+      acting_character: Private.character(conn),
+      from_pid: self(),
+      topic: Kalevala.Event.Message,
+      data: %Kalevala.Event.Message{
+        channel_name: channel_name,
+        character: Private.character(conn),
+        emote: true,
+        text: text
+      }
+    }
+
+    publish_channel_message(conn, channel_name, event, options, error_fun)
+  end
+
+  defp publish_channel_message(conn, channel_name, event, options, error_fun) do
+    options = Keyword.merge([character: Private.character(conn)], options)
 
     channel_changes = [
       {:publish, channel_name, event, options, error_fun} | conn.private.channel_changes

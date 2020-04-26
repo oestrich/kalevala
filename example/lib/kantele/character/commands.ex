@@ -10,6 +10,10 @@ defmodule Kantele.Character.Commands do
       command("combat tick", :tick)
     end
 
+    module(EmoteCommand) do
+      command("emote :text", :run)
+    end
+
     module(ItemCommand) do
       command("drop :item_name", :drop)
       command("get :item_name", :get)

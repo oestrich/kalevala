@@ -8,6 +8,7 @@ defmodule Kantele.Character.Events do
   alias Kalevala.Event.Message
   alias Kalevala.Event.Movement
   alias Kantele.Character.ChannelEvent
+  alias Kantele.Character.EmoteEvent
   alias Kantele.Character.SayEvent
 
   scope(Kantele.Character) do
@@ -15,6 +16,10 @@ defmodule Kantele.Character.Events do
       event("combat/start", :start)
       event("combat/stop", :stop)
       event("combat/tick", :tick)
+    end
+
+    module(EmoteEvent) do
+      event(Message, :echo, interested?: &EmoteEvent.interested?/1)
     end
 
     module(ItemEvent) do
