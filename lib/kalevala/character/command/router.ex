@@ -131,9 +131,9 @@ defmodule Kalevala.Character.Command.Router do
     end
   end
 
-  defp match_pattern(pattern, text) do
+  defp match_pattern(original_pattern, text) do
     pattern =
-      pattern
+      original_pattern
       |> String.split(" ")
       |> Enum.map(fn
         ":" <> var ->
@@ -144,15 +144,17 @@ defmodule Kalevala.Character.Command.Router do
       end)
       |> Enum.join(" ")
 
+    pattern = "^" <> pattern <> "$"
+
     captures =
-      ("^" <> pattern <> "$")
+      pattern
       |> Regex.compile!()
       |> Regex.named_captures(text)
 
     case captures != nil do
       true ->
         %StaticCommand{
-          pattern: pattern,
+          pattern: original_pattern,
           params: captures
         }
 
