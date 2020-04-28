@@ -1,7 +1,7 @@
 defmodule Kantele.World.Items do
   @moduledoc false
 
-  use Kalevala.World.Cache
+  use Kalevala.Cache
 end
 
 defmodule Kantele.World.Item do

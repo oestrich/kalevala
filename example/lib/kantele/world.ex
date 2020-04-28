@@ -36,7 +36,7 @@ defmodule Kantele.World do
   def init(_opts) do
     children = [
       {Kantele.World.Cache, [name: Kantele.World.Cache]},
-      {Kalevala.World.Cache, [name: Kantele.World.Items]},
+      {Kantele.World.Items, [name: Kantele.World.Items]},
       {Kalevala.World, [name: Kantele.World]},
       {Kantele.World.Kickoff, []}
     ]
