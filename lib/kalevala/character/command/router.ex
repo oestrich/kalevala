@@ -1,8 +1,38 @@
+defmodule Kalevala.Character.Command.DynamicCommand do
+  @moduledoc """
+  A parsed dynamic command
+
+  Generated from the `dynamic` command router DSL.
+  """
+
+  defstruct [:module, :function, :params]
+
+  @doc """
+  Called when parsing text from a user
+
+  Options are passed through from the router.
+  """
+  @callback parse(text :: String.t(), options :: Keyword.t()) ::
+              {:dynamic, function :: atom(), params :: map()} | :skip
+end
+
+defmodule Kalevala.Character.Command.StaticCommand do
+  @moduledoc """
+  A parsed static command
+
+  Generated from the command router DSL.
+  """
+
+  defstruct [:pattern, :params]
+end
+
 defmodule Kalevala.Character.Command.Router do
   @moduledoc """
   Parse player input and match against known patterns
   """
 
+  alias Kalevala.Character.Command.DynamicCommand
+  alias Kalevala.Character.Command.StaticCommand
   alias Kalevala.Character.Conn
 
   defmacro __using__(_opts) do
@@ -24,16 +54,18 @@ defmodule Kalevala.Character.Command.Router do
   @typedoc "Route tuple"
   @type command() :: {String.t(), String.t(), atom()}
 
+  @typedoc "Parsed command"
+  @type parsed_command :: %StaticCommand{} | %DynamicCommand{}
+
   @doc """
   Parse an input string with the conn as the context
   """
   @callback call(conn :: Conn.t(), text :: String.t()) :: :ok
 
   @doc """
-  Parse an input string into matching route and params
+  Parse an input string into matching pattern and params
   """
-  @callback parse(text :: String.t()) ::
-              {:ok, {route :: String.t(), params()}} | {:error, :unknown}
+  @callback parse(text :: String.t()) :: {:ok, parsed_command()} | {:error, :unknown}
 
   @doc """
   Return a list of all commands
@@ -41,16 +73,20 @@ defmodule Kalevala.Character.Command.Router do
   @callback commands() :: [command()]
 
   @doc """
-  Pattern match the route and run the command
+  Pattern match the pattern and run the command
   """
-  @callback recv(route :: String.t(), params()) :: map()
+  @callback recv(pattern :: String.t(), params()) :: map()
 
   @doc false
   def call(module, conn, text) do
     case module.parse(text) do
-      {:ok, {route, params}} ->
+      {:ok, %DynamicCommand{module: module, function: function, params: params}} ->
         conn = Map.put(conn, :params, params)
-        module.recv(route, conn)
+        apply(module, function, [conn, conn.params])
+
+      {:ok, %StaticCommand{pattern: pattern, params: params}} ->
+        conn = Map.put(conn, :params, params)
+        module.recv(pattern, conn)
 
       {:error, :unknown} ->
         {:error, :unknown}
@@ -64,11 +100,11 @@ defmodule Kalevala.Character.Command.Router do
     match =
       Enum.find_value(patterns, fn pattern ->
         case match_pattern(pattern, text) do
-          nil ->
+          :skip ->
             false
 
-          captures ->
-            {pattern, captures}
+          command = %{} ->
+            command
         end
       end)
 
@@ -81,6 +117,20 @@ defmodule Kalevala.Character.Command.Router do
     end
   end
 
+  defp match_pattern({:dynamic, module, function, arguments}, text) do
+    case apply(module, function, [text, arguments]) do
+      {:dynamic, function, params} ->
+        %DynamicCommand{
+          module: module,
+          function: function,
+          params: params
+        }
+
+      :skip ->
+        :skip
+    end
+  end
+
   defp match_pattern(pattern, text) do
     pattern =
       pattern
@@ -90,15 +140,25 @@ defmodule Kalevala.Character.Command.Router do
           "(?<#{var}>.*)"
 
         segment ->
-          segment
+          Regex.escape(segment)
       end)
       |> Enum.join(" ")
 
-    pattern = "^" <> pattern <> "$"
+    captures =
+      ("^" <> pattern <> "$")
+      |> Regex.compile!()
+      |> Regex.named_captures(text)
 
-    pattern
-    |> Regex.compile!()
-    |> Regex.named_captures(text)
+    case captures != nil do
+      true ->
+        %StaticCommand{
+          pattern: pattern,
+          params: captures
+        }
+
+      false ->
+        :skip
+    end
   end
 
   @doc """
@@ -123,9 +183,11 @@ defmodule Kalevala.Character.Command.Router do
         Enum.sort(@commands)
       end
 
+      @reversed_patterns Enum.reverse(@patterns)
+
       @impl true
       def parse(text) do
-        Kalevala.Character.Command.Router.parse(@patterns, text)
+        Kalevala.Character.Command.Router.parse(@reversed_patterns, text)
       end
 
       defoverridable parse: 1, recv: 2
@@ -143,12 +205,25 @@ defmodule Kalevala.Character.Command.Router do
     parse_module(top_module, {:module, opts, args})
   end
 
+  def parse_modules({:__aliases__, _, top_module}, {:dynamic, opts, args}) do
+    parse_module(top_module, {:dynamic, opts, args})
+  end
+
   @doc false
   def parse_module(top_module, {:module, _, args}) do
     [module, args] = args
     module = {:__aliases__, elem(module, 1), top_module ++ elem(module, 2)}
 
     parse_commands(module, args[:do])
+  end
+
+  def parse_module(top_module, {:dynamic, _, args}) do
+    [module, function, arguments] = args
+    module = {:__aliases__, elem(module, 1), top_module ++ elem(module, 2)}
+
+    quote do
+      @patterns {:dynamic, unquote(module), unquote(function), unquote(arguments)}
+    end
   end
 
   def parse_module(_top_module, _) do

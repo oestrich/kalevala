@@ -52,5 +52,7 @@ defmodule Kantele.Character.Commands do
     module(WhoCommand) do
       command("who", :run)
     end
+
+    dynamic(EmoteCommand, :parse, [])
   end
 end

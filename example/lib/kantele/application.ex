@@ -27,11 +27,12 @@ defmodule Kantele.Application do
 
     children = [
       {Kantele.Config, [name: Kantele.Config]},
-      {Kantele.Character.Presence, []},
-      {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
-      listener(listener_config),
       {Kantele.Communication, []},
       {Kantele.World, []},
+      {Kantele.Character.Presence, []},
+      {Kantele.Character.Emotes, [name: Kantele.Character.Emotes]},
+      {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
+      listener(listener_config),
       {Kantele.Telemetry, []}
     ]
 
