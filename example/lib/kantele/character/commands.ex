@@ -11,7 +11,8 @@ defmodule Kantele.Character.Commands do
     end
 
     module(EmoteCommand) do
-      command("emote :text", :run)
+      command("emote :text", :broadcast)
+      command("emotes", :list)
     end
 
     module(ItemCommand) do

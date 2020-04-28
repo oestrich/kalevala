@@ -52,6 +52,13 @@ defmodule Kalevala.Cache do
       def initialize(_state), do: :ok
 
       @doc """
+      Get all keys in the cache
+      """
+      def keys() do
+        Kalevala.Cache.keys(__MODULE__)
+      end
+
+      @doc """
       Put a value in the cache
       """
       def put(key, value) do
@@ -109,6 +116,21 @@ defmodule Kalevala.Cache do
       _ ->
         {:error, :not_found}
     end
+  end
+
+  @doc """
+  Get a list of all keys in a table
+  """
+  def keys(ets_key) do
+    key = :ets.first(ets_key)
+    keys(key, [], ets_key)
+  end
+
+  def keys(:"$end_of_table", accumulator, _ets_key), do: accumulator
+
+  def keys(current_key, accumulator, ets_key) do
+    next_key = :ets.next(ets_key, current_key)
+    keys(next_key, [current_key | accumulator], ets_key)
   end
 
   @impl true
