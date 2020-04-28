@@ -117,8 +117,8 @@ defmodule Kalevala.Character.Command.Router do
     end
   end
 
-  defp match_pattern({:dynamic, module, function, arguments}, text) do
-    case apply(module, function, [text, arguments]) do
+  defp match_pattern({:dynamic, module, arguments}, text) do
+    case apply(module, :parse, [text, arguments]) do
       {:dynamic, function, params} ->
         %DynamicCommand{
           module: module,
@@ -218,11 +218,11 @@ defmodule Kalevala.Character.Command.Router do
   end
 
   def parse_module(top_module, {:dynamic, _, args}) do
-    [module, function, arguments] = args
+    [module, options] = args
     module = {:__aliases__, elem(module, 1), top_module ++ elem(module, 2)}
 
     quote do
-      @patterns {:dynamic, unquote(module), unquote(function), unquote(arguments)}
+      @patterns {:dynamic, unquote(module), unquote(options)}
     end
   end
 
