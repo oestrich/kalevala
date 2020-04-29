@@ -16,7 +16,7 @@ defmodule Kalevala.Output.TagsTest do
 
       text = Output.process(iodata, Tags)
 
-      assert text == ["hello, ", "\e[37m", "world", "\e[0m", ""]
+      assert text == ["hello, ", "\e[37m", "\e[40m", "world", "\e[0m", ""]
     end
 
     test "allows for coloration" do
