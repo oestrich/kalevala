@@ -1,9 +1,9 @@
 defmodule Kantele.Character.SpawnView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
 
   def render("spawn", %{character: character}) do
-    ~i(#{white()}#{character.name}#{reset()} spawned.)
+    ~i(#{CharacterView.render("name", %{character: character})} spawned.)
   end
 end

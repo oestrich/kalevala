@@ -1,13 +1,22 @@
 defmodule Kantele.Character.SayView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
+
+  def render("text", %{text: text}) do
+    ~i("{color foreground="green"}#{text}{/color}")
+  end
 
   def render("echo", %{text: text}) do
-    ~i(You say, "\e[32m#{text}\e[0m"\n)
+    ~i(You say, #{render("text", %{text: text})}\n)
   end
 
   def render("listen", %{character_name: character_name, text: text}) do
-    ~i(#{white()}#{character_name}#{reset()} says, "\e[32m#{text}\e[0m"\n)
+    [
+      CharacterView.render("name", %{name: character_name}),
+      " says, ",
+      render("text", %{text: text}),
+      "\n"
+    ]
   end
 end

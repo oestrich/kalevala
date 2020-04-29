@@ -2,24 +2,31 @@ defmodule Kantele.Character.LoginView do
   use Kalevala.Character.View
 
   def render("welcome", _assigns) do
-    ~i"""
+    ~E"""
     Welcome to
-    \e[38;5;39m
+    {color foreground="256:39"}
      __   ___       __      _____  ___  ___________  _______  ___       _______
-    |/"| /  ")     /""\\    (\\"   \\|"  \\("     _   ")/"     "||"  |     /"     "|
-    (: |/   /     /    \\   |.\\\\   \\    |)__/  \\\\__/(: ______)||  |    (: ______)
-    |    __/     /' /\\  \\  |: \\.   \\\\  |   \\\\_ /    \\/    |  |:  |     \\/    |
-    (// _  \\    //  __'  \\ |.  \\    \\. |   |.  |    // ___)_  \\  |___  // ___)_
-    |: | \\  \\  /   /  \\\\  \\|    \\    \\ |   \\:  |   (:      "|( \\_|:  \\(:      "|
-    (__|  \\__)(___/    \\___)\\___|\\____\\)    \\__|    \\_______) \\_______)\\_______)
-    \e[0m
+    |/"| /  ")     /""\    (\"   \|"  \("     _   ")/"     "||"  |     /"     "|
+    (: |/   /     /    \   |.\\   \    |)__/  \\__/(: ______)||  |    (: ______)
+    |    __/     /' /\  \  |: \.   \\  |   \\_ /    \/    |  |:  |     \/    |
+    (// _  \    //  __'  \ |.  \    \. |   |.  |    // ___)_  \  |___  // ___)_
+    |: | \  \  /   /  \\  \|    \    \ |   \:  |   (:      "|( \_|:  \(:      "|
+    (__|  \__)(___/    \___)\___|\____\)    \__|    \_______) \_______)\_______)
+    {/color}
 
-    Powered by \e[38;5;39mKalevala\e[0m 🧝 \e[36mv#{Kalevala.version()}\e[0m.
+    <%= render("powered-by", %{}) %>
     """
   end
 
+  def render("powered-by", _assigns) do
+    [
+      ~s(Powered by {color foreground="256:39"}Kalevala{/color} 🧝),
+      ~s({color foreground="cyan"}v#{Kalevala.version()}{/color}.)
+    ]
+  end
+
   def render("name", _assigns) do
-    "What is your \e[37mname\e[0m? "
+    ~s(What is your {color foreground="white"}name{/color}? )
   end
 
   def render("password", _assigns) do
@@ -29,7 +36,7 @@ defmodule Kantele.Character.LoginView do
   def render("signed-in", %{username: username}) do
     """
 
-    Welcome \e[37m#{username}\e[0m. Thanks for signing in.
+    Welcome {color foreground="white"}#{username}{/color}. Thanks for signing in.
     """
   end
 
@@ -39,7 +46,9 @@ defmodule Kantele.Character.LoginView do
 
   def render("enter-world", %{character: character}) do
     """
-    Welcome to the world of \e[38;5;39mKantele\e[0m, \e[37m#{character.name}\e[0m.
+    Welcome to the world of {color foreground="256:39"}Kantele{/color}, {color foreground="white"}#{
+      character.name
+    }{/color}.
     """
   end
 end

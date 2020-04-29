@@ -1,11 +1,12 @@
 defmodule Kantele.Character.LookView do
   use Kalevala.Character.View
 
+  alias Kantele.Character.CharacterView
   alias Kantele.Character.ItemView
 
   def render("look", %{room: room, characters: characters, items: items}) do
     ~E"""
-    {color foreground="blue"}<%= room.name %>{/color}
+    {color foreground="black" background="cyan"}<%= room.name %>{/color}
     <%= render("_description", %{room: room}) %>
     <%= render("_items", %{items: items}) %>
     <%= render("_exits", %{room: room}) %>
@@ -45,7 +46,7 @@ defmodule Kantele.Character.LookView do
   end
 
   def render("_character", %{character: character}) do
-    ~i(- {color foreground="yellow"}#{character.name}{/color})
+    ~i(- #{CharacterView.render("name", %{character: character})})
   end
 
   def render("_items", %{items: []}), do: nil

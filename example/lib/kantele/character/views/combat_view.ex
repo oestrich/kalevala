@@ -1,8 +1,6 @@
 defmodule Kantele.Character.CombatView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, yellow: 0]
-
   def render("start", _assigns) do
     ~i"Starting combat\n"
   end
@@ -13,8 +11,8 @@ defmodule Kantele.Character.CombatView do
 
   def render("tick", _assigns) do
     ~i"""
-    You attack the #{yellow()}enemy#{reset()}.
-    The #{yellow()}enemy#{reset()} attacks you.
+    You attack the {color foreground="yellow"}enemy{/color}.
+    The {color foreground="yellow"}enemy{/color} attacks you.
     """
   end
 end

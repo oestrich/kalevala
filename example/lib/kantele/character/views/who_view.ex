@@ -1,7 +1,7 @@
 defmodule Kantele.Character.WhoView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
 
   def render("list", %{characters: characters}) do
     ~E"""
@@ -17,6 +17,6 @@ defmodule Kantele.Character.WhoView do
   end
 
   def render("_character", %{character: character}) do
-    ~i(- #{white()}#{character.name}#{reset()})
+    ~i(- #{CharacterView.render("name", %{character: character})})
   end
 end

@@ -1,14 +1,14 @@
 defmodule Kantele.Character.MoveView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
 
   def render("enter", %{character: character}) do
-    ~i(#{white()}#{character.name}#{reset()} enters.)
+    ~i(#{CharacterView.render("name", %{character: character})} enters.)
   end
 
   def render("leave", %{character: character}) do
-    ~i(#{white()}#{character.name}#{reset()} leaves.)
+    ~i(#{CharacterView.render("name", %{character: character})} leaves.)
   end
 
   def render("fail", %{reason: :no_exit, exit_name: exit_name}) do
