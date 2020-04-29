@@ -4,7 +4,7 @@ defmodule Kantele.Character.ItemView do
   import IO.ANSI, only: [reset: 0, white: 0]
 
   def render("name", %{item: item}) do
-    ~i(#{white()}#{item.name}#{reset()})
+    ~i({color foreground="white"}#{item.name}{/color})
   end
 
   def render("drop-abort", %{reason: :no_item, item_name: item_name}) do

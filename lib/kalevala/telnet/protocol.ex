@@ -120,6 +120,8 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   defp push_text(state, text) do
+    text = Kalevala.Output.process([text], Kalevala.Output.Tags)
+
     case state.options.newline do
       true ->
         state.transport.send(state.socket, ["\n", text])
