@@ -5,13 +5,13 @@ defmodule Kantele.Character.InventoryCommand do
   alias Kantele.World.Items
 
   def run(conn, _params) do
-    items =
+    item_instances =
       Enum.map(conn.character.inventory, fn item_instance ->
-        Items.get!(item_instance.item_id)
+        %{item_instance | item: Items.get!(item_instance.item_id)}
       end)
 
     conn
-    |> assign(:items, items)
+    |> assign(:item_instances, item_instances)
     |> render(InventoryView, "list")
   end
 end

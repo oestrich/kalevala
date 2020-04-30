@@ -3,20 +3,20 @@ defmodule Kantele.Character.InventoryView do
 
   alias Kantele.Character.ItemView
 
-  def render("list", %{items: items}) do
+  def render("list", %{item_instances: item_instances}) do
     ~E"""
     You are holding:
-    <%= render("_items", %{items: items}) %>
+    <%= render("_items", %{item_instances: item_instances}) %>
     """
   end
 
-  def render("_items", %{items: items}) do
-    items
-    |> Enum.map(&render("_item", %{item: &1}))
+  def render("_items", %{item_instances: item_instances}) do
+    item_instances
+    |> Enum.map(&render("_item", %{item_instance: &1}))
     |> View.join("\n")
   end
 
-  def render("_item", %{item: item}) do
-    ~i(- #{ItemView.render("name", %{item: item})})
+  def render("_item", %{item_instance: item_instance}) do
+    ~i(- #{ItemView.render("name", %{item_instance: item_instance})})
   end
 end
