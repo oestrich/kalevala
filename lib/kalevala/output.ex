@@ -3,7 +3,7 @@ defmodule Kalevala.Output.Context do
   Context struct for an output callback module
   """
 
-  defstruct data: [], meta: %{}, opts: %{}, processed: []
+  defstruct data: [], meta: %{}, opts: %{}
 end
 
 defmodule Kalevala.Output do
@@ -22,9 +22,10 @@ defmodule Kalevala.Output do
 
   @callback post_parse(Context.t()) :: Context.t()
 
-  @callback process(any(), Context.t()) :: Context.t()
-
   def process(text_data, callback_module, opts \\ []) do
+    text_data = List.wrap(text_data)
+    opts = Enum.into(opts, %{})
+
     context = callback_module.init(opts)
 
     context =
@@ -34,12 +35,7 @@ defmodule Kalevala.Output do
 
     context = callback_module.post_parse(context)
 
-    context =
-      Enum.reduce(context.data, context, fn datum, context ->
-        callback_module.process(datum, context)
-      end)
-
-    context.processed
+    context.data
   end
 
   def parse(data, callback_module, context) when is_list(data) do
@@ -51,97 +47,6 @@ defmodule Kalevala.Output do
   end
 end
 
-defmodule Kalevala.Output.TagColors do
-  @moduledoc false
-
-  def background_color("black"), do: IO.ANSI.black_background()
-
-  def background_color("red"), do: IO.ANSI.red_background()
-
-  def background_color("green"), do: IO.ANSI.green_background()
-
-  def background_color("yellow"), do: IO.ANSI.yellow_background()
-
-  def background_color("blue"), do: IO.ANSI.blue_background()
-
-  def background_color("magenta"), do: IO.ANSI.magenta_background()
-
-  def background_color("cyan"), do: IO.ANSI.cyan_background()
-
-  def background_color("white"), do: IO.ANSI.white_background()
-
-  def background_color(nil), do: nil
-
-  def background_color("256:" <> color) do
-    IO.ANSI.color_background(String.to_integer(color))
-  end
-
-  def background_color(triplet) do
-    case String.split(triplet, ",") do
-      [r, g, b] ->
-        r = String.to_integer(r)
-        g = String.to_integer(g)
-        b = String.to_integer(b)
-
-        IO.ANSI.color_background(r, g, b)
-
-      _ ->
-        nil
-    end
-  end
-
-  def foreground_color("black"), do: IO.ANSI.black()
-
-  def foreground_color("red"), do: IO.ANSI.red()
-
-  def foreground_color("green"), do: IO.ANSI.green()
-
-  def foreground_color("yellow"), do: IO.ANSI.yellow()
-
-  def foreground_color("blue"), do: IO.ANSI.blue()
-
-  def foreground_color("magenta"), do: IO.ANSI.magenta()
-
-  def foreground_color("cyan"), do: IO.ANSI.cyan()
-
-  def foreground_color("white"), do: IO.ANSI.white()
-
-  def foreground_color(nil), do: nil
-
-  def foreground_color("256:" <> color) do
-    IO.ANSI.color(String.to_integer(color))
-  end
-
-  def foreground_color(triplet) do
-    case String.split(triplet, ",") do
-      [r, g, b] ->
-        r = String.to_integer(r)
-        g = String.to_integer(g)
-        b = String.to_integer(b)
-
-        IO.ANSI.color(r, g, b)
-
-      _ ->
-        nil
-    end
-  end
-
-  def process_tag("color", attributes) do
-    attributes = Enum.into(attributes, %{})
-
-    foreground = Map.get(attributes, "foreground")
-    background = Map.get(attributes, "background")
-
-    Enum.reject([foreground_color(foreground), background_color(background)], &is_nil/1)
-  end
-
-  def process_close_tag([]), do: [IO.ANSI.reset()]
-
-  def process_close_tag([{:open, tag_name, attributes} | _stack]) do
-    process_tag(tag_name, attributes)
-  end
-end
-
 defmodule Kalevala.Output.Tags do
   @moduledoc """
   Output processor that parses tags
@@ -150,15 +55,11 @@ defmodule Kalevala.Output.Tags do
   @behaviour Kalevala.Output
 
   alias Kalevala.Output.Context
-  alias Kalevala.Output.TagColors
 
   @impl true
   def init(opts) do
-    opts = Enum.into(opts, %{})
-
     %Context{
       data: [],
-      processed: [],
       opts: opts,
       meta: %{
         current_tag: <<>>,
@@ -168,33 +69,8 @@ defmodule Kalevala.Output.Tags do
   end
 
   @impl true
-  def process({:open, tag_name, attributes}, context) do
-    tag_stack = [{:open, tag_name, attributes} | context.meta.tag_stack]
-    meta = Map.put(context.meta, :tag_stack, tag_stack)
-
-    context
-    |> Map.put(:processed, context.processed ++ TagColors.process_tag(tag_name, attributes))
-    |> Map.put(:meta, meta)
-  end
-
-  def process({:close, tag_name}, context) do
-    [{:open, ^tag_name, _attributes} | tag_stack] = context.meta.tag_stack
-    meta = Map.put(context.meta, :tag_stack, tag_stack)
-
-    context
-    |> Map.put(:processed, context.processed ++ TagColors.process_close_tag(tag_stack))
-    |> Map.put(:meta, meta)
-  end
-
-  def process(datum, context) do
-    Map.put(context, :processed, context.processed ++ [datum])
-  end
-
-  @impl true
   def post_parse(context) do
-    context
-    |> Map.put(:data, context.data ++ [context.meta.current_string])
-    |> Map.put(:meta, %{tag_stack: []})
+    Map.put(context, :data, context.data ++ [context.meta.current_string])
   end
 
   @impl true
@@ -269,7 +145,7 @@ defmodule Kalevala.Output.Tags do
       |> String.replace(~r/[{}]/, "")
       |> String.trim()
 
-    {:open, tag_name, attributes}
+    {:open, tag_name, Enum.into(attributes, %{})}
   end
 
   def parse_tag_attributes(tag) do
@@ -280,5 +156,135 @@ defmodule Kalevala.Output.Tags do
       _ ->
         [tag]
     end
+  end
+end
+
+defmodule Kalevala.Output.TagColors do
+  @moduledoc false
+
+  @behaviour Kalevala.Output
+
+  alias Kalevala.Output.Context
+
+  @impl true
+  def init(opts) do
+    %Context{
+      data: [],
+      opts: opts,
+      meta: %{
+        tag_stack: []
+      }
+    }
+  end
+
+  @impl true
+  def post_parse(context), do: context
+
+  @impl true
+  def parse({:open, tag_name, attributes}, context) do
+    tag_stack = [{:open, tag_name, attributes} | context.meta.tag_stack]
+    meta = Map.put(context.meta, :tag_stack, tag_stack)
+
+    context
+    |> Map.put(:data, context.data ++ process_tag(tag_name, attributes))
+    |> Map.put(:meta, meta)
+  end
+
+  def parse({:close, tag_name}, context) do
+    [{:open, ^tag_name, _attributes} | tag_stack] = context.meta.tag_stack
+    meta = Map.put(context.meta, :tag_stack, tag_stack)
+
+    context
+    |> Map.put(:data, context.data ++ process_close_tag(tag_stack))
+    |> Map.put(:meta, meta)
+  end
+
+  def parse(datum, context) do
+    Map.put(context, :data, context.data ++ [datum])
+  end
+
+  def background_color("black"), do: IO.ANSI.black_background()
+
+  def background_color("red"), do: IO.ANSI.red_background()
+
+  def background_color("green"), do: IO.ANSI.green_background()
+
+  def background_color("yellow"), do: IO.ANSI.yellow_background()
+
+  def background_color("blue"), do: IO.ANSI.blue_background()
+
+  def background_color("magenta"), do: IO.ANSI.magenta_background()
+
+  def background_color("cyan"), do: IO.ANSI.cyan_background()
+
+  def background_color("white"), do: IO.ANSI.white_background()
+
+  def background_color(nil), do: nil
+
+  def background_color("256:" <> color) do
+    IO.ANSI.color_background(String.to_integer(color))
+  end
+
+  def background_color(triplet) do
+    case String.split(triplet, ",") do
+      [r, g, b] ->
+        r = String.to_integer(r)
+        g = String.to_integer(g)
+        b = String.to_integer(b)
+
+        IO.ANSI.color_background(r, g, b)
+
+      _ ->
+        nil
+    end
+  end
+
+  def foreground_color("black"), do: IO.ANSI.black()
+
+  def foreground_color("red"), do: IO.ANSI.red()
+
+  def foreground_color("green"), do: IO.ANSI.green()
+
+  def foreground_color("yellow"), do: IO.ANSI.yellow()
+
+  def foreground_color("blue"), do: IO.ANSI.blue()
+
+  def foreground_color("magenta"), do: IO.ANSI.magenta()
+
+  def foreground_color("cyan"), do: IO.ANSI.cyan()
+
+  def foreground_color("white"), do: IO.ANSI.white()
+
+  def foreground_color(nil), do: nil
+
+  def foreground_color("256:" <> color) do
+    IO.ANSI.color(String.to_integer(color))
+  end
+
+  def foreground_color(triplet) do
+    case String.split(triplet, ",") do
+      [r, g, b] ->
+        r = String.to_integer(r)
+        g = String.to_integer(g)
+        b = String.to_integer(b)
+
+        IO.ANSI.color(r, g, b)
+
+      _ ->
+        nil
+    end
+  end
+
+  def process_tag("color", attributes) do
+    foreground = Map.get(attributes, "foreground")
+    background = Map.get(attributes, "background")
+
+    Enum.reject([foreground_color(foreground), background_color(background)], &is_nil/1)
+  end
+
+  def process_close_tag([]), do: [IO.ANSI.reset()]
+
+  def process_close_tag([{:open, tag_name, attributes} | _stack]) do
+    process_tag(tag_name, attributes)
   end
 end

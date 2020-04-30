@@ -7,6 +7,7 @@ defmodule Kalevala.Telnet.Protocol do
   alias Kalevala.Character.Conn.Lines
   alias Kalevala.Character.Conn.Option
   alias Kalevala.Character.Foreman
+  alias Kalevala.Output
   alias Telnet.Options
 
   require Logger
@@ -22,18 +23,21 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   @doc false
-  def init(ref, transport, foreman_options) do
+  def init(ref, transport, options) do
     # See deadlock comment above
     {:ok, socket} = :ranch.handshake(ref)
     :ok = transport.setopts(socket, active: true)
     send(self(), :init)
 
+    protocol_options = Enum.into(options.protocol, %{})
+
     state = %{
       socket: socket,
       transport: transport,
+      output_processors: protocol_options.output_processors,
       buffer: <<>>,
       foreman_pid: nil,
-      foreman_options: foreman_options,
+      foreman_options: options[:foreman],
       options: %{
         newline: false
       }
@@ -120,7 +124,10 @@ defmodule Kalevala.Telnet.Protocol do
   end
 
   defp push_text(state, text) do
-    text = Kalevala.Output.process([text], Kalevala.Output.Tags)
+    text =
+      Enum.reduce(state.output_processors, text, fn processor, text ->
+        Output.process(text, processor)
+      end)
 
     case state.options.newline do
       true ->

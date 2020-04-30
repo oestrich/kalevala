@@ -8,7 +8,7 @@ defmodule Kantele.Character.CharacterView do
   end
 
   def render("name", %{name: name}) do
-    ~i({color foreground="white"}#{name}{/color})
+    ~i({character}#{name}{/character})
   end
 
   def render("vitals", %{character: character}) do

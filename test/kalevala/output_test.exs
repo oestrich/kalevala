@@ -3,10 +3,14 @@ defmodule Kalevala.Output.TagsTest do
 
   alias Kalevala.Output
   alias Kalevala.Output.Tags
+  alias Kalevala.Output.TagColors
 
   describe "callbacks to change output" do
     test "no modification" do
-      text = Output.process(["hello ", "world"], Tags)
+      text =
+        ["hello ", "world"]
+        |> Output.process(Tags)
+        |> Output.process(TagColors)
 
       assert text == ["hello world"]
     end
@@ -14,7 +18,10 @@ defmodule Kalevala.Output.TagsTest do
     test "simple coloration" do
       iodata = [~s(hello, {color foreground="white" background="black"}world{/color})]
 
-      text = Output.process(iodata, Tags)
+      text =
+        iodata
+        |> Output.process(Tags)
+        |> Output.process(TagColors)
 
       assert text == ["hello, ", "\e[37m", "\e[40m", "world", "\e[0m", ""]
     end
@@ -22,7 +29,10 @@ defmodule Kalevala.Output.TagsTest do
     test "allows for coloration" do
       iodata = [~s(hello, {color ), ~s(foreground="white"} ), ["world"], [["{/color}"]], []]
 
-      text = Output.process(iodata, Tags)
+      text =
+        iodata
+        |> Output.process(Tags)
+        |> Output.process(TagColors)
 
       assert text == ["hello, ", "\e[37m", " world", "\e[0m", ""]
     end
@@ -32,7 +42,10 @@ defmodule Kalevala.Output.TagsTest do
         ~s(hello, {color foreground="white"} {color foreground="blue"}world{/color}{/color})
       ]
 
-      text = Output.process(iodata, Tags)
+      text =
+        iodata
+        |> Output.process(Tags)
+        |> Output.process(TagColors)
 
       assert text == ["hello, ", "\e[37m", " ", "\e[34m", "world", "\e[37m", "", "\e[0m", ""]
     end
@@ -40,7 +53,10 @@ defmodule Kalevala.Output.TagsTest do
     test "allows special characters to be included but ignored" do
       iodata = [~s(hello, \\{color foreground="white"\\}world\\{/color\\})]
 
-      text = Output.process(iodata, Tags)
+      text =
+        iodata
+        |> Output.process(Tags)
+        |> Output.process(TagColors)
 
       assert text == [~s(hello, {color foreground="white"}world{/color})]
     end
