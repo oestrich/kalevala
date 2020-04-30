@@ -323,6 +323,8 @@ defmodule Kalevala.Output.TagColors do
     Enum.reject(attributes, &is_nil/1)
   end
 
+  def process_tag(_tag_name, _attributes), do: []
+
   def process_close_tag([]), do: [IO.ANSI.reset()]
 
   def process_close_tag([{:open, tag_name, attributes} | _stack]) do
