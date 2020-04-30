@@ -7,8 +7,8 @@ defmodule Kantele.Character.CommandView do
     [
       "[",
       ~i({hp}#{vitals.health_points}/#{vitals.max_health_points}hp{/hp} ),
-      ~i({sp}#{vitals.skill_points}/#{vitals.max_skill_points}sp{/hp} ),
-      ~i({ep}#{vitals.endurance_points}/#{vitals.max_endurance_points}ep{/hp}),
+      ~i({sp}#{vitals.skill_points}/#{vitals.max_skill_points}sp{/sp} ),
+      ~i({ep}#{vitals.endurance_points}/#{vitals.max_endurance_points}ep{/ep}),
       "] > "
     ]
   end
