@@ -33,6 +33,16 @@ defmodule Kalevala.World.Item do
   end
 end
 
+defmodule Kalevala.World.Item.ItemNotLoaded do
+  @moduledoc """
+  An empty struct for item instances to include by default
+
+  To know that the item is _not_ loaded and you should load it
+  """
+
+  defstruct []
+end
+
 defmodule Kalevala.World.Item.Instance do
   @moduledoc """
   Item instance struct
@@ -40,7 +50,9 @@ defmodule Kalevala.World.Item.Instance do
   A specific instance of an item in the world
   """
 
-  defstruct [:id, :item_id, :created_at, :callback_module, meta: %{}]
+  alias Kalevala.World.Item.ItemNotLoaded
+
+  defstruct [:id, :item_id, :created_at, :callback_module, item: %ItemNotLoaded{}, meta: %{}]
 
   @type t() :: %__MODULE__{}
 

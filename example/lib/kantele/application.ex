@@ -18,6 +18,7 @@ defmodule Kantele.Application do
       protocol: [
         output_processors: [
           Kalevala.Output.Tags,
+          Kantele.Output.AdminTags,
           Kantele.Output.SemanticColors,
           Kalevala.Output.TagColors
         ]

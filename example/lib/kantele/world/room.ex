@@ -70,15 +70,15 @@ defmodule Kantele.World.Room.LookEvent do
         character.id == event.acting_character.id
       end)
 
-    items =
+    item_instances =
       Enum.map(context.item_instances, fn item_instance ->
-        Items.get!(item_instance.item_id)
+        %{item_instance | item: Items.get!(item_instance.item_id)}
       end)
 
     context
     |> assign(:room, context.data)
     |> assign(:characters, characters)
-    |> assign(:items, items)
+    |> assign(:item_instances, item_instances)
     |> render(event.from_pid, LookView, "look", %{})
   end
 end

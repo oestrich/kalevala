@@ -4,11 +4,11 @@ defmodule Kantele.Character.LookView do
   alias Kantele.Character.CharacterView
   alias Kantele.Character.ItemView
 
-  def render("look", %{room: room, characters: characters, items: items}) do
+  def render("look", %{room: room, characters: characters, item_instances: item_instances}) do
     ~E"""
     {room-title}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
-    <%= render("_items", %{items: items}) %>
+    <%= render("_items", %{item_instances: item_instances}) %>
     <%= render("_exits", %{room: room}) %>
     <%= render("_characters", %{characters: characters}) %>
     """
@@ -51,10 +51,10 @@ defmodule Kantele.Character.LookView do
 
   def render("_items", %{items: []}), do: nil
 
-  def render("_items", %{items: items}) do
+  def render("_items", %{item_instances: item_instances}) do
     items =
-      items
-      |> Enum.map(&ItemView.render("name", %{item: &1}))
+      item_instances
+      |> Enum.map(&ItemView.render("name", %{item_instance: &1}))
       |> View.join(", ")
 
     View.join(["Items:", items], " ")

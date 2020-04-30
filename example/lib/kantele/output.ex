@@ -68,3 +68,50 @@ defmodule Kantele.Output.SemanticColors do
 
   def transform_tag(tag), do: tag
 end
+
+defmodule Kantele.Output.AdminTags do
+  @moduledoc """
+  Parse admin specific tags
+
+  Display things like item instance ids when present
+  """
+
+  @behaviour Kalevala.Output
+
+  import Kalevala.Character.View.Macro, only: [sigil_i: 2]
+
+  alias Kalevala.Output.Context
+
+  @impl true
+  def init(opts) do
+    %Context{
+      data: [],
+      opts: opts
+    }
+  end
+
+  @impl true
+  def post_parse(context), do: context
+
+  @impl true
+  def parse(tag, context) do
+    tag = transform_tag(tag)
+    Map.put(context, :data, context.data ++ [tag])
+  end
+
+  def transform_tag({:open, "item-instance", attributes}) do
+    id = Map.get(attributes, "id")
+
+    [
+      {:open, "color", %{"foreground" => "155,155,155", "underline" => "true"}},
+      ~i([#{id}]),
+      {:close, "color"},
+      " ",
+      {:open, "color", %{}}
+    ]
+  end
+
+  def transform_tag({:close, "item-instance"}), do: {:close, "color"}
+
+  def transform_tag(tag), do: tag
+end
