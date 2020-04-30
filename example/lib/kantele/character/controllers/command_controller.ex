@@ -3,6 +3,7 @@ defmodule Kantele.Character.CommandController do
 
   require Logger
 
+  alias Kalevala.Output.Tags
   alias Kantele.Character.Commands
   alias Kantele.Character.CommandView
   alias Kantele.Character.Events
@@ -17,6 +18,8 @@ defmodule Kantele.Character.CommandController do
 
   def recv(conn, data) do
     Logger.info("Received - #{inspect(data)}")
+
+    data = Tags.escape(data)
 
     case Commands.call(conn, data) do
       {:error, :unknown} ->

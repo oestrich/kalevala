@@ -60,6 +60,17 @@ defmodule Kalevala.Output.Tags do
 
   alias Kalevala.Output.Context
 
+  @doc """
+  Escape special tag characters in a string
+
+  To prevent characters from using these tags in commands
+  """
+  def escape(string) do
+    string
+    |> String.replace(~r/{/, "\\{")
+    |> String.replace(~r/}/, "\\}")
+  end
+
   @impl true
   def init(opts) do
     %Context{
