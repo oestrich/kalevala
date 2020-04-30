@@ -66,7 +66,7 @@ defmodule Kalevala.World.Item.Instance do
   """
   def generate_id() do
     bytes =
-      Enum.reduce(1..8, <<>>, fn _, bytes ->
+      Enum.reduce(1..4, <<>>, fn _, bytes ->
         bytes <> <<Enum.random(0..255)>>
       end)
 

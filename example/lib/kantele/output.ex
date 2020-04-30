@@ -86,7 +86,10 @@ defmodule Kantele.Output.AdminTags do
   def init(opts) do
     %Context{
       data: [],
-      opts: opts
+      opts: opts,
+      meta: %{
+        tag_stack: []
+      }
     }
   end
 
@@ -94,24 +97,29 @@ defmodule Kantele.Output.AdminTags do
   def post_parse(context), do: context
 
   @impl true
-  def parse(tag, context) do
-    tag = transform_tag(tag)
-    Map.put(context, :data, context.data ++ [tag])
+  def parse({:open, "item-instance", attributes}, context) do
+    tag_stack = [attributes | context.meta.tag_stack]
+    meta = Map.put(context.meta, :tag_stack, tag_stack)
+
+    Map.put(context, :meta, meta)
   end
 
-  def transform_tag({:open, "item-instance", attributes}) do
-    id = Map.get(attributes, "id")
+  def parse({:close, "item-instance"}, context) do
+    [attributes | tag_stack] = context.meta.tag_stack
+    meta = Map.put(context.meta, :tag_stack, tag_stack)
 
-    [
-      {:open, "color", %{"foreground" => "155,155,155", "underline" => "true"}},
-      ~i([#{id}]),
+    tags = [
+      {:open, "color", %{"foreground" => "95,95,95"}},
+      ~i(##{attributes["id"]}),
       {:close, "color"},
-      " ",
-      {:open, "color", %{}}
     ]
+
+    context
+    |> Map.put(:data, context.data ++ tags)
+    |> Map.put(:meta, meta)
   end
 
-  def transform_tag({:close, "item-instance"}), do: {:close, "color"}
-
-  def transform_tag(tag), do: tag
+  def parse(datum, context) do
+    Map.put(context, :data, context.data ++ [datum])
+  end
 end
