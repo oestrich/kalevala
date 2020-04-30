@@ -1,19 +1,25 @@
 defmodule Kantele.Character.ChannelView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
+
+  def render("name", %{name: name}) do
+    ~i({color foreground="white"}[#{name}]{/color})
+  end
 
   def render("echo", %{channel_name: channel_name, text: text}) do
     [
-      ~i(#{white()}[#{channel_name}]#{reset()} You say, ),
-      ~i("\e[32m#{text}\e[0m"\n)
+      render("name", %{name: channel_name}),
+      ~i( You say, ),
+      ~i("{color foreground="green"}#{text}{/color}"\n)
     ]
   end
 
   def render("listen", %{channel_name: channel_name, character_name: character_name, text: text}) do
     [
-      ~i(#{white()}[#{channel_name}]#{reset()} #{white()}#{character_name}#{reset()} says, ),
-      ~i("\e[32m#{text}\e[0m"\n)
+      render("name", %{name: channel_name}),
+      ~i( #{CharacterView.render("name", %{name: character_name})} says, ),
+      ~i("{color foreground="green"}#{text}{/color}"\n)
     ]
   end
 end

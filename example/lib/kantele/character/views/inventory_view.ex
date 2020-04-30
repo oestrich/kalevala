@@ -1,7 +1,7 @@
 defmodule Kantele.Character.InventoryView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.ItemView
 
   def render("list", %{items: items}) do
     ~E"""
@@ -17,6 +17,6 @@ defmodule Kantele.Character.InventoryView do
   end
 
   def render("_item", %{item: item}) do
-    ~i(- #{white()}#{item.name}#{reset()})
+    ~i(- #{ItemView.render("name", %{item: item})})
   end
 end

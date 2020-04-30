@@ -1,10 +1,8 @@
 defmodule Kantele.Character.ItemView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
-
   def render("name", %{item: item}) do
-    ~i(#{white()}#{item.name}#{reset()})
+    ~i({item}#{item.name}{/item})
   end
 
   def render("drop-abort", %{reason: :no_item, item_name: item_name}) do
@@ -24,6 +22,6 @@ defmodule Kantele.Character.ItemView do
   end
 
   def render("unknown", %{item_name: item_name}) do
-    ~i(There is no item #{white()}"#{item_name}"#{reset()}.\n)
+    ~i(There is no item {color foreground="white"}"#{item_name}"{/color}.\n)
   end
 end

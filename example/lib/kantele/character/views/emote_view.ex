@@ -1,10 +1,10 @@
 defmodule Kantele.Character.EmoteView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
 
   def render("echo", %{character: character, text: text}) do
-    ~i(#{white()}#{character.name}#{reset()} #{text}\n)
+    ~i({color foreground="white"}#{character.name}{/color} #{text}\n)
   end
 
   def render("list", %{emotes: emotes}) do
@@ -20,10 +20,10 @@ defmodule Kantele.Character.EmoteView do
   end
 
   def render("_emote", %{emote: emote}) do
-    ~i(- #{white()}#{emote}#{reset()})
+    ~i(- {color foreground="white"}#{emote}{/color})
   end
 
   def render("listen", %{character_name: character_name, text: text}) do
-    ~i(#{white()}#{character_name}#{reset()} #{text}\n)
+    ~i(#{CharacterView.render("name", %{name: character_name})} #{text}\n)
   end
 end

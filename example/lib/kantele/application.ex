@@ -15,6 +15,13 @@ defmodule Kantele.Application do
         keyfile: Path.join(:code.priv_dir(:kantele), "certs/key.pem"),
         certfile: Path.join(:code.priv_dir(:kantele), "certs/cert.pem")
       ],
+      protocol: [
+        output_processors: [
+          Kalevala.Output.Tags,
+          Kantele.Output.SemanticColors,
+          Kalevala.Output.TagColors
+        ]
+      ],
       foreman: [
         supervisor_name: Kantele.Character.Foreman.Supervisor,
         character_module: Kantele.Character,

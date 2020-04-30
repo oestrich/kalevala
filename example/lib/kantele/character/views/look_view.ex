@@ -1,11 +1,12 @@
 defmodule Kantele.Character.LookView do
   use Kalevala.Character.View
 
-  import IO.ANSI, only: [blue: 0, reset: 0, white: 0]
+  alias Kantele.Character.CharacterView
+  alias Kantele.Character.ItemView
 
   def render("look", %{room: room, characters: characters, items: items}) do
     ~E"""
-    <%= blue() %><%= room.name %><%= reset() %>
+    {room-title}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
     <%= render("_items", %{items: items}) %>
     <%= render("_exits", %{room: room}) %>
@@ -26,7 +27,7 @@ defmodule Kantele.Character.LookView do
     exits =
       room.exits
       |> Enum.map(fn room_exit ->
-        ~i(#{white()}#{room_exit.exit_name}#{reset()})
+        ~i({color foreground="white"}#{room_exit.exit_name}{/color})
       end)
       |> View.join(" ")
 
@@ -45,7 +46,7 @@ defmodule Kantele.Character.LookView do
   end
 
   def render("_character", %{character: character}) do
-    ~i(- #{white()}#{character.name}#{reset()})
+    ~i(- #{CharacterView.render("name", %{character: character})})
   end
 
   def render("_items", %{items: []}), do: nil
@@ -53,13 +54,9 @@ defmodule Kantele.Character.LookView do
   def render("_items", %{items: items}) do
     items =
       items
-      |> Enum.map(&render("_item", %{item: &1}))
+      |> Enum.map(&ItemView.render("name", %{item: &1}))
       |> View.join(", ")
 
     View.join(["Items:", items], " ")
-  end
-
-  def render("_item", %{item: item}) do
-    ~i(#{white()}#{item.name}#{reset()})
   end
 end
