@@ -2,7 +2,7 @@ defmodule Kantele.Character.ItemView do
   use Kalevala.Character.View
 
   def render("name", %{item: item}) do
-    ~i({color foreground="white"}#{item.name}{/color})
+    ~i({item}#{item.name}{/item})
   end
 
   def render("drop-abort", %{reason: :no_item, item_name: item_name}) do

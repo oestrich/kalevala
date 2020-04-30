@@ -228,11 +228,7 @@ defmodule Kalevala.Output.TagColors do
   def background_color(triplet) do
     case String.split(triplet, ",") do
       [r, g, b] ->
-        r = String.to_integer(r)
-        g = String.to_integer(g)
-        b = String.to_integer(b)
-
-        IO.ANSI.color_background(r, g, b)
+        "\e[48;2;#{r};#{g};#{b}m"
 
       _ ->
         nil
@@ -264,22 +260,28 @@ defmodule Kalevala.Output.TagColors do
   def foreground_color(triplet) do
     case String.split(triplet, ",") do
       [r, g, b] ->
-        r = String.to_integer(r)
-        g = String.to_integer(g)
-        b = String.to_integer(b)
-
-        IO.ANSI.color(r, g, b)
+        "\e[38;2;#{r};#{g};#{b}m"
 
       _ ->
         nil
     end
   end
 
+  def underline("true"), do: IO.ANSI.underline()
+
+  def underline(_), do: nil
+
   def process_tag("color", attributes) do
     foreground = Map.get(attributes, "foreground")
     background = Map.get(attributes, "background")
 
-    Enum.reject([foreground_color(foreground), background_color(background)], &is_nil/1)
+    attributes = [
+      foreground_color(foreground),
+      background_color(background),
+      underline(Map.get(attributes, "underline"))
+    ]
+
+    Enum.reject(attributes, &is_nil/1)
   end
 
   def process_close_tag([]), do: [IO.ANSI.reset()]

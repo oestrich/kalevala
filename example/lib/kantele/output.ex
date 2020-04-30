@@ -1,7 +1,43 @@
+defmodule Kantele.Output.Macros do
+  @moduledoc """
+  Helper macros for defining semantic colors
+  """
+
+  @doc """
+  Define a semantic color
+
+  Available options:
+  - foreground
+  - background
+  - underline
+  """
+  defmacro color(tag_name, options) do
+    options =
+      options
+      |> Enum.map(fn {key, value} ->
+        {to_string(key), to_string(value)}
+      end)
+      |> Enum.into(%{})
+
+    quote do
+      def transform_tag({:open, unquote(tag_name), attributes}) do
+        attributes = Map.merge(attributes, unquote(Macro.escape(options)))
+        {:open, "color", attributes}
+      end
+
+      def transform_tag({:close, unquote(tag_name)}), do: {:close, "color"}
+    end
+  end
+end
+
 defmodule Kantele.Output.SemanticColors do
-  @moduledoc false
+  @moduledoc """
+  Transform semantic tags into color tags
+  """
 
   @behaviour Kalevala.Output
+
+  import Kantele.Output.Macros
 
   alias Kalevala.Output.Context
 
@@ -22,13 +58,13 @@ defmodule Kantele.Output.SemanticColors do
     Map.put(context, :data, context.data ++ [tag])
   end
 
-  def transform_tag({:open, "character", attributes}) do
-    {:open, "color", Map.merge(attributes, %{"foreground" => "white"})}
-  end
-
-  def transform_tag({:close, "character"}) do
-    {:close, "color"}
-  end
+  color("character", foreground: "yellow")
+  color("item", foreground: "cyan")
+  color("text", foreground: "green")
+  color("room-title", foreground: "blue", underline: true)
+  color("hp", foreground: "red")
+  color("sp", foreground: "blue")
+  color("ep", foreground: "169,114,218")
 
   def transform_tag(tag), do: tag
 end

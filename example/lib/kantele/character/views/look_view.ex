@@ -6,7 +6,7 @@ defmodule Kantele.Character.LookView do
 
   def render("look", %{room: room, characters: characters, items: items}) do
     ~E"""
-    {color foreground="black" background="cyan"}<%= room.name %>{/color}
+    {room-title}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
     <%= render("_items", %{items: items}) %>
     <%= render("_exits", %{room: room}) %>

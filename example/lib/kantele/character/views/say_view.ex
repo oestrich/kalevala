@@ -4,7 +4,7 @@ defmodule Kantele.Character.SayView do
   alias Kantele.Character.CharacterView
 
   def render("text", %{text: text}) do
-    ~i("{color foreground="green"}#{text}{/color}")
+    ~i("{text}#{text}{/text}")
   end
 
   def render("echo", %{text: text}) do
@@ -14,9 +14,7 @@ defmodule Kantele.Character.SayView do
   def render("listen", %{character_name: character_name, text: text}) do
     [
       CharacterView.render("name", %{name: character_name}),
-      " says, ",
-      render("text", %{text: text}),
-      "\n"
+      " says, #{render("text", %{text: text})}\n"
     ]
   end
 end
