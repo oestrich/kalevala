@@ -33,9 +33,13 @@ defmodule Kalevala.Output do
         parse(datum, callback_module, context)
       end)
 
-    context = callback_module.post_parse(context)
+    case callback_module.post_parse(context) do
+      :error ->
+        text_data
 
-    context.data
+      %Context{data: data} ->
+        data
+    end
   end
 
   def parse(data, callback_module, context) when is_list(data) do
@@ -70,7 +74,42 @@ defmodule Kalevala.Output.Tags do
 
   @impl true
   def post_parse(context) do
-    Map.put(context, :data, context.data ++ [context.meta.current_string])
+    context = Map.put(context, :data, context.data ++ [context.meta.current_string])
+
+    case matching_tags?(context) do
+      true ->
+        context
+
+      false ->
+        :error
+    end
+  end
+
+  defp matching_tags?(context) do
+    stack = Enum.reduce(context.data, [], &match_closing_tags/2)
+    stack == []
+  end
+
+  defp match_closing_tags(datum, stack) do
+    case datum do
+      :error ->
+        :error
+
+      {:open, tag_name, _attributes} ->
+        [tag_name | stack]
+
+      {:close, tag_name} ->
+        case stack do
+          [^tag_name | stack] ->
+            stack
+
+          _ ->
+            :error
+        end
+
+      _ ->
+        stack
+    end
   end
 
   @impl true
