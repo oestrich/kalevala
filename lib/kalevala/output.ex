@@ -209,6 +209,39 @@ defmodule Kalevala.Output.Tags do
   end
 end
 
+defmodule Kalevala.Output.StripTags do
+  @moduledoc false
+
+  @behaviour Kalevala.Output
+
+  alias Kalevala.Output.Context
+
+  @impl true
+  def init(opts) do
+    %Context{
+      data: [],
+      opts: opts,
+      meta: %{}
+    }
+  end
+
+  @impl true
+  def post_parse(context), do: context
+
+  @impl true
+  def parse({:open, _tag_name, _attributes}, context) do
+    context
+  end
+
+  def parse({:close, _tag_name}, context) do
+    context
+  end
+
+  def parse(datum, context) do
+    Map.put(context, :data, context.data ++ [datum])
+  end
+end
+
 defmodule Kalevala.Output.TagColors do
   @moduledoc false
 
@@ -231,17 +264,17 @@ defmodule Kalevala.Output.TagColors do
   def post_parse(context), do: context
 
   @impl true
-  def parse({:open, tag_name, attributes}, context) do
-    tag_stack = [{:open, tag_name, attributes} | context.meta.tag_stack]
+  def parse({:open, "color", attributes}, context) do
+    tag_stack = [attributes | context.meta.tag_stack]
     meta = Map.put(context.meta, :tag_stack, tag_stack)
 
     context
-    |> Map.put(:data, context.data ++ process_tag(tag_name, attributes))
+    |> Map.put(:data, context.data ++ process_tag(attributes))
     |> Map.put(:meta, meta)
   end
 
-  def parse({:close, tag_name}, context) do
-    [{:open, ^tag_name, _attributes} | tag_stack] = context.meta.tag_stack
+  def parse({:close, "color"}, context) do
+    [_attributes | tag_stack] = context.meta.tag_stack
     meta = Map.put(context.meta, :tag_stack, tag_stack)
 
     context
@@ -321,7 +354,7 @@ defmodule Kalevala.Output.TagColors do
 
   def underline(_), do: nil
 
-  def process_tag("color", attributes) do
+  def process_tag(attributes) do
     foreground = Map.get(attributes, "foreground")
     background = Map.get(attributes, "background")
 
@@ -334,11 +367,9 @@ defmodule Kalevala.Output.TagColors do
     Enum.reject(attributes, &is_nil/1)
   end
 
-  def process_tag(_tag_name, _attributes), do: []
-
   def process_close_tag([]), do: [IO.ANSI.reset()]
 
-  def process_close_tag([{:open, tag_name, attributes} | _stack]) do
-    process_tag(tag_name, attributes)
+  def process_close_tag([attributes | _stack]) do
+    process_tag(attributes)
   end
 end

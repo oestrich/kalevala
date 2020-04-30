@@ -20,7 +20,8 @@ defmodule Kantele.Application do
           Kalevala.Output.Tags,
           Kantele.Output.AdminTags,
           Kantele.Output.SemanticColors,
-          Kalevala.Output.TagColors
+          Kalevala.Output.TagColors,
+          Kalevala.Output.StripTags
         ]
       ],
       foreman: [
