@@ -16,7 +16,7 @@ defmodule Kantele.Character.ChannelEvent do
       false ->
         conn
         |> assign(:channel_name, "general")
-        |> assign(:character_name, event.data.character.name)
+        |> assign(:character, event.data.character)
         |> assign(:text, event.data.text)
         |> render(ChannelView, "listen")
         |> prompt(CommandView, "prompt", %{})

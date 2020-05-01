@@ -15,7 +15,7 @@ defmodule Kantele.Character.EmoteEvent do
 
       false ->
         conn
-        |> assign(:character_name, event.data.character.name)
+        |> assign(:character, event.data.character)
         |> assign(:text, event.data.text)
         |> render(EmoteView, "listen")
         |> prompt(CommandView, "prompt", %{})

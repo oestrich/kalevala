@@ -22,6 +22,33 @@ defmodule Kalevala.Output do
 
   @callback post_parse(Context.t()) :: Context.t()
 
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour Kalevala.Output
+
+      alias Kalevala.Output.Context
+
+      @impl true
+      def init(opts) do
+        %Context{
+          data: [],
+          opts: opts,
+          meta: %{}
+        }
+      end
+
+      @impl true
+      def post_parse(context), do: context
+
+      @impl true
+      def parse(datum, context) do
+        Map.put(context, :data, context.data ++ [datum])
+      end
+
+      defoverridable init: 1, parse: 2, post_parse: 1
+    end
+  end
+
   def process(text_data, callback_module, opts \\ []) do
     text_data = List.wrap(text_data)
     opts = Enum.into(opts, %{})
@@ -56,9 +83,7 @@ defmodule Kalevala.Output.Tags do
   Output processor that parses tags
   """
 
-  @behaviour Kalevala.Output
-
-  alias Kalevala.Output.Context
+  use Kalevala.Output
 
   @doc """
   Escape special tag characters in a string
@@ -210,23 +235,11 @@ defmodule Kalevala.Output.Tags do
 end
 
 defmodule Kalevala.Output.StripTags do
-  @moduledoc false
+  @moduledoc """
+  Remove any open and close tag tuples from the data
+  """
 
-  @behaviour Kalevala.Output
-
-  alias Kalevala.Output.Context
-
-  @impl true
-  def init(opts) do
-    %Context{
-      data: [],
-      opts: opts,
-      meta: %{}
-    }
-  end
-
-  @impl true
-  def post_parse(context), do: context
+  use Kalevala.Output
 
   @impl true
   def parse({:open, _tag_name, _attributes}, context) do
@@ -243,11 +256,11 @@ defmodule Kalevala.Output.StripTags do
 end
 
 defmodule Kalevala.Output.TagColors do
-  @moduledoc false
+  @moduledoc """
+  Process `color` tags into ANSI escape codes
+  """
 
-  @behaviour Kalevala.Output
-
-  alias Kalevala.Output.Context
+  use Kalevala.Output
 
   @impl true
   def init(opts) do
@@ -259,9 +272,6 @@ defmodule Kalevala.Output.TagColors do
       }
     }
   end
-
-  @impl true
-  def post_parse(context), do: context
 
   @impl true
   def parse({:open, "color", attributes}, context) do

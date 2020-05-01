@@ -11,9 +11,9 @@ defmodule Kantele.Character.SayView do
     ~i(You say, #{render("text", %{text: text})}\n)
   end
 
-  def render("listen", %{character_name: character_name, text: text}) do
+  def render("listen", %{character: character, text: text}) do
     [
-      CharacterView.render("name", %{name: character_name}),
+      CharacterView.render("name", %{character: character}),
       " says, #{render("text", %{text: text})}\n"
     ]
   end

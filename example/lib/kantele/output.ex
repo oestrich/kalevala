@@ -20,12 +20,46 @@ defmodule Kantele.Output.Macros do
       |> Enum.into(%{})
 
     quote do
-      def transform_tag({:open, unquote(tag_name), attributes}) do
+      def parse({:open, unquote(tag_name), attributes}, context) do
         attributes = Map.merge(attributes, unquote(Macro.escape(options)))
-        {:open, "color", attributes}
+        Map.put(context, :data, context.data ++ [{:open, "color", attributes}])
       end
 
-      def transform_tag({:close, unquote(tag_name)}), do: {:close, "color"}
+      def parse({:close, unquote(tag_name)}, context) do
+        Map.put(context, :data, context.data ++ [{:close, "color"}])
+      end
+    end
+  end
+
+  @doc """
+  Display metadata attributes on tags
+  """
+  defmacro metadata(tag_name, color, block) do
+    quote do
+      def parse({:open, unquote(tag_name), attributes}, context) do
+        tag_stack = [{:open, unquote(tag_name), attributes} | context.meta.tag_stack]
+        meta = Map.put(context.meta, :tag_stack, tag_stack)
+
+        context
+        |> Map.put(:data, context.data ++ [{:open, unquote(tag_name), attributes}])
+        |> Map.put(:meta, meta)
+      end
+
+      def parse({:close, unquote(tag_name)}, context) do
+        [{:open, unquote(tag_name), attributes} | tag_stack] = context.meta.tag_stack
+        meta = Map.put(context.meta, :tag_stack, tag_stack)
+
+        tags = [
+          {:close, unquote(tag_name)},
+          {:open, "color", %{"foreground" => unquote(Macro.escape(color))}},
+          unquote(block).(attributes),
+          {:close, "color"}
+        ]
+
+        context
+        |> Map.put(:data, context.data ++ tags)
+        |> Map.put(:meta, meta)
+      end
     end
   end
 end
@@ -35,28 +69,9 @@ defmodule Kantele.Output.SemanticColors do
   Transform semantic tags into color tags
   """
 
-  @behaviour Kalevala.Output
+  use Kalevala.Output
 
-  import Kantele.Output.Macros
-
-  alias Kalevala.Output.Context
-
-  @impl true
-  def init(opts) do
-    %Context{
-      data: [],
-      opts: opts
-    }
-  end
-
-  @impl true
-  def post_parse(context), do: context
-
-  @impl true
-  def parse(tag, context) do
-    tag = transform_tag(tag)
-    Map.put(context, :data, context.data ++ [tag])
-  end
+  import Kantele.Output.Macros, only: [color: 2]
 
   color("character", foreground: "yellow")
   color("item", foreground: "cyan")
@@ -66,7 +81,10 @@ defmodule Kantele.Output.SemanticColors do
   color("sp", foreground: "blue")
   color("ep", foreground: "169,114,218")
 
-  def transform_tag(tag), do: tag
+  @impl true
+  def parse(datum, context) do
+    Map.put(context, :data, context.data ++ [datum])
+  end
 end
 
 defmodule Kantele.Output.AdminTags do
@@ -76,11 +94,10 @@ defmodule Kantele.Output.AdminTags do
   Display things like item instance ids when present
   """
 
-  @behaviour Kalevala.Output
+  use Kalevala.Output
 
   import Kalevala.Character.View.Macro, only: [sigil_i: 2]
-
-  alias Kalevala.Output.Context
+  import Kantele.Output.Macros, only: [metadata: 3]
 
   @impl true
   def init(opts) do
@@ -93,32 +110,19 @@ defmodule Kantele.Output.AdminTags do
     }
   end
 
-  @impl true
-  def post_parse(context), do: context
+  metadata("character", "95,95,95", fn attributes ->
+    ~i( #{attributes["id"]})
+  end)
+
+  metadata("item-instance", "95,95,95", fn attributes ->
+    ~i(##{attributes["id"]})
+  end)
+
+  metadata("room-title", "95,95,95", fn attributes ->
+    ~i( #{attributes["id"]})
+  end)
 
   @impl true
-  def parse({:open, "item-instance", attributes}, context) do
-    tag_stack = [attributes | context.meta.tag_stack]
-    meta = Map.put(context.meta, :tag_stack, tag_stack)
-
-    Map.put(context, :meta, meta)
-  end
-
-  def parse({:close, "item-instance"}, context) do
-    [attributes | tag_stack] = context.meta.tag_stack
-    meta = Map.put(context.meta, :tag_stack, tag_stack)
-
-    tags = [
-      {:open, "color", %{"foreground" => "95,95,95"}},
-      ~i(##{attributes["id"]}),
-      {:close, "color"},
-    ]
-
-    context
-    |> Map.put(:data, context.data ++ tags)
-    |> Map.put(:meta, meta)
-  end
-
   def parse(datum, context) do
     Map.put(context, :data, context.data ++ [datum])
   end

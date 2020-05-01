@@ -15,10 +15,10 @@ defmodule Kantele.Character.ChannelView do
     ]
   end
 
-  def render("listen", %{channel_name: channel_name, character_name: character_name, text: text}) do
+  def render("listen", %{channel_name: channel_name, character: character, text: text}) do
     [
       render("name", %{name: channel_name}),
-      ~i( #{CharacterView.render("name", %{name: character_name})} says, ),
+      ~i( #{CharacterView.render("name", %{character: character})} says, ),
       ~i("{color foreground="green"}#{text}{/color}"\n)
     ]
   end

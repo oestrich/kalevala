@@ -23,7 +23,7 @@ defmodule Kantele.Character.EmoteView do
     ~i(- {color foreground="white"}#{emote}{/color})
   end
 
-  def render("listen", %{character_name: character_name, text: text}) do
-    ~i(#{CharacterView.render("name", %{name: character_name})} #{text}\n)
+  def render("listen", %{character: character, text: text}) do
+    ~i(#{CharacterView.render("name", %{character: character})} #{text}\n)
   end
 end

@@ -6,7 +6,7 @@ defmodule Kantele.Character.LookView do
 
   def render("look", %{room: room, characters: characters, item_instances: item_instances}) do
     ~E"""
-    {room-title}<%= room.name %>{/room-title}
+    {room-title id="<%= room.id %>"}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
     <%= render("_items", %{item_instances: item_instances}) %>
     <%= render("_exits", %{room: room}) %>
@@ -49,7 +49,7 @@ defmodule Kantele.Character.LookView do
     ~i(- #{CharacterView.render("name", %{character: character})})
   end
 
-  def render("_items", %{items: []}), do: nil
+  def render("_items", %{item_instances: []}), do: nil
 
   def render("_items", %{item_instances: item_instances}) do
     items =
