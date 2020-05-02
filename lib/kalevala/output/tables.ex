@@ -11,6 +11,40 @@ end
 defmodule Kalevala.Output.Tables do
   @moduledoc """
   Process table tags into ANSI tables
+
+  Processes 3 tags, `{table}`, `{row}`, and `{cell}`.
+
+  Tables are automatically balanced and text in cells are centered.
+
+  Example table:
+
+  ```
+  {table}
+    {row}
+      {cell}Player Name{/cell}
+    {/row}
+    {row}
+      {cell}HP{/cell}
+      {cell}{color foreground="red"}50/50{/color}{/cell}
+    {/row}
+  {/table}
+  ```
+
+  # `{table}` Tag
+
+  This tag starts a new table. It can _only_ contain `{row}` tags as children. Any
+  whitespace is trimmed and ignored inside the table.
+
+  # `{row}` Tag
+
+  This tag starts a new row. It can _only_ contain `{cell}` tags as children. Any
+  whitespace is trimmed and ignored inside the row.
+
+  # `{cell}` Tag
+
+  This tag is a cell. It can contain strings and other tags that don't increase
+  the width of the cell, e.g. color tags. Anything other than a string is not
+  used to calculate the width of the cell, which is used for balacing the table.
   """
 
   use Kalevala.Output
@@ -131,14 +165,24 @@ defmodule Kalevala.Output.Tables do
   """
   def table_breathing_room([]), do: []
 
-  def table_breathing_room([datum, table = %Tag{name: :table} | data])
-      when datum not in ["", "\n"] do
-    [datum, "\n" | table_breathing_room([table | data])]
+  def table_breathing_room([datum, table = %Tag{name: :table} | data]) do
+    case String.ends_with?(datum, "\n") || datum == "" do
+      true ->
+        [datum | table_breathing_room([table | data])]
+
+      false ->
+        [datum, "\n" | table_breathing_room([table | data])]
+    end
   end
 
-  def table_breathing_room([table = %Tag{name: :table}, datum | data])
-      when datum not in ["", "\n"] do
-    [table, "\n" | table_breathing_room([datum, data])]
+  def table_breathing_room([table = %Tag{name: :table}, datum | data]) do
+    case String.starts_with?(datum, "\n") || datum == "" do
+      true ->
+        [table | table_breathing_room([datum | data])]
+
+      false ->
+        [table, "\n" | table_breathing_room([datum | data])]
+    end
   end
 
   def table_breathing_room([datum | data]) do
@@ -187,13 +231,19 @@ defmodule Kalevala.Output.Tables do
     [child | trim_children(children)]
   end
 
-  defp valid_rows?(rows) do
+  @doc """
+  Validate rows in a table (are all row tags and have valid cells)
+  """
+  def valid_rows?(rows) do
     Enum.all?(rows, fn row ->
       match?(%Tag{name: :row}, row) && valid_cells?(row.children)
     end)
   end
 
-  defp valid_cells?(cells) do
+  @doc """
+  Validate cells in a row (are all cell tags)
+  """
+  def valid_cells?(cells) do
     Enum.all?(cells, fn cell ->
       match?(%Tag{name: :cell}, cell)
     end)
