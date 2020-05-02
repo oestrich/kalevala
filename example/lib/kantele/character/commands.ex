@@ -50,6 +50,10 @@ defmodule Kantele.Character.Commands do
       command("general :text", :general)
     end
 
+    module(InfoCommand) do
+      command("info", :run)
+    end
+
     module(WhoCommand) do
       command("who", :run)
     end
