@@ -81,7 +81,8 @@ characters "town_crier" {
               {
                 type = "conditions/message-match"
                 data = {
-                  text = "hi"
+                  self_trigger = false
+                  text = "\bhi\b"
                 }
               },
               {
@@ -90,12 +91,14 @@ characters "town_crier" {
                   {
                     type = "actions/say"
                     data = {
-                      text = "Hello!"
+                      channel_name = "${channel_name}"
+                      text = "Hello, ${character.name}!"
                     }
                   },
                   {
                     type = "actions/say"
                     data = {
+                      channel_name = "${channel_name}"
                       text = "How are you?"
                     }
                   }
@@ -109,12 +112,14 @@ characters "town_crier" {
               {
                 type = "conditions/message-match"
                 data = {
-                  text = "goblin"
+                  self_trigger = false
+                  text = "\bgoblin\b"
                 }
               },
               {
                 type = "actions/say"
                 data = {
+                  channel_name = "${channel_name}"
                   text = "I have a quest for you."
                 }
               }
@@ -128,12 +133,14 @@ characters "town_crier" {
           {
             type = "conditions/message-match"
             data = {
-              text = "boo"
+              self_trigger = false
+              text = "\bboo\b"
             }
           },
           {
             type = "actions/emote"
             data = {
+              channel_name = "${channel_name}"
               text = "hides behind a desk"
             }
           }
@@ -156,7 +163,8 @@ characters "villager" {
           {
             type = "conditions/message-match"
             data = {
-              text = "hi"
+              self_trigger = false
+              text = "\bhi\b"
             }
           },
           {
@@ -165,6 +173,7 @@ characters "villager" {
               {
                 type = "actions/say"
                 data = {
+                  channel_name = "${channel_name}"
                   text = "Hello!"
                 }
               }

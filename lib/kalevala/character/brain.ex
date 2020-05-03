@@ -149,13 +149,66 @@ defmodule Kalevala.Character.Brain.Action do
   Node to trigger an action
   """
 
-  @callback run(Event.t(), Conn.t(), map()) :: :ok
+  @callback run(Conn.t(), map()) :: :ok
 
-  defstruct [:data, :type]
+  defstruct [:data, :type, delay: 0]
+
+  @doc """
+  Replace action data variables with event data
+  """
+  def replace(data, event_data) do
+    Enum.into(data, %{}, fn {key, value} ->
+      case is_binary(value) do
+        true ->
+          value = replace_variables(value, event_data)
+
+          {key, value}
+
+        false ->
+          {key, value}
+      end
+    end)
+  end
+
+  @doc """
+  Replace variables in a string value with a given map of data
+  """
+  def replace_variables(value, data) do
+    variables = Regex.scan(~r/\$\{(?<variable>[\w\.]+)\}/, value)
+
+    Enum.reduce(variables, value, fn [string, variable], value ->
+      variable_path = String.split(variable, ".")
+      variable_value = dereference(data, variable_path)
+      String.replace(value, string, variable_value)
+    end)
+  end
+
+  @doc """
+  Dereference a variable path from a map of data
+  """
+  def dereference(data, variable_path) do
+    Enum.reduce(variable_path, data, fn path, data ->
+      data =
+        Enum.into(maybe_destruct(data), %{}, fn {key, value} ->
+          {to_string(key), value}
+        end)
+
+      Map.get(data, path)
+    end)
+  end
+
+  defp maybe_destruct(data = %{__struct__: struct}) when not is_nil(struct) do
+    Map.from_struct(data)
+  end
+
+  defp maybe_destruct(data), do: data
 
   defimpl Kalevala.Character.Brain.Node do
+    alias Kalevala.Character.Brain.Action
+
     def run(node, conn, event) do
-      node.type.run(event, conn, node.data)
+      data = Action.replace(node.data, event.data)
+      node.type.run(conn, data)
     end
   end
 end
@@ -167,9 +220,23 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
 
   @behaviour Kalevala.Character.Brain.Condition
 
+  alias Kalevala.Event.Message
+
   @impl true
-  def match?(event, _conn, data) do
-    event.topic == Kalevala.Event.Message && Regex.match?(data.text, event.data.text)
+  def match?(event = %{topic: Message}, conn, data) do
+    self_check(event, conn, data) && Regex.match?(data.text, event.data.text)
+  end
+
+  def match?(_event, _conn, _data), do: false
+
+  def self_check(event, conn, %{self_trigger: self_trigger}) do
+    case event.acting_character.id == conn.character.id do
+      true ->
+        self_trigger
+
+      false ->
+        true
+    end
   end
 end
 
@@ -183,8 +250,8 @@ defmodule Kalevala.Character.Actions.Say do
   import Kalevala.Character.Conn, only: [publish_message: 5]
 
   @impl true
-  def run(event, conn, data) do
-    publish_message(conn, event.data.channel_name, data.text, [], &publish_error/2)
+  def run(conn, data) do
+    publish_message(conn, data.channel_name, data.text, [], &publish_error/2)
   end
 
   def publish_error(conn, _error), do: conn
@@ -200,8 +267,8 @@ defmodule Kalevala.Character.Actions.Emote do
   import Kalevala.Character.Conn, only: [publish_emote: 5]
 
   @impl true
-  def run(event, conn, data) do
-    publish_emote(conn, event.data.channel_name, data.text, [], &publish_error/2)
+  def run(conn, data) do
+    publish_emote(conn, data.channel_name, data.text, [], &publish_error/2)
   end
 
   def publish_error(conn, _error), do: conn

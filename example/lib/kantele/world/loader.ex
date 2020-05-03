@@ -166,10 +166,13 @@ defmodule Kantele.World.Loader do
   end
 
   defp parse_node(%{type: "conditions/message-match", data: data}) do
+    {:ok, regex} = Regex.compile(data.text, "i")
+
     %Kalevala.Character.Brain.Condition{
       type: Kalevala.Character.Conditions.MessageMatch,
       data: %{
-        text: ~r/#{data.text}/i
+        self_trigger: data.self_trigger == "true",
+        text: regex
       }
     }
   end
@@ -177,18 +180,14 @@ defmodule Kantele.World.Loader do
   defp parse_node(%{type: "actions/say", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kalevala.Character.Actions.Say,
-      data: %{
-        text: data.text
-      }
+      data: data
     }
   end
 
   defp parse_node(%{type: "actions/emote", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kalevala.Character.Actions.Emote,
-      data: %{
-        text: data.text
-      }
+      data: data
     }
   end
 
