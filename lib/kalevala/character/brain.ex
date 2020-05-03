@@ -1,8 +1,16 @@
 defprotocol Kalevala.Character.Brain.Node do
+  @moduledoc """
+  Process a node in the behavior tree
+  """
+
   def run(node, conn, event)
 end
 
 defmodule Kalevala.Character.Brain.NullNode do
+  @moduledoc """
+  A no-op node
+  """
+
   defstruct []
 
   defimpl Kalevala.Character.Brain.Node do
@@ -11,7 +19,7 @@ defmodule Kalevala.Character.Brain.NullNode do
 end
 
 defmodule Kalevala.Character.Brain.FirstSelector do
-  @doc """
+  @moduledoc """
   Processes each node one at a time and stops processing when the first one succeeds
   """
 
@@ -44,7 +52,7 @@ defmodule Kalevala.Character.Brain.FirstSelector do
 end
 
 defmodule Kalevala.Character.Brain.ConditionalSelector do
-  @doc """
+  @moduledoc """
   Processes each node one at a time and stops processing when the first one fails
   """
 
@@ -68,7 +76,7 @@ defmodule Kalevala.Character.Brain.ConditionalSelector do
 end
 
 defmodule Kalevala.Character.Brain.RandomSelector do
-  @doc """
+  @moduledoc """
   Processes a random node
   """
 
@@ -89,7 +97,7 @@ defmodule Kalevala.Character.Brain.RandomSelector do
 end
 
 defmodule Kalevala.Character.Brain.Sequence do
-  @doc """
+  @moduledoc """
   Process each node one at a time
   """
 
@@ -113,6 +121,12 @@ defmodule Kalevala.Character.Brain.Sequence do
 end
 
 defmodule Kalevala.Character.Brain.Condition do
+  @moduledoc """
+  Check if a condition is valid
+
+  Returns error if it does not match
+  """
+
   defstruct [:data, :type]
 
   @callback match?(Event.t(), Conn.t(), map()) :: boolean()
@@ -131,6 +145,10 @@ defmodule Kalevala.Character.Brain.Condition do
 end
 
 defmodule Kalevala.Character.Brain.Action do
+  @moduledoc """
+  Node to trigger an action
+  """
+
   @callback run(Event.t(), Conn.t(), map()) :: :ok
 
   defstruct [:data, :type]
@@ -143,6 +161,10 @@ defmodule Kalevala.Character.Brain.Action do
 end
 
 defmodule Kalevala.Character.Conditions.MessageMatch do
+  @moduledoc """
+  Condition check for the event being a message and the regex matches
+  """
+
   @behaviour Kalevala.Character.Brain.Condition
 
   @impl true
@@ -152,6 +174,10 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
 end
 
 defmodule Kalevala.Character.Actions.Say do
+  @moduledoc """
+  Action to speak in a channel (e.g. a room)
+  """
+
   @behaviour Kalevala.Character.Brain.Action
 
   import Kalevala.Character.Conn, only: [publish_message: 5]
@@ -165,6 +191,10 @@ defmodule Kalevala.Character.Actions.Say do
 end
 
 defmodule Kalevala.Character.Actions.Emote do
+  @moduledoc """
+  Action to emote in a channel (e.g. a room)
+  """
+
   @behaviour Kalevala.Character.Brain.Action
 
   import Kalevala.Character.Conn, only: [publish_emote: 5]
