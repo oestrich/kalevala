@@ -68,11 +68,112 @@ room_characters "inn" {
 characters "town_crier" {
   name = "Town Crier"
   description = "A small man with a loud voice."
+
+  brain = {
+    type = "sequence"
+    nodes = [
+      {
+        type = "first"
+        nodes = [
+          {
+            type = "conditional"
+            nodes = [
+              {
+                type = "conditions/message-match"
+                data = {
+                  text = "hi"
+                }
+              },
+              {
+                type = "sequence"
+                nodes = [
+                  {
+                    type = "actions/say"
+                    data = {
+                      text = "Hello!"
+                    }
+                  },
+                  {
+                    type = "actions/say"
+                    data = {
+                      text = "How are you?"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type = "conditional"
+            nodes = [
+              {
+                type = "conditions/message-match"
+                data = {
+                  text = "goblin"
+                }
+              },
+              {
+                type = "actions/say"
+                data = {
+                  text = "I have a quest for you."
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/message-match"
+            data = {
+              text = "boo"
+            }
+          },
+          {
+            type = "actions/emote"
+            data = {
+              text = "hides behind a desk"
+            }
+          }
+        ]
+      }
+    ]
+  }
 }
 
 characters "villager" {
   name = "Villager"
   description = "A villager of Sammatti."
+
+  brain = {
+    type = "first"
+    nodes = [
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/message-match"
+            data = {
+              text = "hi"
+            }
+          },
+          {
+            type = "sequence"
+            nodes = [
+              {
+                type = "actions/say"
+                data = {
+                  text = "Hello!"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
 
 room_items "town_square" {

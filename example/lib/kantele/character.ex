@@ -24,7 +24,7 @@ defmodule Kantele.Character.NonPlayerMeta do
   Specific metadata for a world character in Kantele
   """
 
-  defstruct [:vitals, :zone_id]
+  defstruct [:brain, :vitals, :zone_id]
 end
 
 defmodule Kantele.Character.Vitals do

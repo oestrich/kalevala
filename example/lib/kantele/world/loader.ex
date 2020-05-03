@@ -126,6 +126,7 @@ defmodule Kantele.World.Loader do
       description: character_data.description,
       meta: %Kantele.Character.NonPlayerMeta{
         zone_id: zone.id,
+        brain: parse_brain(character_data),
         vitals: %Kantele.Character.Vitals{
           health_points: 25,
           max_health_points: 25,
@@ -138,6 +139,57 @@ defmodule Kantele.World.Loader do
     }
 
     {key, character}
+  end
+
+  defp parse_brain(%{brain: brain}) do
+    parse_node(brain)
+  end
+
+  defp parse_brain(_), do: %Kalevala.Character.Brain.NullNode{}
+
+  defp parse_node(%{type: "sequence", nodes: nodes}) do
+    %Kalevala.Character.Brain.Sequence{
+      nodes: Enum.map(nodes, &parse_node/1)
+    }
+  end
+
+  defp parse_node(%{type: "first", nodes: nodes}) do
+    %Kalevala.Character.Brain.FirstSelector{
+      nodes: Enum.map(nodes, &parse_node/1)
+    }
+  end
+
+  defp parse_node(%{type: "conditional", nodes: nodes}) do
+    %Kalevala.Character.Brain.ConditionalSelector{
+      nodes: Enum.map(nodes, &parse_node/1)
+    }
+  end
+
+  defp parse_node(%{type: "conditions/message-match", data: data}) do
+    %Kalevala.Character.Brain.Condition{
+      type: Kalevala.Character.Conditions.MessageMatch,
+      data: %{
+        text: ~r/#{data.text}/i
+      }
+    }
+  end
+
+  defp parse_node(%{type: "actions/say", data: data}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kalevala.Character.Actions.Say,
+      data: %{
+        text: data.text
+      }
+    }
+  end
+
+  defp parse_node(%{type: "actions/emote", data: data}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kalevala.Character.Actions.Emote,
+      data: %{
+        text: data.text
+      }
+    }
   end
 
   @doc """

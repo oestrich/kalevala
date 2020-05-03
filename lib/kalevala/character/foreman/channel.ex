@@ -7,7 +7,9 @@ defmodule Kalevala.Character.Foreman.Channel do
   Handle any channel updates from the conn
   """
   def handle_channels(conn, state) do
-    Enum.reduce(conn.private.channel_changes, conn, fn channel_change, conn ->
+    channel_changes = Enum.reverse(conn.private.channel_changes)
+
+    Enum.reduce(channel_changes, conn, fn channel_change, conn ->
       handle_channel_change(channel_change, conn, state)
     end)
   end
