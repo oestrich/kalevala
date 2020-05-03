@@ -3,6 +3,7 @@ defmodule Kantele.Character.LoginController do
 
   require Logger
 
+  alias Kalevala.Character
   alias Kantele.Character.ChannelEvent
   alias Kantele.Character.CharacterView
   alias Kantele.Character.CommandController
@@ -96,8 +97,8 @@ defmodule Kantele.Character.LoginController do
       Kantele.Config.get([:player, :starting_room_id])
       |> Kantele.World.dereference()
 
-    %Kalevala.Character{
-      id: name,
+    %Character{
+      id: Character.generate_id(),
       pid: self(),
       room_id: starting_room_id,
       name: name,

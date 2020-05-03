@@ -291,6 +291,7 @@ defmodule Kantele.World.Loader do
         end)
 
       characters = Map.get(room, :characters, [])
+      character = %{character | id: Character.generate_id()}
       room = Map.put(room, :characters, [character | characters])
 
       rooms = Map.put(zone.rooms, room_key, room)
