@@ -38,6 +38,10 @@ defmodule Kantele.World.Room.Events do
   use Kalevala.Event.Router
 
   scope(Kantele.World.Room) do
+    module(FleeEvent) do
+      event("room/flee", :call)
+    end
+
     module(ForwardEvent) do
       event("combat/start", :call)
       event("combat/stop", :call)
@@ -55,6 +59,19 @@ defmodule Kantele.World.Room.ForwardEvent do
 
   def call(context, event) do
     event(context, event.from_pid, self(), event.topic, %{})
+  end
+end
+
+defmodule Kantele.World.Room.FleeEvent do
+  import Kalevala.World.Room.Context
+
+  def call(context, event) do
+    exits =
+      Enum.map(context.data.exits, fn room_exit ->
+        room_exit.exit_name
+      end)
+
+    event(context, event.from_pid, self(), event.topic, %{exits: exits})
   end
 end
 

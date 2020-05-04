@@ -149,8 +149,6 @@ defmodule Kalevala.Character.Brain.Action do
   Node to trigger an action
   """
 
-  @callback run(Conn.t(), map()) :: :ok
-
   defstruct [:data, :type, delay: 0]
 
   @doc """
@@ -238,38 +236,4 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
         true
     end
   end
-end
-
-defmodule Kalevala.Character.Actions.Say do
-  @moduledoc """
-  Action to speak in a channel (e.g. a room)
-  """
-
-  @behaviour Kalevala.Character.Brain.Action
-
-  import Kalevala.Character.Conn, only: [publish_message: 5]
-
-  @impl true
-  def run(conn, data) do
-    publish_message(conn, data.channel_name, data.text, [], &publish_error/2)
-  end
-
-  def publish_error(conn, _error), do: conn
-end
-
-defmodule Kalevala.Character.Actions.Emote do
-  @moduledoc """
-  Action to emote in a channel (e.g. a room)
-  """
-
-  @behaviour Kalevala.Character.Brain.Action
-
-  import Kalevala.Character.Conn, only: [publish_emote: 5]
-
-  @impl true
-  def run(conn, data) do
-    publish_emote(conn, data.channel_name, data.text, [], &publish_error/2)
-  end
-
-  def publish_error(conn, _error), do: conn
 end

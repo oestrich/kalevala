@@ -179,15 +179,22 @@ defmodule Kantele.World.Loader do
 
   defp parse_node(%{type: "actions/say", data: data}) do
     %Kalevala.Character.Brain.Action{
-      type: Kalevala.Character.Actions.Say,
+      type: Kantele.Character.SayAction,
       data: data
     }
   end
 
   defp parse_node(%{type: "actions/emote", data: data}) do
     %Kalevala.Character.Brain.Action{
-      type: Kalevala.Character.Actions.Emote,
+      type: Kantele.Character.EmoteAction,
       data: data
+    }
+  end
+
+  defp parse_node(%{type: "actions/flee"}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kantele.Character.FleeAction,
+      data: %{}
     }
   end
 

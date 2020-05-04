@@ -143,6 +143,9 @@ characters "town_crier" {
               channel_name = "${channel_name}"
               text = "hides behind a desk"
             }
+          },
+          {
+            type = "actions/flee"
           }
         ]
       }

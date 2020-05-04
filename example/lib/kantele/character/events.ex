@@ -50,12 +50,16 @@ defmodule Kantele.Character.NonPlayerEvents do
 
   use Kalevala.Event.Router
 
-  alias Kalevala.Event.Message
-  alias Kantele.Character.SayEvent
+  alias Kalevala.Event.Movement
 
   scope(Kantele.Character) do
-    module(SayEvent) do
-      event(Message, :echo_chamber, interested?: &SayEvent.interested?/1)
+    module(FleeEvent) do
+      event("room/flee", :run)
+    end
+
+    module(MoveEvent) do
+      event(Movement.Commit, :commit)
+      event(Movement.Abort, :abort)
     end
   end
 end
