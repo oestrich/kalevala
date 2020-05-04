@@ -1,6 +1,7 @@
 defmodule Kantele.Character.SayCommand do
   use Kalevala.Character.Command
 
+  alias Kantele.Character.SayAction
   alias Kantele.Character.SayView
 
   def run(conn, params) do
@@ -9,9 +10,7 @@ defmodule Kantele.Character.SayCommand do
     conn
     |> assign(:text, params["text"])
     |> render(SayView, "echo")
-    |> publish_message(channel_name, params["text"], [], &publish_error/2)
+    |> SayAction.run(%{channel_name: channel_name, text: params["text"]})
     |> assign(:prompt, false)
   end
-
-  def publish_error(conn, _error), do: conn
 end
