@@ -7,10 +7,24 @@ defmodule Kalevala.Character.Conn.Private do
     :character_module,
     :event_router,
     :next_controller,
+    :request_id,
     :update_character,
+    actions: [],
     channel_changes: [],
     halt?: false
   ]
+
+  @doc """
+  Generate a request id to track actions past usage in the conn
+  """
+  def generate_request_id() do
+    bytes =
+      Enum.reduce(1..16, <<>>, fn _, bytes ->
+        bytes <> <<Enum.random(0..255)>>
+      end)
+
+    Base.encode16(bytes, case: :lower)
+  end
 
   @doc false
   def character(conn) do
@@ -347,6 +361,17 @@ defmodule Kalevala.Character.Conn do
     ]
 
     put_private(conn, :channel_changes, channel_changes)
+  end
+
+  @doc """
+  Put an action to be performed
+
+  This should be a `Kalevala.Character.Action` struct to save which
+  action module should be run, along with any delay and params.
+  """
+  def put_action(conn, action = %Kalevala.Character.Action{}) do
+    action = %{action | request_id: conn.private.request_id}
+    put_private(conn, :actions, conn.private.actions ++ [action])
   end
 
   defp put_private(conn, key, value) do

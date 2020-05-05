@@ -17,7 +17,7 @@ defmodule Kalevala.Character.Brain.ActionTest do
 
       data = Action.replace(data, event_data)
 
-      assert data.channel_name == "general"
+      assert data["channel_name"] == "general"
     end
 
     test "multiple variables" do
@@ -32,7 +32,7 @@ defmodule Kalevala.Character.Brain.ActionTest do
 
       data = Action.replace(data, event_data)
 
-      assert data.text == "[general] Hello!"
+      assert data["text"] == "[general] Hello!"
     end
 
     test "nested values" do
@@ -51,7 +51,7 @@ defmodule Kalevala.Character.Brain.ActionTest do
 
       data = Action.replace(data, event_data)
 
-      assert data.text == "How are you, Elias? Welcome to general"
+      assert data["text"] == "How are you, Elias? Welcome to general"
     end
   end
 end

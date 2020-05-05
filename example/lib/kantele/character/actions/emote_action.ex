@@ -5,9 +5,14 @@ defmodule Kantele.Character.EmoteAction do
 
   use Kalevala.Character.Action
 
+  alias Kantele.Character.EmoteView
+
   @impl true
-  def run(conn, data) do
-    publish_emote(conn, data.channel_name, data.text, [], &publish_error/2)
+  def run(conn, params) do
+    conn
+    |> assign(:text, params["text"])
+    |> render(EmoteView, "echo")
+    |> publish_emote(params["channel_name"], params["text"], [], &publish_error/2)
   end
 
   def publish_error(conn, _error), do: conn

@@ -8,6 +8,8 @@ defmodule Kalevala.Character.Action do
 
   @callback run(Conn.t(), map()) :: :ok
 
+  defstruct [:request_id, :type, delay: 0, params: %{}]
+
   defmacro __using__(_opts) do
     quote do
       import Kalevala.Character.Conn

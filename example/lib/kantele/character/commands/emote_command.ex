@@ -17,12 +17,10 @@ defmodule Kantele.Character.EmoteCommand do
   end
 
   def broadcast(conn, params) do
-    channel_name = "rooms:#{conn.character.room_id}"
+    params = Map.put(params, "channel_name", "rooms:#{conn.character.room_id}")
 
     conn
-    |> assign(:text, params["text"])
-    |> render(EmoteView, "echo")
-    |> EmoteAction.run(%{channel_name: channel_name, text: params["text"]})
+    |> EmoteAction.run(params)
     |> assign(:prompt, false)
   end
 

@@ -160,10 +160,10 @@ defmodule Kalevala.Character.Brain.Action do
         true ->
           value = replace_variables(value, event_data)
 
-          {key, value}
+          {to_string(key), value}
 
         false ->
-          {key, value}
+          {to_string(key), value}
       end
     end)
   end
@@ -203,10 +203,16 @@ defmodule Kalevala.Character.Brain.Action do
 
   defimpl Kalevala.Character.Brain.Node do
     alias Kalevala.Character.Brain.Action
+    alias Kalevala.Character.Conn
 
     def run(node, conn, event) do
       data = Action.replace(node.data, event.data)
-      node.type.run(conn, data)
+
+      Conn.put_action(conn, %Kalevala.Character.Action{
+        type: node.type,
+        params: data,
+        delay: node.delay
+      })
     end
   end
 end

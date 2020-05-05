@@ -90,6 +90,7 @@ characters "town_crier" {
                 nodes = [
                   {
                     type = "actions/say"
+                    delay = 500
                     data = {
                       channel_name = "${channel_name}"
                       text = "Hello, ${character.name}!"
@@ -97,6 +98,7 @@ characters "town_crier" {
                   },
                   {
                     type = "actions/say"
+                    delay = 750
                     data = {
                       channel_name = "${channel_name}"
                       text = "How are you?"

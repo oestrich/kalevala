@@ -177,24 +177,27 @@ defmodule Kantele.World.Loader do
     }
   end
 
-  defp parse_node(%{type: "actions/say", data: data}) do
+  defp parse_node(action = %{type: "actions/say", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.SayAction,
-      data: data
+      data: data,
+      delay: Map.get(action, :delay, 0)
     }
   end
 
-  defp parse_node(%{type: "actions/emote", data: data}) do
+  defp parse_node(action = %{type: "actions/emote", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.EmoteAction,
-      data: data
+      data: data,
+      delay: Map.get(action, :delay, 0)
     }
   end
 
-  defp parse_node(%{type: "actions/flee"}) do
+  defp parse_node(action = %{type: "actions/flee"}) do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.FleeAction,
-      data: %{}
+      data: %{},
+      delay: Map.get(action, :delay, 0)
     }
   end
 
