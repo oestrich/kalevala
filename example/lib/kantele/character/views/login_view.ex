@@ -20,7 +20,7 @@ defmodule Kantele.Character.LoginView do
 
   def render("powered-by", _assigns) do
     [
-      ~s(Powered by {color foreground="256:39"}Kalevala{/color} 🧝),
+      ~s(Powered by {color foreground="256:39"}Kalevala{/color} 🧝 ),
       ~s({color foreground="cyan"}v#{Kalevala.version()}{/color}.)
     ]
   end
