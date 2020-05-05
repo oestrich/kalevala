@@ -201,11 +201,11 @@ defmodule Kalevala.Output.Tags do
   end
 
   def parse_string(<<character::utf8, string::binary>>, <<>>, current_string, processed) do
-    parse_string(string, <<>>, current_string <> <<character>>, processed)
+    parse_string(string, <<>>, current_string <> <<character::utf8>>, processed)
   end
 
   def parse_string(<<character::utf8, string::binary>>, current_tag, current_string, processed) do
-    parse_string(string, current_tag <> <<character>>, current_string, processed)
+    parse_string(string, current_tag <> <<character::utf8>>, current_string, processed)
   end
 
   def parse_tag("{/" <> name) do
