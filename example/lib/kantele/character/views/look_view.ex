@@ -17,10 +17,15 @@ defmodule Kantele.Character.LookView do
   def render("_description", %{room: room}) do
     features =
       Enum.map(room.features, fn feature ->
-        feature.short_description
+        description = String.split(feature.short_description, feature.keyword)
+        View.join(description, [~s({color foreground="white"}), feature.keyword, "{/color}"])
       end)
 
-    View.join([room.description] ++ features, " ")
+    description = [room.description] ++ features
+
+    description
+    |> Enum.reject(fn line -> line == "" end)
+    |> View.join(" ")
   end
 
   def render("_exits", %{room: room}) do

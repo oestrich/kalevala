@@ -35,6 +35,8 @@ defmodule Kantele.Character.Commands do
       command("south", :south)
       command("east", :east)
       command("west", :west)
+      command("up", :up)
+      command("down", :down)
     end
 
     module(QuitCommand) do

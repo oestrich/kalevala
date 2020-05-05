@@ -24,4 +24,16 @@ defmodule Kantele.Character.MoveCommand do
     |> request_movement("west")
     |> assign(:prompt, false)
   end
+
+  def up(conn, _params) do
+    conn
+    |> request_movement("up")
+    |> assign(:prompt, false)
+  end
+
+  def down(conn, _params) do
+    conn
+    |> request_movement("down")
+    |> assign(:prompt, false)
+  end
 end

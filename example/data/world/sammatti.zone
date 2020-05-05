@@ -40,6 +40,7 @@ rooms "marketplace" {
 room_exits "marketplace" {
   room_id = rooms.marketplace.id
 
+  north = rooms.well.id
   south = rooms.town_square.id
 }
 
@@ -52,6 +53,7 @@ room_exits "inn" {
   room_id = rooms.inn.id
 
   west = rooms.town_square.id
+  up = rooms.inn_upstairs.id
 }
 
 room_characters "inn" {
@@ -63,6 +65,36 @@ room_characters "inn" {
       name = "Tapio"
     }
   ]
+}
+
+rooms "inn_upstairs" {
+  name = "Lohikäärme Upstairs"
+  description = "The upstairs of the small inn. A small staircase leads downstairs."
+}
+
+room_exits "inn_upstairs" {
+  room_id = rooms.inn_upstairs.id
+
+  down = rooms.inn.id
+}
+
+rooms "well" {
+  name = "Town Well"
+  description = ""
+
+  features = [
+    {
+      keyword = "well"
+      short = "A well with a bucket dangling is off to the side of the road in this part of town."
+      long = "A well with a bucket dangling is off to the side of the road in this part of town."
+    }
+  ]
+}
+
+room_exits "well" {
+  room_id = rooms.well.id
+
+  south = rooms.marketplace.id
 }
 
 characters "town_crier" {
