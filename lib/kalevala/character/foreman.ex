@@ -22,6 +22,8 @@ defmodule Kalevala.Character.Foreman do
     :communication_module,
     :controller,
     :supervisor_name,
+    processing_action: nil,
+    action_queue: [],
     private: %{},
     session: %{}
   ]
@@ -75,7 +77,8 @@ defmodule Kalevala.Character.Foreman do
       character: state.character,
       session: state.session,
       private: %Conn.Private{
-        character_module: state.character_module
+        character_module: state.character_module,
+        request_id: Conn.Private.generate_request_id()
       }
     }
   end
@@ -118,6 +121,27 @@ defmodule Kalevala.Character.Foreman do
     |> handle_conn(state)
   end
 
+  def handle_info({:process_action, action}, state) do
+    case state.processing_action == action do
+      true ->
+        Logger.info(
+          "Processing #{inspect(action.type)}, #{Enum.count(state.action_queue)} left in the queue.",
+          request_id: action.request_id
+        )
+
+        state = Map.put(state, :processing_action, nil)
+
+        new_conn(state)
+        |> action.type.run(action.params)
+        |> handle_conn(state)
+
+      false ->
+        Logger.warn("Character tried processing an action that was not next", type: :foreman)
+
+        {:noreply, state}
+    end
+  end
+
   def handle_info(:terminate, state) do
     state.callback_module.terminating(state)
     DynamicSupervisor.terminate_child(state.supervisor_name, self())
@@ -135,7 +159,11 @@ defmodule Kalevala.Character.Foreman do
     |> send_events()
 
     session = Map.merge(state.session, conn.session)
-    state = Map.put(state, :session, session)
+
+    state =
+      state
+      |> Map.put(:session, session)
+      |> Map.put(:action_queue, state.action_queue ++ conn.private.actions)
 
     case conn.private.halt? do
       true ->
@@ -144,10 +172,26 @@ defmodule Kalevala.Character.Foreman do
 
       false ->
         state
+        |> handle_actions()
         |> update_character(conn)
         |> update_controller(conn)
     end
   end
+
+  defp handle_actions(state = %{processing_action: nil, action_queue: [action | actions]}) do
+    Logger.info(
+      "Delaying #{inspect(action.type)} for #{action.delay}ms with #{inspect(action.params)}",
+      request_id: action.request_id
+    )
+
+    Process.send_after(self(), {:process_action, action}, action.delay)
+
+    state
+    |> Map.put(:processing_action, action)
+    |> Map.put(:action_queue, actions)
+  end
+
+  defp handle_actions(state), do: state
 
   defp send_options(conn, state) do
     state.callback_module.send_options(state, conn.options)

@@ -2,6 +2,7 @@ defmodule Kantele.Character.EmoteCommand do
   use Kalevala.Character.Command, dynamic: true
 
   alias Kantele.Character.Emotes
+  alias Kantele.Character.EmoteAction
   alias Kantele.Character.EmoteView
 
   @impl true
@@ -16,12 +17,10 @@ defmodule Kantele.Character.EmoteCommand do
   end
 
   def broadcast(conn, params) do
-    channel_name = "rooms:#{conn.character.room_id}"
+    params = Map.put(params, "channel_name", "rooms:#{conn.character.room_id}")
 
     conn
-    |> assign(:text, params["text"])
-    |> render(EmoteView, "echo")
-    |> publish_emote(channel_name, params["text"], [], &publish_error/2)
+    |> EmoteAction.run(params)
     |> assign(:prompt, false)
   end
 
@@ -30,6 +29,4 @@ defmodule Kantele.Character.EmoteCommand do
 
     render(conn, EmoteView, "list", %{emotes: emotes})
   end
-
-  def publish_error(conn, _error), do: conn
 end

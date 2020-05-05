@@ -111,7 +111,7 @@ defmodule Kantele.Output.AdminTags do
   end
 
   metadata("character", "95,95,95", fn attributes ->
-    ~i( #{attributes["id"]})
+    ~i(##{attributes["id"]})
   end)
 
   metadata("item-instance", "95,95,95", fn attributes ->

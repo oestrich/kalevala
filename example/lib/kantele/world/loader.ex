@@ -126,6 +126,7 @@ defmodule Kantele.World.Loader do
       description: character_data.description,
       meta: %Kantele.Character.NonPlayerMeta{
         zone_id: zone.id,
+        brain: parse_brain(character_data),
         vitals: %Kantele.Character.Vitals{
           health_points: 25,
           max_health_points: 25,
@@ -138,6 +139,66 @@ defmodule Kantele.World.Loader do
     }
 
     {key, character}
+  end
+
+  defp parse_brain(%{brain: brain}) do
+    parse_node(brain)
+  end
+
+  defp parse_brain(_), do: %Kalevala.Character.Brain.NullNode{}
+
+  defp parse_node(%{type: "sequence", nodes: nodes}) do
+    %Kalevala.Character.Brain.Sequence{
+      nodes: Enum.map(nodes, &parse_node/1)
+    }
+  end
+
+  defp parse_node(%{type: "first", nodes: nodes}) do
+    %Kalevala.Character.Brain.FirstSelector{
+      nodes: Enum.map(nodes, &parse_node/1)
+    }
+  end
+
+  defp parse_node(%{type: "conditional", nodes: nodes}) do
+    %Kalevala.Character.Brain.ConditionalSelector{
+      nodes: Enum.map(nodes, &parse_node/1)
+    }
+  end
+
+  defp parse_node(%{type: "conditions/message-match", data: data}) do
+    {:ok, regex} = Regex.compile(data.text, "i")
+
+    %Kalevala.Character.Brain.Condition{
+      type: Kalevala.Character.Conditions.MessageMatch,
+      data: %{
+        self_trigger: data.self_trigger == "true",
+        text: regex
+      }
+    }
+  end
+
+  defp parse_node(action = %{type: "actions/say", data: data}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kantele.Character.SayAction,
+      data: data,
+      delay: Map.get(action, :delay, 0)
+    }
+  end
+
+  defp parse_node(action = %{type: "actions/emote", data: data}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kantele.Character.EmoteAction,
+      data: data,
+      delay: Map.get(action, :delay, 0)
+    }
+  end
+
+  defp parse_node(action = %{type: "actions/flee"}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kantele.Character.FleeAction,
+      data: %{},
+      delay: Map.get(action, :delay, 0)
+    }
   end
 
   @doc """
@@ -239,6 +300,7 @@ defmodule Kantele.World.Loader do
         end)
 
       characters = Map.get(room, :characters, [])
+      character = %{character | id: Character.generate_id()}
       room = Map.put(room, :characters, [character | characters])
 
       rooms = Map.put(zone.rooms, room_key, room)
