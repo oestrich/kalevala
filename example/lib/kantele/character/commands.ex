@@ -56,6 +56,10 @@ defmodule Kantele.Character.Commands do
       command("info", :run)
     end
 
+    module(ReloadCommand) do
+      command("reload", :run)
+    end
+
     module(WhoCommand) do
       command("who", :run)
     end

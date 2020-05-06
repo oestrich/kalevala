@@ -5,7 +5,10 @@ defmodule Kantele.Character.QuitView do
 
   # passed to foreman disconnect
   def render("disconnected", %{character: character}) do
-    ~i(#{CharacterView.render("name", %{character: character})} has left the game.)
+    [
+      CharacterView.render("name", %{character: character}),
+      " has left the game."
+    ]
   end
 
   def render("goodbye", _assigns) do

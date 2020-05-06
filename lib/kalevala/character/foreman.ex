@@ -368,19 +368,47 @@ defmodule Kalevala.Character.Foreman.NonPlayer do
 
   require Logger
 
+  alias Kalevala.Character.Foreman
+  alias Kalevala.Event
+
   @behaviour Kalevala.Character.Foreman.Callbacks
+
+  defstruct [:quit_view]
 
   @impl true
   def init(state, opts) do
     Logger.info("Character starting - #{opts.character.id}")
-    %{state | character: %{opts.character | pid: self()}}
+
+    private = %__MODULE__{
+      quit_view: opts.quit_view
+    }
+
+    %{state | character: %{opts.character | pid: self()}, private: private}
   end
 
   @impl true
   def terminate(state), do: state
 
   @impl true
-  def terminating(state), do: state
+  def terminating(%{character: nil}), do: :ok
+
+  def terminating(state) do
+    {quit_view, quit_template} = state.private.quit_view
+
+    event = %Event{
+      topic: Event.Movement,
+      data: %Event.Movement{
+        character: state.character,
+        direction: :from,
+        reason: quit_view.render(quit_template, %{character: state.character}),
+        room_id: state.character.room_id
+      }
+    }
+
+    Foreman.new_conn(state)
+    |> Map.put(:events, [event])
+    |> Foreman.send_events()
+  end
 
   @impl true
   def send_options(_state, _options), do: :ok

@@ -42,6 +42,7 @@ room_exits "marketplace" {
 
   north = rooms.well.id
   south = rooms.town_square.id
+  east = rooms.guild_hall.id
 }
 
 rooms "inn" {
@@ -95,6 +96,17 @@ room_exits "well" {
   room_id = rooms.well.id
 
   south = rooms.marketplace.id
+}
+
+rooms "guild_hall" {
+  name = "Trader's Guild Hall"
+  description = "The local trader guild's guildhall."
+}
+
+room_exits "guild_hall" {
+  room_id = rooms.guild_hall.id
+
+  west = rooms.marketplace.id
 }
 
 characters "town_crier" {

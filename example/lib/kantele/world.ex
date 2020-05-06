@@ -38,7 +38,7 @@ defmodule Kantele.World do
       {Kantele.World.Cache, [name: Kantele.World.Cache]},
       {Kantele.World.Items, [name: Kantele.World.Items]},
       {Kalevala.World, [name: Kantele.World]},
-      {Kantele.World.Kickoff, []}
+      {Kantele.World.Kickoff, [name: Kantele.World.Kickoff]}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
