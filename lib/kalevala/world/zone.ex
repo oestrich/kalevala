@@ -19,6 +19,13 @@ defmodule Kalevala.World.Zone do
   """
   @callback init(zone :: t()) :: t()
 
+  @doc """
+  Replace internal zone state
+  """
+  def update(pid, zone) do
+    GenServer.call(pid, {:update, zone})
+  end
+
   @doc false
   def global_name(zone = %__MODULE__{}), do: global_name(zone.id)
 
@@ -46,6 +53,12 @@ defmodule Kalevala.World.Zone do
     }
 
     {:ok, state}
+  end
+
+  @impl true
+  def handle_call({:update, zone}, _from, state) do
+    state = %{state | data: zone}
+    {:reply, :ok, state}
   end
 
   @impl true

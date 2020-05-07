@@ -57,13 +57,8 @@ defmodule Kantele.World.Kickoff do
         Kalevala.World.start_zone(zone, config)
 
       pid ->
-        :sys.replace_state(pid, fn state ->
-          Map.put(state, :data, zone)
-        end)
-
         reset_characters(zone)
-
-        {:ok, pid}
+        Kalevala.World.Zone.update(pid, zone)
     end
   end
 
@@ -81,13 +76,8 @@ defmodule Kantele.World.Kickoff do
         Kalevala.World.start_room(room, item_instances, config)
 
       pid ->
-        :sys.replace_state(pid, fn state ->
-          private = Map.put(state.private, :item_instances, item_instances)
-
-          state
-          |> Map.put(:data, room)
-          |> Map.put(:private, private)
-        end)
+        Kalevala.World.Room.update_items(pid, item_instances)
+        Kalevala.World.Room.update(pid, room)
     end
   end
 

@@ -153,6 +153,20 @@ defmodule Kalevala.World.Room do
     GenServer.call(global_name(room_id), event)
   end
 
+  @doc """
+  Replace internal room state
+  """
+  def update(pid, room) do
+    GenServer.call(pid, {:update, room})
+  end
+
+  @doc """
+  Replace internal room items state
+  """
+  def update_items(pid, item_instances) do
+    GenServer.call(pid, {:update_items, item_instances})
+  end
+
   @doc false
   def global_name(room = %__MODULE__{}), do: global_name(room.id)
 
@@ -203,6 +217,16 @@ defmodule Kalevala.World.Room do
     state = Map.put(state, :data, context.data)
 
     {:reply, event, state}
+  end
+
+  def handle_call({:update, room}, _from, state) do
+    state = %{state | data: room}
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:update_items, item_instances}, _from, state) do
+    state = %{state | private: %{state.private | item_instances: item_instances}}
+    {:reply, :ok, state}
   end
 
   @impl true
