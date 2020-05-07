@@ -33,6 +33,7 @@ defmodule Kantele.Character.Events do
     module(MoveEvent) do
       event(Movement.Commit, :commit)
       event(Movement.Abort, :abort)
+      event(Movement.Notice, :notice)
     end
 
     module(SayEvent) do
@@ -60,6 +61,7 @@ defmodule Kantele.Character.NonPlayerEvents do
     module(MoveEvent) do
       event(Movement.Commit, :commit)
       event(Movement.Abort, :abort)
+      event(Movement.Notice, :notice)
     end
   end
 end

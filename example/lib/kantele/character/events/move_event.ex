@@ -19,7 +19,13 @@ defmodule Kantele.Character.MoveEvent do
   def abort(conn, %{data: event}) do
     conn
     |> render(MoveView, "fail", event)
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
+  end
+
+  def notice(conn, %{data: event}) do
+    conn
+    |> render(MoveView, "notice", %{reason: event.reason})
+    |> prompt(CommandView, "prompt")
   end
 
   def unsubscribe_error(conn, error) do

@@ -4,7 +4,6 @@ defmodule Kalevala.World.Room.Movement do
   """
 
   alias Kalevala.Event
-  alias Kalevala.Event.Display
   alias Kalevala.Event.Movement
   alias Kalevala.Event.Movement.Voting
   alias Kalevala.World.Zone
@@ -75,11 +74,19 @@ defmodule Kalevala.World.Room.Movement do
   Broadcast the event to characters in the room
   """
   def broadcast(state, event) do
-    lines = %Kalevala.Character.Conn.Lines{data: event.data.reason, newline: true}
-    display_event = %Display{lines: [lines]}
+    event = %Kalevala.Event{
+      acting_character: event.data.character,
+      from_pid: event.from_pid,
+      topic: Kalevala.Event.Movement.Notice,
+      data: %Kalevala.Event.Movement.Notice{
+        character: event.data.character,
+        direction: event.data.direction,
+        reason: event.data.reason
+      }
+    }
 
     Enum.each(state.private.characters, fn character ->
-      send(character.pid, display_event)
+      send(character.pid, event)
     end)
 
     state

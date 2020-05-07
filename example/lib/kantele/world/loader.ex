@@ -177,6 +177,19 @@ defmodule Kantele.World.Loader do
     }
   end
 
+  defp parse_node(%{type: "conditions/room-enter", data: data}) do
+    %Kalevala.Character.Brain.Condition{
+      type: Kalevala.Character.Conditions.EventMatch,
+      data: %{
+        self_trigger: data.self_trigger == "true",
+        topic: Kalevala.Event.Movement.Notice,
+        data: %{
+          direction: :to
+        }
+      }
+    }
+  end
+
   defp parse_node(action = %{type: "actions/say", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.SayAction,

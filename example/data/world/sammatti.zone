@@ -194,6 +194,25 @@ characters "town_crier" {
             type = "actions/flee"
           }
         ]
+      },
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/room-enter"
+            data = {
+              self_trigger = false
+            }
+          },
+          {
+            type = "actions/say"
+            data = {
+              channel_name = "rooms:${room_id}"
+              delay = 500
+              text = "Welcome, ${character.name}!"
+            }
+          }
+        ]
       }
     ]
   }

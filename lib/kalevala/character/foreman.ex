@@ -326,17 +326,19 @@ defmodule Kalevala.Character.Foreman.Player do
   def terminating(state) do
     {quit_view, quit_template} = state.private.quit_view
 
+    conn = Foreman.new_conn(state)
+
     event = %Event{
       topic: Event.Movement,
       data: %Event.Movement{
-        character: state.character,
+        character: Conn.Private.character(conn),
         direction: :from,
         reason: quit_view.render(quit_template, %{character: state.character}),
         room_id: state.character.room_id
       }
     }
 
-    Foreman.new_conn(state)
+    conn
     |> Map.put(:events, [event])
     |> Foreman.send_events()
   end
@@ -368,6 +370,7 @@ defmodule Kalevala.Character.Foreman.NonPlayer do
 
   require Logger
 
+  alias Kalevala.Character.Conn
   alias Kalevala.Character.Foreman
   alias Kalevala.Event
 
@@ -395,17 +398,19 @@ defmodule Kalevala.Character.Foreman.NonPlayer do
   def terminating(state) do
     {quit_view, quit_template} = state.private.quit_view
 
+    conn = Foreman.new_conn(state)
+
     event = %Event{
       topic: Event.Movement,
       data: %Event.Movement{
-        character: state.character,
+        character: Conn.Private.character(conn),
         direction: :from,
         reason: quit_view.render(quit_template, %{character: state.character}),
         room_id: state.character.room_id
       }
     }
 
-    Foreman.new_conn(state)
+    conn
     |> Map.put(:events, [event])
     |> Foreman.send_events()
   end

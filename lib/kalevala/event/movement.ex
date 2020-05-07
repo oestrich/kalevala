@@ -17,6 +17,14 @@ defmodule Kalevala.Event.Movement do
   @type t() :: %__MODULE__{}
 end
 
+defmodule Kalevala.Event.Movement.Notice do
+  @moduledoc """
+  Event to send a notice to other characters in the room
+  """
+
+  defstruct [:character, :direction, :reason]
+end
+
 defmodule Kalevala.Event.Movement.Commit do
   @moduledoc """
   Struct for committing movement between two rooms
