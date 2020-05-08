@@ -203,6 +203,21 @@ defmodule Kalevala.Character.Conn do
   end
 
   @doc """
+  Delay an event
+  """
+  def delay_event(conn, delay, topic, data \\ %{}) do
+    event = %Kalevala.Event.Delayed{
+      delay: delay,
+      acting_character: Private.character(conn),
+      from_pid: self(),
+      topic: topic,
+      data: data
+    }
+
+    Map.put(conn, :events, conn.events ++ [event])
+  end
+
+  @doc """
   Send a telnet option
   """
   def send_option(conn, name, value) when is_boolean(value) do

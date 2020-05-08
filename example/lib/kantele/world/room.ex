@@ -46,6 +46,7 @@ defmodule Kantele.World.Room.Events do
       event("combat/start", :call)
       event("combat/stop", :call)
       event("combat/tick", :call)
+      event("commands/delayed", :call)
     end
 
     module(LookEvent) do
@@ -58,7 +59,7 @@ defmodule Kantele.World.Room.ForwardEvent do
   import Kalevala.World.Room.Context
 
   def call(context, event) do
-    event(context, event.from_pid, self(), event.topic, %{})
+    event(context, event.from_pid, self(), event.topic, event.data)
   end
 end
 

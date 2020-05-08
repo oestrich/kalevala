@@ -18,6 +18,10 @@ defmodule Kantele.Character.Events do
       event("combat/tick", :tick)
     end
 
+    module(DelayedEvent) do
+      event("commands/delayed", :run)
+    end
+
     module(EmoteEvent) do
       event(Message, :echo, interested?: &EmoteEvent.interested?/1)
     end

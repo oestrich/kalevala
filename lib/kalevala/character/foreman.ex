@@ -115,6 +115,14 @@ defmodule Kalevala.Character.Foreman do
     |> handle_conn(state)
   end
 
+  def handle_info(event = %Event.Delayed{}, state) do
+    event = Event.Delayed.to_event(event)
+
+    new_conn(state)
+    |> Map.put(:events, [event])
+    |> handle_conn(state)
+  end
+
   def handle_info(event = %Event.Display{}, state) do
     new_conn(state)
     |> state.controller.display(event)
@@ -207,12 +215,21 @@ defmodule Kalevala.Character.Foreman do
 
   @doc false
   def send_events(conn) do
+    {events, delayed_events} =
+      Enum.split_with(conn.events, fn event ->
+        match?(%Kalevala.Event{}, event)
+      end)
+
+    Enum.each(delayed_events, fn delayed_event ->
+      Process.send_after(self(), delayed_event, delayed_event.delay)
+    end)
+
     case Conn.event_router(conn) do
       nil ->
         conn
 
       event_router ->
-        Enum.each(conn.events, fn event ->
+        Enum.each(events, fn event ->
           send(event_router, event)
         end)
 

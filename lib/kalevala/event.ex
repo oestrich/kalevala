@@ -45,7 +45,7 @@ defmodule Kalevala.Event do
 
   @type topic() :: String.t()
 
-  defstruct [:acting_character, :from_pid, :topic, :data, metadata: %__MODULE__.Metadata{}]
+  defstruct [:acting_character, :data, :from_pid, :topic, metadata: %__MODULE__.Metadata{}]
 
   @doc """
   Set the start time on an event
@@ -70,6 +70,36 @@ defmodule Kalevala.Event do
 
   defp update_metadata(event, metadata) do
     %{event | metadata: metadata}
+  end
+end
+
+defmodule Kalevala.Event.Delayed do
+  @moduledoc """
+  Struct for sending a message
+  """
+
+  @type t() :: %__MODULE__{}
+
+  defstruct [
+    :acting_character,
+    :data,
+    :delay,
+    :from_pid,
+    :topic,
+    metadata: %Kalevala.Event.Metadata{}
+  ]
+
+  @doc """
+  Turn a delayed event into a stanard event
+  """
+  def to_event(delayed_event) do
+    %Kalevala.Event{
+      acting_character: delayed_event.acting_character,
+      data: delayed_event.data,
+      from_pid: delayed_event.from_pid,
+      topic: delayed_event.topic,
+      metadata: delayed_event.metadata
+    }
   end
 end
 

@@ -10,6 +10,10 @@ defmodule Kantele.Character.Commands do
       command("combat tick", :tick)
     end
 
+    module(DelayedCommand) do
+      command("delay :command", :run)
+    end
+
     module(EmoteCommand) do
       command("emote :text", :broadcast)
       command("emotes", :list)
