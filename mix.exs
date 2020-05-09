@@ -22,6 +22,7 @@ defmodule Kalevala.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:benchee, "~> 1.0", only: :dev},
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21.3", only: :dev, runtime: false},
       {:ranch, "~> 1.7"},
