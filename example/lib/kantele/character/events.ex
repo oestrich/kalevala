@@ -67,5 +67,9 @@ defmodule Kantele.Character.NonPlayerEvents do
       event(Movement.Abort, :abort)
       event(Movement.Notice, :notice)
     end
+
+    module(WanderEvent) do
+      event("room/wander", :run)
+    end
   end
 end

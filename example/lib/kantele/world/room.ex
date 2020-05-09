@@ -38,8 +38,9 @@ defmodule Kantele.World.Room.Events do
   use Kalevala.Event.Router
 
   scope(Kantele.World.Room) do
-    module(FleeEvent) do
+    module(RandomExitEvent) do
       event("room/flee", :call)
+      event("room/wander", :call)
     end
 
     module(ForwardEvent) do
@@ -65,7 +66,7 @@ defmodule Kantele.World.Room.ForwardEvent do
   end
 end
 
-defmodule Kantele.World.Room.FleeEvent do
+defmodule Kantele.World.Room.RandomExitEvent do
   import Kalevala.World.Room.Context
 
   def call(context, event) do

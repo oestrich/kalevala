@@ -1,6 +1,6 @@
-defmodule Kantele.Character.FleeAction do
+defmodule Kantele.Character.WanderAction do
   @moduledoc """
-  Action to flee to a random exit in a room
+  Action to pick a random exit and move
   """
 
   use Kalevala.Character.Action
@@ -8,7 +8,7 @@ defmodule Kantele.Character.FleeAction do
   @impl true
   def run(conn, _data) do
     conn
-    |> event("room/flee")
+    |> event("room/wander")
     |> assign(:prompt, false)
   end
 

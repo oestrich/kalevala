@@ -238,6 +238,14 @@ defmodule Kantele.World.Loader do
     }
   end
 
+  defp parse_node(action = %{type: "actions/wander"}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kantele.Character.WanderAction,
+      data: %{},
+      delay: Map.get(action, :delay, 0)
+    }
+  end
+
   defp parse_node(action = %{type: "actions/delay-event", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.DelayEventAction,

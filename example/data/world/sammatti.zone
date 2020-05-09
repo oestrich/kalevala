@@ -28,6 +28,22 @@ room_characters "town_square" {
   characters = [
     {
       id = characters.town_crier.id
+    },
+    {
+      id = characters.wandering_villager.id
+    }
+  ]
+}
+
+room_items "town_square" {
+  room_id = rooms.town_square.id
+
+  items = [
+    {
+      id = global.items.longsword.id
+    },
+    {
+      id = global.items.potion.id
     }
   ]
 }
@@ -120,13 +136,6 @@ characters "town_crier" {
       data = {
         id = "looking"
         message = "looks around for someone to talk to."
-      }
-    },
-    {
-      topic = "characters/move"
-      delay = 5000
-      data = {
-        id = "flee"
       }
     }
   ]
@@ -264,34 +273,6 @@ characters "town_crier" {
             }
           }
         ]
-      },
-      {
-        type = "conditional"
-        nodes = [
-          {
-            type = "conditions/event-match"
-            data = {
-              topic = "characters/move"
-              data = {
-                id = "flee"
-              }
-            }
-          },
-          {
-            type = "actions/flee"
-          },
-          {
-            type = "actions/delay-event"
-            data = {
-              minimum_delay = 3000
-              random_delay = 18000
-              topic = "characters/move"
-              data = {
-                id = "${id}"
-              }
-            }
-          }
-        ]
       }
     ]
   }
@@ -351,15 +332,75 @@ characters "villager" {
   }
 }
 
-room_items "town_square" {
-  room_id = rooms.town_square.id
+characters "wandering_villager" {
+  name = "Villager"
+  description = "A villager of Sammatti."
 
-  items = [
+  initial_events = [
     {
-      id = global.items.longsword.id
-    },
-    {
-      id = global.items.potion.id
+      topic = "characters/move"
+      delay = 5000
+      data = {
+        id = "wander"
+      }
     }
   ]
+
+  brain = {
+    type = "first"
+    nodes = [
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/message-match"
+            data = {
+              self_trigger = false
+              text = "\bhi\b"
+            }
+          },
+          {
+            type = "sequence"
+            nodes = [
+              {
+                type = "actions/say"
+                data = {
+                  channel_name = "${channel_name}"
+                  text = "Hello!"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/event-match"
+            data = {
+              topic = "characters/move"
+              data = {
+                id = "wander"
+              }
+            }
+          },
+          {
+            type = "actions/wander"
+          },
+          {
+            type = "actions/delay-event"
+            data = {
+              minimum_delay = 3000
+              random_delay = 18000
+              topic = "characters/move"
+              data = {
+                id = "${id}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
 }
