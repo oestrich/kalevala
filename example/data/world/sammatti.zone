@@ -121,6 +121,13 @@ characters "town_crier" {
         id = "looking"
         message = "looks around for someone to talk to."
       }
+    },
+    {
+      topic = "characters/move"
+      delay = 5000
+      data = {
+        id = "flee"
+      }
     }
   ]
 
@@ -247,12 +254,40 @@ characters "town_crier" {
           {
             type = "actions/delay-event"
             data = {
-              minimum_delay = 3000
-              random_delay = 15000
+              minimum_delay = 30000
+              random_delay = 180000
               topic = "characters/emote"
               data = {
                 id = "${id}"
                 message = "${message}"
+              }
+            }
+          }
+        ]
+      },
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/event-match"
+            data = {
+              topic = "characters/move"
+              data = {
+                id = "flee"
+              }
+            }
+          },
+          {
+            type = "actions/flee"
+          },
+          {
+            type = "actions/delay-event"
+            data = {
+              minimum_delay = 3000
+              random_delay = 18000
+              topic = "characters/move"
+              data = {
+                id = "${id}"
               }
             }
           }
@@ -290,6 +325,25 @@ characters "villager" {
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/room-enter"
+            data = {
+              self_trigger = false
+            }
+          },
+          {
+            type = "actions/say"
+            data = {
+              channel_name = "rooms:${room_id}"
+              delay = 500
+              text = "Welcome, ${character.name}!"
+            }
           }
         ]
       }
