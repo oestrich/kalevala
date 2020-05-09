@@ -6,87 +6,6 @@ alias Kalevala.Character.Brain.Node
 alias Kalevala.Character
 alias Kalevala.Character.Conn
 
-defmodule Kantele.Character.DelayEventAction do
-  @moduledoc """
-  Delay an event
-  """
-
-  use Kalevala.Character.Action
-
-  @impl true
-  def run(conn, params) do
-    minimum_delay = Map.get(params, "minimum_delay", 0)
-    random_delay = Map.get(params, "random_delay", 0)
-    delay = minimum_delay + Enum.random(0..random_delay)
-
-    data =
-      params
-      |> Map.get("data", %{})
-      |> Enum.into(%{}, fn {key, value} ->
-        {String.to_atom(key), value}
-      end)
-
-    delay_event(conn, delay, params["topic"], data)
-  end
-end
-
-defmodule Kantele.Character.EmoteAction do
-  @moduledoc """
-  Action to emote in a channel (e.g. a room)
-  """
-
-  use Kalevala.Character.Action
-
-  alias Kantele.Character.EmoteView
-
-  @impl true
-  def run(conn, params) do
-    conn
-    |> assign(:text, params["text"])
-    |> render(EmoteView, "echo")
-    |> publish_emote(params["channel_name"], params["text"], [], &publish_error/2)
-  end
-
-  def publish_error(conn, _error), do: conn
-end
-
-defmodule Kantele.Character.FleeAction do
-  @moduledoc """
-  Action to emote in a channel (e.g. a room)
-  """
-
-  use Kalevala.Character.Action
-
-  @impl true
-  def run(conn, _data) do
-    conn
-    |> event("room/flee")
-    |> assign(:prompt, false)
-  end
-
-  def publish_error(conn, _error), do: conn
-end
-
-defmodule Kantele.Character.SayAction do
-  @moduledoc """
-  Action to speak in a channel (e.g. a room)
-  """
-
-  use Kalevala.Character.Action
-
-  alias Kantele.Character.SayView
-
-  @impl true
-  def run(conn, params) do
-    conn
-    |> assign(:text, params["text"])
-    |> render(SayView, "echo")
-    |> publish_message(params["channel_name"], params["text"], [], &publish_error/2)
-  end
-
-  def publish_error(conn, _error), do: conn
-end
-
 brain = %Sequence{
   nodes: [
     %FirstSelector{
@@ -310,4 +229,4 @@ end
 Benchee.run(%{
   "hi" => hi_event,
   "move" => move_event,
-})
+}, parallel: System.schedulers_online())
