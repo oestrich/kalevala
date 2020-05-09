@@ -32,6 +32,8 @@ defmodule Kantele.World.Kickoff do
   def handle_continue(:load, state) do
     world = Loader.load_world()
 
+    Enum.each(world.items, &cache_item/1)
+
     Enum.each(world.zones, fn zone ->
       zone
       |> Cache.cache_zone()
@@ -41,7 +43,6 @@ defmodule Kantele.World.Kickoff do
 
     Enum.each(world.rooms, &start_room/1)
     Enum.each(world.characters, &start_character/1)
-    Enum.each(world.items, &cache_item/1)
 
     {:noreply, state}
   end
