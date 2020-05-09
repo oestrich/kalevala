@@ -24,7 +24,7 @@ defmodule Kantele.Character.NonPlayerMeta do
   Specific metadata for a world character in Kantele
   """
 
-  defstruct [:brain, :vitals, :zone_id]
+  defstruct [:brain, :initial_events, :vitals, :zone_id]
 end
 
 defmodule Kantele.Character.Vitals do
@@ -41,4 +41,12 @@ defmodule Kantele.Character.Vitals do
     :endurance_points,
     :max_endurance_points
   ]
+end
+
+defmodule Kantele.Character.InitialEvent do
+  @moduledoc """
+  Initial events to kick off when a character starts
+  """
+
+  defstruct [:data, :delay, :topic]
 end

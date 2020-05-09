@@ -43,6 +43,7 @@ defmodule Kantele.World.Room.Events do
     end
 
     module(ForwardEvent) do
+      event("characters/emote", :call)
       event("combat/start", :call)
       event("combat/stop", :call)
       event("combat/tick", :call)

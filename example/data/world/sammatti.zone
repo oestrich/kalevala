@@ -113,6 +113,16 @@ characters "town_crier" {
   name = "Town Crier"
   description = "A small man with a loud voice."
 
+  initial_events = [
+    {
+      topic = "characters/emote"
+      delay = 3000
+      data = {
+        message = "looks around for someone to talk to."
+      }
+    }
+  ]
+
   brain = {
     type = "sequence"
     nodes = [
@@ -210,6 +220,35 @@ characters "town_crier" {
               channel_name = "rooms:${room_id}"
               delay = 500
               text = "Welcome, ${character.name}!"
+            }
+          }
+        ]
+      },
+      {
+        type = "conditional"
+        nodes = [
+          {
+            type = "conditions/event-match"
+            data = {
+              topic = "characters/emote"
+            }
+          },
+          {
+            type = "actions/emote"
+            data = {
+              channel_name = "rooms:${room_id}"
+              text = "${message}"
+            }
+          },
+          {
+            type = "actions/delay-event"
+            data = {
+              minimum_delay = 3000
+              random_delay = 15000
+              topic = "characters/emote"
+              data = {
+                message = "${message}"
+              }
             }
           }
         ]

@@ -127,6 +127,7 @@ defmodule Kantele.World.Loader do
       meta: %Kantele.Character.NonPlayerMeta{
         zone_id: zone.id,
         brain: parse_brain(character_data),
+        initial_events: parse_initial_events(character_data),
         vitals: %Kantele.Character.Vitals{
           health_points: 25,
           max_health_points: 25,
@@ -140,6 +141,18 @@ defmodule Kantele.World.Loader do
 
     {key, character}
   end
+
+  defp parse_initial_events(%{initial_events: initial_events}) do
+    Enum.map(initial_events, fn initial_event ->
+      %Kantele.Character.InitialEvent{
+        data: initial_event.data,
+        delay: initial_event.delay,
+        topic: initial_event.topic
+      }
+    end)
+  end
+
+  defp parse_initial_events(_), do: []
 
   defp parse_brain(%{brain: brain}) do
     parse_node(brain)
@@ -190,6 +203,17 @@ defmodule Kantele.World.Loader do
     }
   end
 
+  defp parse_node(%{type: "conditions/event-match", data: data}) do
+    %Kalevala.Character.Brain.Condition{
+      type: Kalevala.Character.Conditions.EventMatch,
+      data: %{
+        self_trigger: Map.get(data, :self_trigger, "false") == "true",
+        topic: data.topic,
+        data: Map.get(data, :data, %{})
+      }
+    }
+  end
+
   defp parse_node(action = %{type: "actions/say", data: data}) do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.SayAction,
@@ -210,6 +234,14 @@ defmodule Kantele.World.Loader do
     %Kalevala.Character.Brain.Action{
       type: Kantele.Character.FleeAction,
       data: %{},
+      delay: Map.get(action, :delay, 0)
+    }
+  end
+
+  defp parse_node(action = %{type: "actions/delay-event", data: data}) do
+    %Kalevala.Character.Brain.Action{
+      type: Kantele.Character.DelayEventAction,
+      data: data,
       delay: Map.get(action, :delay, 0)
     }
   end

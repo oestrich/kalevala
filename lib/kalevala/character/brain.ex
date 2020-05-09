@@ -156,16 +156,21 @@ defmodule Kalevala.Character.Brain.Action do
   """
   def replace(data, event_data) do
     Enum.into(data, %{}, fn {key, value} ->
-      case is_binary(value) do
-        true ->
-          value = replace_variables(value, event_data)
-
-          {to_string(key), value}
-
-        false ->
-          {to_string(key), value}
-      end
+      replace_value(key, value, event_data)
     end)
+  end
+
+  defp replace_value(key, value, event_data) when is_binary(value) do
+    value = replace_variables(value, event_data)
+    {to_string(key), value}
+  end
+
+  defp replace_value(key, value, event_data) when is_map(value) do
+    {to_string(key), replace(value, event_data)}
+  end
+
+  defp replace_value(key, value, _event_data) do
+    {to_string(key), value}
   end
 
   @doc """

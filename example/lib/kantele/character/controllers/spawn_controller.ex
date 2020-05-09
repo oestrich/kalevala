@@ -10,6 +10,11 @@ defmodule Kantele.Character.SpawnController do
   def init(conn) do
     character = conn.character
 
+    conn =
+      Enum.reduce(character.meta.initial_events, conn, fn initial_event, conn ->
+        delay_event(conn, initial_event.delay, initial_event.topic, initial_event.data)
+      end)
+
     conn
     |> move(:to, character.room_id, SpawnView, "spawn", %{})
     |> subscribe("rooms:#{character.room_id}", [], &MoveEvent.subscribe_error/2)
