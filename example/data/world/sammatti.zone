@@ -118,6 +118,7 @@ characters "town_crier" {
       topic = "characters/emote"
       delay = 3000
       data = {
+        id = "looking"
         message = "looks around for someone to talk to."
       }
     }
@@ -231,6 +232,9 @@ characters "town_crier" {
             type = "conditions/event-match"
             data = {
               topic = "characters/emote"
+              data = {
+                id = "looking"
+              }
             }
           },
           {
@@ -247,6 +251,7 @@ characters "town_crier" {
               random_delay = 15000
               topic = "characters/emote"
               data = {
+                id = "${id}"
                 message = "${message}"
               }
             }

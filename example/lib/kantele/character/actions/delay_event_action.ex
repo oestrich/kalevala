@@ -11,6 +11,13 @@ defmodule Kantele.Character.DelayEventAction do
     random_delay = Map.get(params, "random_delay", 0)
     delay = minimum_delay + Enum.random(0..random_delay)
 
-    delay_event(conn, delay, params["topic"], Map.get(params, "data", %{}))
+    data =
+      params
+      |> Map.get("data", %{})
+      |> Enum.into(%{}, fn {key, value} ->
+        {String.to_atom(key), value}
+      end)
+
+    delay_event(conn, delay, params["topic"], data)
   end
 end
