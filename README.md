@@ -157,6 +157,58 @@ defmodule Kantele.World.Room.NotifyEvent do
 end
 ```
 
+### Actions
+
+A `Kalevala.Character.Action` is a small set of functionality that a character can perform. Think of this as an "atom" building block that you can piece together other commands and the behavior tree below together with.
+
+Actions have a single function `run/2`. They accept a `conn` and `params` as commands and controllers do.
+
+The example below bundles together what it means to speak into a channel, e.g. the room your character is in.
+
+```elixir
+defmodule Kantele.Character.SayAction do
+  @moduledoc """
+  Action to speak in a channel (e.g. a room)
+  """
+
+  use Kalevala.Character.Action
+
+  alias Kantele.Character.SayView
+
+  @impl true
+  def run(conn, params) do
+    conn
+    |> assign(:text, params["text"])
+    |> render(SayView, "echo")
+    |> publish_message(params["channel_name"], params["text"], [], &publish_error/2)
+  end
+
+  def publish_error(conn, _error), do: conn
+end
+```
+
+### Character "Brains" - Behavior Tree
+
+In order to create non-player characters, you can equip them with a brain of sorts. This comes in the form of a simple behavior tree. The tree evaluates an incoming event and checks to see which branches/leaves trigger.
+
+#### Selectors
+
+- `FirstSelector`, starts at the top and tries each node, continuing until the first node succeeds
+- `ConditionalSelector`, starts at the top and tries each node, continuing as long as nodes succeed
+- `RandomSelector`, selects a random node to process
+- `Sequence`, starts at the top and runs each node, ignoring failing nodes
+
+#### Leaves
+
+- `Condition`, a node that evaluates the condition, if the condition is `false`, then the node fails, generally this is matched with a `ConditionalSelector` at the start to fail the actions below it
+- `Action`, a node that will append an action to the conn to be performed, optionally delayed
+- `NullNode`, a no-op node that can be used as an empty brain to skip node operation
+
+#### Conditions
+
+- `MessageMatch`, built-in condition to match a `Kalevala.Event.Message` event
+- `EventMatch`, built-in condition to match a base `Kalevala.Event` event
+
 ### Communication & Channels
 
 A `Kalevala.Communication.Channel` is a pub/sub for sending chat messages between characters. Channels are registered with a callback module, allowing for callbacks before subscriptions/unsubscriptions/publishes.
