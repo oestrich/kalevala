@@ -30,7 +30,7 @@ defmodule Kantele.World.Kickoff do
 
   @impl true
   def handle_continue(:load, state) do
-    world = Loader.load_world()
+    world = Loader.load()
 
     Enum.each(world.items, &cache_item/1)
 
