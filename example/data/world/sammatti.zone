@@ -151,28 +151,7 @@ characters "villager" {
     type = "first"
     nodes = [
       {
-        type = "conditional"
-        nodes = [
-          {
-            type = "conditions/message-match"
-            data = {
-              self_trigger = false
-              text = "\bhi\b"
-            }
-          },
-          {
-            type = "sequence"
-            nodes = [
-              {
-                type = "actions/say"
-                data = {
-                  channel_name = "${channel_name}"
-                  text = "Hello!"
-                }
-              }
-            ]
-          }
-        ]
+        ref = brains.generic_hello
       },
       {
         type = "conditional"

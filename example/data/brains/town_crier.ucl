@@ -1,42 +1,46 @@
+brains "generic_hello" {
+  type = "conditional"
+  nodes = [
+    {
+      type = "conditions/message-match"
+      data = {
+        self_trigger = false
+        text = "\bhi\b"
+      }
+    },
+    {
+      type = "sequence"
+      nodes = [
+        {
+          type = "actions/say"
+          delay = 500
+          data = {
+            channel_name = "${channel_name}"
+            text = "Hello, ${character.name}!"
+          }
+        },
+        {
+          type = "actions/say"
+          delay = 750
+          data = {
+            channel_name = "${channel_name}"
+            text = "How are you?"
+          }
+        }
+      ]
+    }
+  ]
+}
+
 brains "town_crier" {
   type = "sequence"
   nodes = [
     {
+      ref = brains.generic_hello
+    },
+    {
       type = "first"
       nodes = [
-        {
-          type = "conditional"
-          nodes = [
-            {
-              type = "conditions/message-match"
-              data = {
-                self_trigger = false
-                text = "\bhi\b"
-              }
-            },
-            {
-              type = "sequence"
-              nodes = [
-                {
-                  type = "actions/say"
-                  delay = 500
-                  data = {
-                    channel_name = "${channel_name}"
-                    text = "Hello, ${character.name}!"
-                  }
-                },
-                {
-                  type = "actions/say"
-                  delay = 750
-                  data = {
-                    channel_name = "${channel_name}"
-                    text = "How are you?"
-                  }
-                }
-              ]
-            }
-          ]
-        },
         {
           type = "conditional"
           nodes = [

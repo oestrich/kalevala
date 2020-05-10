@@ -12,8 +12,8 @@ defmodule Kantele.World.Loader do
   Load zone files into Kalevala structs
   """
   def load(world_path \\ "data/world", brain_path \\ "data/brains") do
-    world_data = load_folder(world_path, &merge_world_data/1)
-    brain_data = load_folder(brain_path, &merge_brain_data/1)
+    world_data = load_folder(world_path, ".zone", &merge_world_data/1)
+    brain_data = load_folder(brain_path, ".ucl", &merge_brain_data/1)
 
     zones = Enum.map(world_data, &parse_zone(&1, brain_data))
 
@@ -26,26 +26,28 @@ defmodule Kantele.World.Loader do
     |> parse_world()
   end
 
-  defp load_folder(path, merge_fun) do
+  defp load_folder(path, file_extension, merge_fun) do
     File.ls!(path)
     |> Enum.filter(fn file ->
-      String.ends_with?(file, ".zone")
+      String.ends_with?(file, file_extension)
     end)
     |> Enum.map(fn file ->
       File.read!(Path.join(path, file))
     end)
     |> Enum.map(&Elias.parse/1)
-    |> Enum.into(%{}, merge_fun)
+    |> Enum.flat_map(merge_fun)
+    |> Enum.into(%{})
   end
 
   defp merge_brain_data(brain_data) do
-    [key] = Map.keys(brain_data.brains)
-    {to_string(key), brain_data.brains[key]}
+    Enum.map(brain_data.brains, fn {key, value} ->
+      {to_string(key), value}
+    end)
   end
 
   defp merge_world_data(zone_data) do
     [key] = Map.keys(zone_data.zones)
-    {to_string(key), zone_data}
+    [{to_string(key), zone_data}]
   end
 
   defp zone_items_to_list(zone) do
@@ -170,6 +172,10 @@ defmodule Kantele.World.Loader do
   defp parse_brain(_, _brains), do: %Kalevala.Character.Brain.NullNode{}
 
   defp parse_node("brains." <> key_path, brains) do
+    parse_node(brains[key_path], brains)
+  end
+
+  defp parse_node(%{ref: "brains." <> key_path}, brains) do
     parse_node(brains[key_path], brains)
   end
 
