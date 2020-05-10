@@ -12,7 +12,7 @@ defmodule Kantele.World.Loader do
   Load zone files into Kalevala structs
   """
   def load(world_path \\ "data/world", brain_path \\ "data/brains") do
-    world_data = load_folder(world_path, ".zone", &merge_world_data/1)
+    world_data = load_folder(world_path, ".ucl", &merge_world_data/1)
     brain_data = load_folder(brain_path, ".ucl", &merge_brain_data/1)
 
     zones = Enum.map(world_data, &parse_zone(&1, brain_data))
