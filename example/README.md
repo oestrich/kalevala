@@ -1,21 +1,24 @@
 # Kantele
 
-**TODO: Add description**
+Kantele is an example implementation of Kalevala. Kantele stresses everything that Kalevala is capable of.
 
-## Installation
+If you want to start your own Kalevala game, copying Kantele is a great place to start until Kalevala ships with a new game generator.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `kantele` to your list of dependencies in `mix.exs`:
+## Game Data
 
-```elixir
-def deps do
-  [
-    {:kantele, "~> 0.1.0"}
-  ]
-end
-```
+Game data is held in the `data` folder. These files are in the [UCL](https://github.com/vstakhov/libucl) format. They are parsed by [Elias](https://github.com/oestrich/elias), a custom parser for UCL.
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/kantele](https://hexdocs.pm/kantele).
+### Configuration
 
+General configuration lives in single files in the top level of the folder.
+
+- `emotes.ucl`, definition of emotes/socials for players to use
+- `config.ucl`, general configuration of the game, e.g. player initial data
+
+### Zone Files
+
+Zone files are in the `data/world` folder. Each file contains a full zone, including rooms, items, characters, and more.
+
+### Behavior Tree Brain Files
+
+Characters can have behavior tree "brains" and these can be stored directly in the character definition or in separate files and referenced. This is due to the fact that these brains can get quite large.
