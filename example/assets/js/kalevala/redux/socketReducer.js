@@ -1,6 +1,5 @@
-import { createReducer } from "reduxsauce";
-
 import { Types } from "./actions";
+import { createReducer } from "./createReducer";
 
 const INITIAL_STATE = {
   connected: false,
@@ -26,7 +25,7 @@ export const socketSentEvent = (state, action) => {
 };
 
 export const socketReceivedEvent = (state, action) => {
-  const { event } = action;
+  const { event } = action.data;
 
   switch (event.type) {
     case "system/display":

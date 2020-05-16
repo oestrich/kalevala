@@ -1,8 +1,7 @@
-import { createReducer } from "reduxsauce";
-
 import { Types } from "./actions";
+import { createReducer } from "./createReducer";
 
-const INITITAL_STATE = {
+const INITIAL_STATE = {
   index: -1,
   history: [],
   currentText: "",
@@ -14,7 +13,7 @@ export const promptClear = (state, action) => {
 };
 
 export const promptSetCurrentText = (state, action) => {
-  const { text } = action;
+  const { text } = action.data;
   return {...state, index: -1, currentText: text, displayText: text};
 }
 
@@ -58,4 +57,4 @@ export const HANDLERS = {
   [Types.PROMPT_SET_CURRENT_TEXT]: promptSetCurrentText,
 }
 
-export const promptReducer = createReducer(INITITAL_STATE, HANDLERS);
+export const promptReducer = createReducer(INITIAL_STATE, HANDLERS);

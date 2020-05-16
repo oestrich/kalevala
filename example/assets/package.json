@@ -18,7 +18,6 @@
     "react-redux": "^7.1.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "reduxsauce": "^1.0.1",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
     "tailwindcss": "^1.4.6"
