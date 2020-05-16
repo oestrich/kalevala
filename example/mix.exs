@@ -25,6 +25,8 @@ defmodule Kantele.MixProject do
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:elias, "~> 0.2"},
       {:kalevala, path: "../"},
+      {:plug_cowboy, "~> 2.2"},
+      {:ranch, "~> 1.7"},
       {:telemetry_metrics, "~> 0.4.0"},
       {:telemetry_metrics_prometheus, "~> 0.3.1"},
       {:telemetry_poller, "~> 0.4.1"}

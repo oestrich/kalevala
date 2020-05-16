@@ -35,6 +35,30 @@ defmodule Kantele.Application do
       ]
     ]
 
+    websocket_config = [
+      port: 4500,
+      dispatch_matches: [
+        {:_, Plug.Cowboy.Handler, {Kantele.Websocket.Endpoint, []}}
+      ],
+      handler: [
+        output_processors: [
+          Kalevala.Output.Tags,
+          Kantele.Output.AdminTags,
+          Kantele.Output.SemanticColors,
+          Kalevala.Output.Tables,
+          Kalevala.Output.Websocket
+        ]
+      ],
+      foreman: [
+        supervisor_name: Kantele.Character.Foreman.Supervisor,
+        character_module: Kantele.Character,
+        communication_module: Kantele.Communication,
+        initial_controller: Kantele.Character.LoginController,
+        presence_module: Kantele.Character.Presence,
+        quit_view: {Kantele.Character.QuitView, "disconnected"}
+      ]
+    ]
+
     children = [
       {Kantele.Config, [name: Kantele.Config]},
       {Kantele.Communication, []},
@@ -43,6 +67,7 @@ defmodule Kantele.Application do
       {Kantele.Character.Emotes, [name: Kantele.Character.Emotes]},
       {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
       listener(listener_config),
+      {Kalevala.Websocket.Listener, websocket_config},
       {Kantele.Telemetry, []}
     ]
 
