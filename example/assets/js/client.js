@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import { Prompt, SocketProvider, Terminal } from "./kalevala/components";
+import { Prompt, SocketProvider, Terminal } from "./kalevala";
 
 import { makeStore } from "./store.js";
 

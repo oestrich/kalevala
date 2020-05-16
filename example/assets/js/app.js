@@ -1,10 +1,11 @@
 import "../css/app.scss";
 
-import { Client } from "./client";
-import Keys from "./kalevala/keys";
-
 import React from "react";
 import ReactDOM from "react-dom";
+
+import { Keys } from "./kalevala";
+
+import { Client } from "./client";
 
 const keys = new Keys();
 
