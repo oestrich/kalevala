@@ -1,8 +1,7 @@
 import "../css/app.scss";
 
-import "./versioning";
 import { Client } from "./client";
-import Keys from "./keys";
+import Keys from "./kalevala/keys";
 
 import React from "react";
 import ReactDOM from "react-dom";
