@@ -25,9 +25,8 @@ class ConnectionStatus extends React.Component {
     return (
       <div className="flex items-center justify-center">
         <div
-          style={{borderRadius: "100%", width: "16px", height: "16px"}}
-          title={this.connectionTitle()}
-          className={this.connectionClassName()} />
+          className={`rounded-full w-4 h-4 ${this.connectionClassName()}`}
+          title={this.connectionTitle()} />
       </div>
     );
   }
