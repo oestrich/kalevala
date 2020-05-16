@@ -1,4 +1,10 @@
 defmodule Kalevala.Websocket.Handler do
+  @moduledoc """
+  Cowboy websocket handler
+
+  Starts a foreman process tied to this websocket connection
+  """
+
   @behaviour :cowboy_websocket
 
   alias Kalevala.Character.Conn.Lines
