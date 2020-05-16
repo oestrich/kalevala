@@ -2,17 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircle } from '@fortawesome/free-solid-svg-icons'
-
 import { getSocketConnectionState } from "../redux";
 
 class ConnectionStatus extends React.Component {
   connectionClassName() {
     if (this.props.connected) {
-      return "text-green-500";
+      return "bg-green-500";
     } else {
-      return "text-red-500";
+      return "bg-red-500";
     }
   }
 
@@ -27,7 +24,10 @@ class ConnectionStatus extends React.Component {
   render() {
     return (
       <div className="flex items-center justify-center">
-        <FontAwesomeIcon icon={faCircle} title={this.connectionTitle()} className={this.connectionClassName()} />
+        <div
+          style={{borderRadius: "100%", width: "16px", height: "16px"}}
+          title={this.connectionTitle()}
+          className={this.connectionClassName()} />
       </div>
     );
   }
