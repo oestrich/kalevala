@@ -1,7 +1,7 @@
 import _ from "underscore";
 import { createReducer } from "reduxsauce";
 
-import {Types} from "./actions";
+import { Types } from "./actions";
 
 const INITITAL_STATE = {
   index: -1,
@@ -15,7 +15,7 @@ export const promptClear = (state, action) => {
 };
 
 export const promptSetCurrentText = (state, action) => {
-  const {text} = action;
+  const { text } = action;
   return {...state, index: -1, currentText: text, displayText: text};
 }
 

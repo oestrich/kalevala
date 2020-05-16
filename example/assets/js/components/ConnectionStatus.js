@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
 
-import { getSocketConnectionState } from "../redux/store";
+import { getSocketConnectionState } from "../redux";
 
 class ConnectionStatus extends React.Component {
   connectionClassName() {

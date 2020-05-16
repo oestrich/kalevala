@@ -3,7 +3,7 @@ import React from "react";
 import { connect } from 'react-redux';
 
 import { parse256Color } from "./colors";
-import { getSocketTags } from "../redux/store";
+import { getSocketTags } from "../redux";
 
 const theme = {
   colors: {

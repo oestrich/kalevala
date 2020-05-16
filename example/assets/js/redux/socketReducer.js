@@ -1,9 +1,7 @@
 import _ from "underscore";
-import {createReducer} from "reduxsauce";
+import { createReducer } from "reduxsauce";
 
-import {Types} from "./actions";
-
-const MAX_LINES = 1000;
+import { Types } from "./actions";
 
 const INITIAL_STATE = {
   connected: false,
@@ -29,7 +27,7 @@ export const socketSentEvent = (state, action) => {
 };
 
 export const socketReceivedEvent = (state, action) => {
-  const {event} = action;
+  const { event } = action;
 
   switch (event.type) {
     case "system/display":

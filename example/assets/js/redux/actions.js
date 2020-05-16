@@ -1,6 +1,6 @@
 import {createActions} from 'reduxsauce';
 
-export const {Types, Creators} = createActions({
+export const { Types, Creators } = createActions({
   promptClear: null,
   promptHistoryAdd: null,
   promptHistoryScrollBackward: null,

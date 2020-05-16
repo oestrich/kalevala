@@ -1,5 +1,5 @@
-import {promptReducer} from "./promptReducer";
-import {Creators} from "./actions";
+import { promptReducer } from "./promptReducer";
+import { Creators } from "./actions";
 
 describe("prompt reducer", () => {
   test("resets the prompt state on clear", () => {

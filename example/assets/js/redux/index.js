@@ -1,7 +1,8 @@
-import {combineReducers, createStore, compose} from 'redux';
+import { combineReducers } from 'redux';
 
-import {promptReducer} from "./promptReducer";
-import {socketReducer} from "./socketReducer";
+import { Types, Creators } from "./actions";
+import { promptReducer } from "./promptReducer";
+import { socketReducer } from "./socketReducer";
 
 // Selectors
 
@@ -19,7 +20,7 @@ export const getSocketState = (state) => {
 
 export const getSocketConnectionState = (state) => {
   return getSocketState(state).connected;
-}
+};
 
 export const getSocketTags = (state) => {
   let socketState = getSocketState(state);
@@ -29,17 +30,12 @@ export const getSocketTags = (state) => {
 
 // Reducers
 
-let rootReducer = combineReducers({
+export const kalevalaReducer = combineReducers({
   prompt: promptReducer,
   socket: socketReducer,
 });
 
-const composeEnhancers =
-  typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
-    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
-
-const enhancer = composeEnhancers();
-
-export const makeStore = () => {
-  return createStore(rootReducer, enhancer);
+export {
+  Creators,
+  Types
 };

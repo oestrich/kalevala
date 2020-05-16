@@ -6,13 +6,10 @@ import { connect } from 'react-redux';
 import ConnectionStatus from "./ConnectionStatus";
 
 import {
-  Creators
-} from "../redux/actions";
-
-import {
+  Creators,
   getSocketPromptType,
   getPromptDisplayText,
-} from "../redux/store";
+} from "../redux";
 
 class Prompt extends React.Component {
   constructor(props) {

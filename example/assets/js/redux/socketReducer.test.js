@@ -1,5 +1,5 @@
-import {socketReducer} from "./socketReducer";
-import {Creators} from "./actions";
+import { socketReducer } from "./socketReducer";
+import { Creators } from "./actions";
 
 describe("socket reducer", () => {
   test("socket connected", () => {

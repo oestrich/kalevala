@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Fragment } from "react";
 import { connect } from 'react-redux';
 
-import { Creators } from "../redux/actions";
+import { Creators } from "../redux";
 
 import { ClientSocket } from "../socket";
 
