@@ -5,9 +5,7 @@ import _ from 'underscore';
 import {Creators} from "./redux/actions";
 import {makeStore} from "./redux/store";
 
-import Prompt from "./components/prompt";
-import SocketProvider from "./components/socket_provider";
-import Terminal from "./components/terminal";
+import { Prompt, SocketProvider, Terminal } from "./components";
 
 let body = document.getElementById("body");
 let store = makeStore();

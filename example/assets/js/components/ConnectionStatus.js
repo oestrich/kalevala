@@ -1,11 +1,11 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
 
-import {getSocketConnectionState} from "../redux/store";
+import { getSocketConnectionState } from "../redux/store";
 
 class ConnectionStatus extends React.Component {
   connectionClassName() {
@@ -39,7 +39,7 @@ ConnectionStatus.contextTypes = {
 
 let mapStateToProps = (state) => {
   const connected = getSocketConnectionState(state);
-  return {connected};
+  return { connected };
 };
 
 export default ConnectionStatus = connect(mapStateToProps)(ConnectionStatus);

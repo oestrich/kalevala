@@ -1,9 +1,9 @@
 import _ from "underscore";
-import React, {Fragment} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-import ConnectionStatus from "./connection_status";
+import ConnectionStatus from "./ConnectionStatus";
 
 import {
   Creators
@@ -36,12 +36,14 @@ class Prompt extends React.Component {
         this.sendMessage();
         break;
       }
+
       case 38: { // up
         e.preventDefault();
         this.props.promptHistoryScrollBackward();
         this.shouldSelect = true;
         break;
       }
+
       case 40: { // down
         e.preventDefault();
         this.props.promptHistoryScrollForward();
@@ -55,8 +57,14 @@ class Prompt extends React.Component {
     this.props.promptHistoryAdd();
     this.prompt.setSelectionRange(0, this.prompt.value.length);
 
-    const {socket} = this.context;
-    socket.send({type: "system/send", data: {text: this.props.displayText}});
+    const { socket } = this.context;
+
+    socket.send({
+      type: "system/send",
+      data: {
+        text: this.props.displayText
+      }
+    });
   }
 
   onTextChange(e) {
@@ -100,7 +108,7 @@ Prompt.contextTypes = {
 
 let mapStateToProps = (state) => {
   let displayText = getPromptDisplayText(state);
-  return {displayText};
+  return { displayText };
 };
 
 export default Prompt = connect(mapStateToProps, {

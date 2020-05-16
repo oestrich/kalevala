@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import React, {Fragment} from "react";
-import {connect} from 'react-redux';
+import React, { Fragment } from "react";
+import { connect } from 'react-redux';
 
-import {Creators} from "../redux/actions";
+import { Creators } from "../redux/actions";
 
-import {ClientSocket} from "../socket";
+import { ClientSocket } from "../socket";
 
 class SocketProvider extends React.Component {
   constructor(props) {

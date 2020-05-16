@@ -1,9 +1,9 @@
 import _ from "underscore";
 import React from "react";
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
-import {getSocketTags} from "../redux/store";
-import {parse256Color} from "../colors";
+import { parse256Color } from "./colors";
+import { getSocketTags } from "../redux/store";
 
 const theme = {
   colors: {
@@ -29,8 +29,12 @@ const theme = {
   },
 };
 
-export const TextTag = ({ text }) => {
-  return text;
+export class TextTag extends React.Component {
+  render() {
+    const { text } = this.props;
+
+    return text;
+  }
 }
 
 export class ColorTag extends React.Component {
@@ -76,50 +80,58 @@ export class ColorTag extends React.Component {
   }
 }
 
-export const Tag = ({ tag }) => {
-  if (typeof tag === "string") {
-    return (
-      <TextTag text={tag} />
-    );
-  }
+export class Tag extends React.Component {
+  render() {
+    const { tag } = this.props;
 
-  switch (tag.name) {
-    case "color":
+    if (typeof tag === "string") {
       return (
-        <ColorTag children={tag.children} attributes={tag.attributes} />
+        <TextTag text={tag} />
       );
+    }
 
-    default:
-      return (
-        <span>
-          <Tags children={tag.children} />
-        </span>
-      );
+    switch (tag.name) {
+      case "color":
+        return (
+          <ColorTag children={tag.children} attributes={tag.attributes} />
+        );
+
+      default:
+        return (
+          <span>
+            <Tags children={tag.children} />
+          </span>
+        );
+    }
   }
 }
 
-export const Tags = ({ children }) => {
-  if(!(children instanceof Array)){
-    children = [children];
-  }
+export class Tags extends React.Component {
+  render() {
+    const { children } = this.props;
 
-  let renderChild = (child, i) => {
-    if (child instanceof Array) {
-      return (
-        <Tags key={i} children={child} />
-      );
-    } else {
-      return (
-        <Tag key={i} tag={child} />
-      );
+    if(!(children instanceof Array)){
+      children = [children];
     }
-  }
 
-  return (
-    <span>
-      {_.map(children, renderChild)}
-    </span>
-  );
+    let renderChild = (child, i) => {
+      if (child instanceof Array) {
+        return (
+          <Tags key={i} children={child} />
+        );
+      } else {
+        return (
+          <Tag key={i} tag={child} />
+        );
+      }
+    }
+
+    return (
+      <span>
+        {_.map(children, renderChild)}
+      </span>
+    );
+  }
 }
 
 class Terminal extends React.Component {
@@ -175,7 +187,7 @@ class Terminal extends React.Component {
 let mapStateToProps = (state) => {
   const tags = getSocketTags(state);
 
-  return {font: "Monaco", fontSize: 16, lineHeight: 1.5, tags};
+  return { font: "Monaco", fontSize: 16, lineHeight: 1.5, tags };
 };
 
 export default Terminal = connect(mapStateToProps)(Terminal);
