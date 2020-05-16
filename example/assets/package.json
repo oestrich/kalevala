@@ -12,13 +12,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.9",
-    "@grapevine/ansi": "^1.0.0",
-    "chart.js": "^2.7.3",
-    "jquery": "^3.3.1",
-    "moment": "^2.24.0",
-    "moment-timezone": "^0.5.26",
     "node-sass": "^4.11.0",
-    "popper.js": "^1.14.7",
     "react": "^16.7.0",
     "react-dom": "^16.5.2",
     "react-redux": "^7.1.0",
@@ -26,10 +20,8 @@
     "redux-thunk": "^2.3.0",
     "reduxsauce": "^1.0.1",
     "sass-loader": "^8.0.0",
-    "sizzle": "^2.3.3",
     "style-loader": "^1.0.0",
-    "tailwindcss": "^1.4.6",
-    "underscore": "^1.9.1"
+    "tailwindcss": "^1.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",

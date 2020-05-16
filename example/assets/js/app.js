@@ -1,9 +1,7 @@
 import "../css/app.scss";
 
-import Sizzle from "sizzle";
-
 import "./versioning";
-import {Client} from "./client";
+import { Client } from "./client";
 import Keys from "./keys";
 
 import React from "react";

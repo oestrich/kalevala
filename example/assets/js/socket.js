@@ -1,6 +1,3 @@
-import Sizzle from "sizzle";
-import _ from "underscore";
-
 class Socket {
   constructor(path) {
     this.path = path;

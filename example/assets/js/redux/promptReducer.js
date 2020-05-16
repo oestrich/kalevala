@@ -1,4 +1,3 @@
-import _ from "underscore";
 import { createReducer } from "reduxsauce";
 
 import { Types } from "./actions";
@@ -20,11 +19,11 @@ export const promptSetCurrentText = (state, action) => {
 }
 
 export const promptHistoryAdd = (state, action) => {
-  if (_.first(state.history) == state.displayText) {
+  if (state.history[0] == state.displayText) {
     return {...state, index: -1};
   } else {
     let history = [state.displayText, ...state.history];
-    history = _.first(history, 10);
+    history = history.slice(0, 10);
     return {...state, history: history};
   }
 }

@@ -1,7 +1,6 @@
 import React from 'react';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import { compose, createStore } from 'redux';
-import _ from 'underscore';
 
 import { Creators } from "./redux/actions";
 import { kalevalaReducer } from "./redux";

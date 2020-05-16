@@ -1,4 +1,3 @@
-import _ from "underscore";
 import { createReducer } from "reduxsauce";
 
 import { Types } from "./actions";

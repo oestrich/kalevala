@@ -1,5 +1,3 @@
-import _ from "underscore"
-
 export default class Keys {
   constructor() {
     this.keysDown = [];
@@ -26,7 +24,7 @@ export default class Keys {
     this.keysDown.push(key);
 
     if (this.listeners[this.keysDown] != undefined) {
-      _.each(this.listeners[this.keysDown], callback => {
+      this.listeners[this.keysDown].each(callback => {
         callback();
       });
     }

@@ -1,4 +1,3 @@
-import _ from "underscore";
 import React from "react";
 import { connect } from 'react-redux';
 
@@ -128,7 +127,7 @@ export class Tags extends React.Component {
 
     return (
       <span>
-        {_.map(children, renderChild)}
+        {children.map(renderChild)}
       </span>
     );
   }
