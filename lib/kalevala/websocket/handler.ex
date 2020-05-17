@@ -9,7 +9,7 @@ defmodule Kalevala.Websocket.Handler do
 
   alias Kalevala.Character.Conn.Event
   alias Kalevala.Character.Conn.EventText
-  alias Kalevala.Character.Conn.Lines
+  alias Kalevala.Character.Conn.Text
   alias Kalevala.Character.Foreman
   alias Kalevala.Output
 
@@ -125,7 +125,7 @@ defmodule Kalevala.Websocket.Handler do
     |> Map.put(:newline, newline)
   end
 
-  defp process_datum(context, %Lines{data: text, newline: newline}) do
+  defp process_datum(context, %Text{data: text, newline: newline}) do
     event = %{
       "topic" => "system/display",
       "data" => process_text(context, text)

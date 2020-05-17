@@ -5,7 +5,7 @@ defmodule Kalevala.Telnet.Protocol do
 
   alias Kalevala.Character.Conn.Event
   alias Kalevala.Character.Conn.EventText
-  alias Kalevala.Character.Conn.Lines
+  alias Kalevala.Character.Conn.Text
   alias Kalevala.Character.Conn.Option
   alias Kalevala.Character.Foreman
   alias Kalevala.Output
@@ -117,7 +117,7 @@ defmodule Kalevala.Telnet.Protocol do
     |> push(event)
   end
 
-  defp push(state, output = %Lines{}) do
+  defp push(state, output = %Text{}) do
     push_text(state, output.data)
     if output.go_ahead, do: state.transport.send(state.socket, <<255, 249>>)
     update_newline(state, output.newline)

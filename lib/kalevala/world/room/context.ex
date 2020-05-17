@@ -7,7 +7,7 @@ defmodule Kalevala.World.Room.Context do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, assigns: %{}, characters: [], events: [], item_instances: [], lines: []]
+  defstruct [:data, assigns: %{}, characters: [], events: [], item_instances: [], output: []]
 
   @doc """
   Create a new context struct from room state
@@ -32,16 +32,16 @@ defmodule Kalevala.World.Room.Context do
   end
 
   defp push(context, to_pid, event = %Kalevala.Character.Conn.Event{}, _newline) do
-    Map.put(context, :lines, context.lines ++ [{to_pid, event}])
+    Map.put(context, :output, context.output ++ [{to_pid, event}])
   end
 
   defp push(context, to_pid, data, newline) do
-    lines = %Kalevala.Character.Conn.Lines{
+    text = %Kalevala.Character.Conn.Text{
       data: data,
       newline: newline
     }
 
-    Map.put(context, :lines, context.lines ++ [{to_pid, lines}])
+    Map.put(context, :output, context.output ++ [{to_pid, text}])
   end
 
   @doc """
@@ -88,22 +88,22 @@ defmodule Kalevala.World.Room.Context do
   """
   def handle_context(context) do
     context
-    |> send_lines()
+    |> send_output()
     |> send_events()
   end
 
-  defp send_lines(context) do
-    context.lines
+  defp send_output(context) do
+    context.output
     |> Enum.group_by(
-      fn {to_pid, _line} ->
+      fn {to_pid, _text} ->
         to_pid
       end,
-      fn {_to_pid, line} ->
-        line
+      fn {_to_pid, text} ->
+        text
       end
     )
-    |> Enum.each(fn {to_pid, lines} ->
-      send(to_pid, %Event.Display{lines: lines})
+    |> Enum.each(fn {to_pid, text} ->
+      send(to_pid, %Event.Display{output: text})
     end)
 
     context

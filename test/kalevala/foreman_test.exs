@@ -5,13 +5,13 @@ defmodule Kalevala.ForemanTest do
   alias Kalevala.Character.Foreman
 
   describe "handling the conn" do
-    test "prints lines" do
+    test "prints text" do
       conn = setup_conn(["Text"])
       state = setup_state()
 
       {:noreply, _state} = Foreman.handle_conn(conn, state)
 
-      assert_receive {:send, %Conn.Lines{data: ["Text"]}}
+      assert_receive {:send, %Conn.Text{data: ["Text"]}}
     end
 
     test "handles halting" do
@@ -41,9 +41,9 @@ defmodule Kalevala.ForemanTest do
     %Conn{}
   end
 
-  defp setup_conn(lines) do
+  defp setup_conn(text) do
     %Conn{
-      lines: [%Conn.Lines{data: lines}]
+      output: [%Conn.Text{data: text}]
     }
   end
 

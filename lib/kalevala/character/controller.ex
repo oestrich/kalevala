@@ -66,7 +66,7 @@ defmodule Kalevala.Character.Controller do
       def display(conn, event) do
         conn
         |> Map.put(:options, event.options)
-        |> Map.put(:lines, event.lines)
+        |> Map.put(:output, event.output)
       end
 
       defoverridable display: 2, event: 2, option: 2
