@@ -7,6 +7,7 @@ defmodule Kalevala.Websocket.Handler do
 
   @behaviour :cowboy_websocket
 
+  alias Kalevala.Character.Conn.Event
   alias Kalevala.Character.Conn.Lines
   alias Kalevala.Character.Foreman
   alias Kalevala.Output
@@ -52,6 +53,7 @@ defmodule Kalevala.Websocket.Handler do
   @impl true
   def websocket_info({:send, data}, state) do
     context = %{
+      events: [],
       lines: [],
       newline: state.options.newline,
       output_processors: state.output_processors
@@ -66,8 +68,8 @@ defmodule Kalevala.Websocket.Handler do
 
     event =
       Jason.encode!(%{
-        "type" => "system/multiple",
-        "data" => context.lines
+        "topic" => "system/multiple",
+        "data" => context.lines ++ context.events
       })
 
     {:reply, {:text, event}, update_newline(state, context.newline)}
@@ -88,11 +90,11 @@ defmodule Kalevala.Websocket.Handler do
     :ok
   end
 
-  def handle_in(%{"type" => "system/ping"}, state) do
-    {:reply, {:text, Jason.encode!(%{"type" => "system/pong"})}, state}
+  def handle_in(%{"topic" => "system/ping"}, state) do
+    {:reply, {:text, Jason.encode!(%{"topic" => "system/pong"})}, state}
   end
 
-  def handle_in(%{"type" => "system/send", "data" => %{"text" => string}}, state) do
+  def handle_in(%{"topic" => "system/send", "data" => %{"text" => string}}, state) do
     send(state.foreman_pid, {:recv, :text, string})
 
     {:ok, state}
@@ -100,6 +102,10 @@ defmodule Kalevala.Websocket.Handler do
 
   def handle_in(event, state) do
     {:reply, {:text, Jason.encode!(event)}, state}
+  end
+
+  defp process_datum(context, event = %Event{}) do
+    %{context | events: context.events ++ [event]}
   end
 
   defp process_datum(context, %Lines{data: text, newline: newline}) do
@@ -110,11 +116,11 @@ defmodule Kalevala.Websocket.Handler do
 
     case context.newline do
       true ->
-        lines = [%{"type" => "system/display", "data" => ["\n", text]}]
+        lines = [%{"topic" => "system/display", "data" => ["\n", text]}]
         %{context | lines: context.lines ++ lines, newline: newline}
 
       false ->
-        lines = [%{"type" => "system/display", "data" => text}]
+        lines = [%{"topic" => "system/display", "data" => text}]
         %{context | lines: context.lines ++ lines, newline: newline}
     end
   end

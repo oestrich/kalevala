@@ -1,6 +1,8 @@
-import { compose, createStore } from 'redux';
+import { combineReducers, compose, createStore } from 'redux';
 
-import { kalevalaMiddleware, kalevalaReducer } from "./kalevala";
+import { kalevalaMiddleware, promptReducer, socketReducer } from "./kalevala";
+
+import { eventsReducer } from "./redux";
 
 const composeEnhancers =
   typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
@@ -8,6 +10,12 @@ const composeEnhancers =
 
 const middleware = compose(kalevalaMiddleware, composeEnhancers());
 
+const reducers = combineReducers({
+  prompt: promptReducer,
+  socket: socketReducer,
+  events: eventsReducer
+});
+
 export const makeStore = () => {
-  return createStore(kalevalaReducer, middleware);
+  return createStore(reducers, middleware);
 }

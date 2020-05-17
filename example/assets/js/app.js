@@ -3,17 +3,7 @@ import "../css/app.scss";
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { Keys } from "./kalevala";
-
 import { Client } from "./client";
-
-const keys = new Keys();
-
-document.addEventListener('keydown', e => {
-  if (!keys.isModifierKeyPressed()) {
-    document.getElementById('prompt').focus();
-  }
-});
 
 window.Components = {
   Client

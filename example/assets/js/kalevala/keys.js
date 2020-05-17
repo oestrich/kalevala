@@ -8,7 +8,7 @@ export default class Keys {
     });
 
     document.addEventListener("keydown", e => {
-      this.keyDown(e.key);
+      this.keyDown(e);
     });
 
     document.addEventListener("keyup", e => {
@@ -20,12 +20,12 @@ export default class Keys {
     return this.keysDown.includes("Control") || this.keysDown.includes("Alt") || this.keysDown.includes("Meta");
   }
 
-  keyDown(key) {
-    this.keysDown.push(key);
+  keyDown(event) {
+    this.keysDown.push(event.key);
 
     if (this.listeners[this.keysDown] != undefined) {
-      this.listeners[this.keysDown].each(callback => {
-        callback();
+      this.listeners[this.keysDown].map(callback => {
+        callback(event);
       });
     }
   }

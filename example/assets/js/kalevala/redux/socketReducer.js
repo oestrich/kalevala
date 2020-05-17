@@ -24,7 +24,7 @@ export const socketDisconnected = (state, action) => {
 export const socketReceivedEvent = (state, action) => {
   const { event } = action.data;
 
-  switch (event.type) {
+  switch (event.topic) {
     case "system/display":
       return {...state, tags: state.tags.concat(event.data)};
 

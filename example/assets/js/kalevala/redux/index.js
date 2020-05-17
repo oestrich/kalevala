@@ -2,6 +2,7 @@ import { applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 
 import { Types, Creators } from "./actions";
+import { createReducer } from "./createReducer";
 import { promptReducer } from "./promptReducer";
 import { socketReducer } from "./socketReducer";
 
@@ -29,12 +30,15 @@ export const getSocketTags = (state) => {
 
 export const kalevalaMiddleware = applyMiddleware(thunk);
 
-export const kalevalaReducer = combineReducers({
+export const kalevalaReducers = combineReducers({
   prompt: promptReducer,
   socket: socketReducer,
 });
 
 export {
+  createReducer,
   Creators,
+  promptReducer,
+  socketReducer,
   Types
 };

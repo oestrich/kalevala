@@ -44,7 +44,7 @@ export class Socket {
     };
 
     this.pingTimeout = setInterval(() => {
-      this.send({type: "system/ping"});
+      this.send({topic: "system/ping"});
     }, 5000);
   }
 
@@ -103,7 +103,7 @@ export class ReduxSocket {
 
   connect() {
     this.socket.onEvent((event) => {
-      if (event.type == "system/multiple") {
+      if (event.topic == "system/multiple") {
         event.data.forEach((event) => {
           this.creators.receivedEvent(event);
         });

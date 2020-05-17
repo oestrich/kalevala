@@ -100,7 +100,8 @@ defmodule Kantele.World.Room.LookEvent do
     |> assign(:room, context.data)
     |> assign(:characters, characters)
     |> assign(:item_instances, item_instances)
-    |> render(event.from_pid, LookView, "look", %{})
+    |> render(event.from_pid, LookView, "look.text", %{})
+    |> render(event.from_pid, LookView, "look.event", %{})
   end
 end
 

@@ -58,6 +58,7 @@ defmodule Kalevala.Character.Conn.Event do
   Send an out of band Event
   """
 
+  @derive Jason.Encoder
   defstruct [:topic, :data]
 end
 

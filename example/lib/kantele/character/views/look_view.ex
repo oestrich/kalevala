@@ -1,10 +1,21 @@
 defmodule Kantele.Character.LookView do
   use Kalevala.Character.View
 
+  alias Kalevala.Character.Conn.Event
   alias Kantele.Character.CharacterView
   alias Kantele.Character.ItemView
 
-  def render("look", %{room: room, characters: characters, item_instances: item_instances}) do
+  def render("look.event", %{room: room}) do
+    %Event{
+      topic: "Room.Info",
+      data: %{
+        name: room.name,
+        exits: Enum.map(room.exits, fn room_exit -> room_exit.exit_name end)
+      }
+    }
+  end
+
+  def render("look.text", %{room: room, characters: characters, item_instances: item_instances}) do
     ~E"""
     {room-title id="<%= room.id %>"}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>

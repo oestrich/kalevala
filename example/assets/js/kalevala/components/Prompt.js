@@ -53,7 +53,7 @@ class Prompt extends React.Component {
     this.prompt.setSelectionRange(0, this.prompt.value.length);
 
     this.props.socketSendEvent({
-      type: "system/send",
+      topic: "system/send",
       data: {
         text: this.props.displayText
       }

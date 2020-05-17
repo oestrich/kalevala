@@ -1,16 +1,19 @@
 import Keys from "./keys";
 import { Prompt, Terminal } from "./components";
-import { Creators, kalevalaMiddleware, kalevalaReducer } from "./redux";
+import { createReducer, Creators, kalevalaMiddleware, promptReducer, socketReducer, Types } from "./redux";
 import { makeReduxSocket, ReduxSocket, Socket } from "./socket";
 
 export {
+  createReducer,
   Creators,
   kalevalaMiddleware,
-  kalevalaReducer,
   Keys,
   makeReduxSocket,
   Prompt,
+  promptReducer,
   ReduxSocket,
+  socketReducer,
   Socket,
-  Terminal
+  Terminal,
+  Types
 };
