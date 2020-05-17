@@ -6,7 +6,9 @@ export class Socket {
   }
 
   connect() {
-    this.socket = new WebSocket(`ws://${location.host}${this.path}`);
+    const protocol = location.protocol == "https:" ? "wss:" : "ws:";
+
+    this.socket = new WebSocket(`${protocol}//${location.host}${this.path}`);
 
     this.socket.onmessage = (message) => {
       let event = JSON.parse(message.data);
