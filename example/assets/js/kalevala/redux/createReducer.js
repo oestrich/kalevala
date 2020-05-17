@@ -1,3 +1,5 @@
+// Inspired/copied from reduxsauce
+
 const isNil = (object) => {
   return object === null || object === undefined;
 };
