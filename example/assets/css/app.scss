@@ -1,0 +1,43 @@
+@tailwind base;
+
+@tailwind components;
+
+.btn-primary {
+  @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
+}
+
+.btn-primary:focus {
+  @apply outline-none shadow-outline;
+}
+
+.btn-primary:hover {
+  @apply bg-blue-700;
+}
+
+.input {
+  @apply mr-4 ml-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;
+}
+
+.input:focus {
+  @apply outline-none shadow-outline;
+}
+
+@tailwind utilities;
+
+.blink {
+  animation: 2s linear infinite blink_effect;
+}
+
+@keyframes blink_effect {
+  0% {
+    visibility: hidden;
+  }
+
+  50% {
+    visibility: hidden;
+  }
+
+  100% {
+    visibility: visible;
+  }
+}

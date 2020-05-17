@@ -16,10 +16,14 @@ To start the game:
 cd example/
 mix deps.get
 mix compile
+cd assets/
+yarn install
+yarn build
+cd ..
 mix run --no-halt
 ```
 
-A telnet listener will start on `4444` and a TLS listener will start on `4443` with a self signed cert.
+A telnet listener will start on port `4444` and a TLS listener will start on port `4443` with a self signed cert. A web client will start on port `4500`, visit `http://localhost:4500/` to view it in your browser.
 
 ## Components of Kalevala
 
