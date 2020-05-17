@@ -33,7 +33,23 @@ export const Creators = {
     return { type: Types.SOCKET_DISCONNECTED };
   },
   socketReceivedEvent: (event) => {
-    return { type: Types.SOCKET_RECEIVED_EVENT, data: { event } };
+    return (dispatch, getState, { eventHandlers }) => {
+      const eventHandler = eventHandlers[event.topic];
+
+      if (eventHandler) {
+        eventHandler(dispatch, getState, event);
+      }
+
+      if (event.topic == "system/multiple") {
+        event.data.forEach((event) => {
+          dispatch(Creators.socketReceivedEvent(event));
+        });
+
+        return;
+      }
+
+      dispatch({ type: Types.SOCKET_RECEIVED_EVENT, data: { event } });
+    };
   },
   socketSendEvent: (event) => {
     return (dispatch, getState) => {

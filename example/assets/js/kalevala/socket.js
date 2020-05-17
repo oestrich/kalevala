@@ -103,14 +103,6 @@ export class ReduxSocket {
 
   connect() {
     this.socket.onEvent((event) => {
-      if (event.topic == "system/multiple") {
-        event.data.forEach((event) => {
-          this.creators.receivedEvent(event);
-        });
-
-        return;
-      }
-
       this.creators.receivedEvent(event);
     });
 

@@ -1,7 +1,17 @@
 defmodule Kantele.Character.LoginView do
   use Kalevala.Character.View
 
-  def render("welcome", _assigns) do
+  alias Kalevala.Character.Conn.EventText
+
+  def render("welcome", assigns) do
+    %EventText{
+      topic: "Login.Welcome",
+      data: %{powered_by: "Kalevala #{Kalevala.version()}"},
+      text: render("welcome.text", assigns)
+    }
+  end
+
+  def render("welcome.text", _assigns) do
     ~E"""
     Welcome to
     {color foreground="256:39"}
