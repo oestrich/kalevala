@@ -24,5 +24,8 @@ spec:
             - name: telnet
               containerPort: 4444
               protocol: TCP
+            - name: http
+              containerPort: 4500
+              protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

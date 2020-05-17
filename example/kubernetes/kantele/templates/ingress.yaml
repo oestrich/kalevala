@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "kantele.fullname" . }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+      - {{ .Values.web.host }}
+      secretName: {{ include "kantele.fullname" . }}
+  rules:
+  - host: {{ .Values.web.host }}
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: {{ include "kantele.fullname" . }}
+            servicePort: http

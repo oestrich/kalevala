@@ -12,3 +12,7 @@ spec:
       targetPort: telnet
       protocol: TCP
       name: telnet
+    - port: 4500
+      targetPort: http
+      protocol: TCP
+      name: http
