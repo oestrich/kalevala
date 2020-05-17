@@ -8,9 +8,17 @@ COPY example/mix.* /app/example/
 RUN mix deps.get --only prod
 RUN mix deps.compile
 
+FROM node:12.16 as frontend
+WORKDIR /app
+COPY example/assets/package.json example/assets/yarn.lock /app/
+RUN yarn install
+COPY example/assets /app
+RUN yarn run deploy
+
 FROM builder as releaser
 WORKDIR /app/example
 ENV MIX_ENV=prod
+COPY --from=frontend /priv/static /app/priv/static
 COPY . /app/
 RUN mix release
 
@@ -22,5 +30,6 @@ COPY --from=releaser /app/example/_build/prod/rel/kantele /app/
 COPY example/data /app/data
 EXPOSE 4443
 EXPOSE 4444
+EXPOSE 4500
 ENTRYPOINT ["bin/kantele"]
 CMD ["start"]
