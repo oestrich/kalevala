@@ -18,7 +18,7 @@ RUN yarn run deploy
 FROM builder as releaser
 WORKDIR /app/example
 ENV MIX_ENV=prod
-COPY --from=frontend /priv/static /app/priv/static
+COPY --from=frontend /priv/static /app/example/priv/static
 COPY . /app/
 RUN mix release
 
