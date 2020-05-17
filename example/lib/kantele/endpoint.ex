@@ -1,4 +1,6 @@
 defmodule Kantele.Websocket.Endpoint do
+  @moduledoc false
+
   use Plug.Router
 
   plug(Plug.Static, at: "/", gzip: true, only: ["js", "css", "robots.txt"], from: :kantele)
@@ -13,10 +15,6 @@ defmodule Kantele.Websocket.Endpoint do
 
   match "/_health" do
     send_resp(conn, 200, "")
-  end
-
-  match "/version" do
-    send_resp(conn, 200, Jason.encode!(%{version: Kalevala.version()}))
   end
 
   match _ do
