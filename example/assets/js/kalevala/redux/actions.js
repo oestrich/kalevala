@@ -7,7 +7,7 @@ export const Types = {
   SOCKET_CONNECTED: "SOCKET_CONNECTED",
   SOCKET_DISCONNECTED: "SOCKET_DISCONNECTED",
   SOCKET_RECEIVED_EVENT: "SOCKET_RECEIVED_EVENT",
-  SOCKET_SENT_EVENT: "SOCKET_SENT_EVENT",
+  SOCKET_SEND_EVENT: "SOCKET_SEND_EVENT",
 };
 
 export const Creators = {
@@ -26,8 +26,8 @@ export const Creators = {
   promptSetCurrentText: (text) => {
     return { type: Types.PROMPT_SET_CURRENT_TEXT, data: { text } };
   },
-  socketConnected: () => {
-    return { type: Types.SOCKET_CONNECTED };
+  socketConnected: (socket) => {
+    return { type: Types.SOCKET_CONNECTED, data: { socket } };
   },
   socketDisconnected: () => {
     return { type: Types.SOCKET_DISCONNECTED };
@@ -35,7 +35,13 @@ export const Creators = {
   socketReceivedEvent: (event) => {
     return { type: Types.SOCKET_RECEIVED_EVENT, data: { event } };
   },
-  socketSentEvent: (event) => {
-    return { type: Types.SOCKET_SENT_EVENT, data: { event } };
+  socketSendEvent: (event) => {
+    return (dispatch, getState) => {
+      const { socket } = getState().socket;
+
+      socket.send(event);
+
+      dispatch({ type: Types.SOCKET_SEND_EVENT, data: { event } });
+    };
   },
 };

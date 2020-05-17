@@ -1,4 +1,6 @@
-class Socket {
+import { Creators } from "./redux";
+
+export class Socket {
   constructor(path) {
     this.path = path;
   }
@@ -70,14 +72,29 @@ class Socket {
   }
 }
 
+export const makeReduxSocket = (path, store) => {
+  const socket = new Socket(path);
 
-class ClientSocket {
-  constructor(client) {
-    this.client = client;
+  return new ReduxSocket(socket, {
+    connected: (socket) => {
+      store.dispatch(Creators.socketConnected(socket));
+    },
+    disconnected: () => {
+      store.dispatch(Creators.socketDisconnected());
+    },
+    receivedEvent: (event) => {
+      store.dispatch(Creators.socketReceivedEvent(event));
+    }
+  });
+};
+
+export class ReduxSocket {
+  constructor(socket, creators) {
+    this.socket = socket;
+    this.creators = creators;
   }
 
   join() {
-    this.socket = new Socket("/socket");
     this.socket.connect();
     this.connect();
   }
@@ -86,25 +103,25 @@ class ClientSocket {
     this.socket.onEvent((event) => {
       if (event.type == "system/multiple") {
         event.data.forEach((event) => {
-          this.client.receivedEvent(event);
+          this.creators.receivedEvent(event);
         });
 
         return;
       }
 
-      this.client.receivedEvent(event);
+      this.creators.receivedEvent(event);
     });
 
     this.socket.onOpen(() => {
-      this.client.connected();
+      this.creators.connected(this);
     });
 
     this.socket.onClose(() => {
-      this.client.disconnected();
+      this.creators.disconnected();
     });
 
     this.socket.onError(() => {
-      this.client.disconnected();
+      this.creators.disconnected();
     });
   }
 
@@ -112,5 +129,3 @@ class ClientSocket {
     this.socket.send(event);
   }
 }
-
-export {ClientSocket};

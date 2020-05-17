@@ -2,12 +2,15 @@ import { Types } from "./actions";
 import { createReducer } from "./createReducer";
 
 const INITIAL_STATE = {
+  socket: null,
   connected: false,
   tags: [],
 }
 
 export const socketConnected = (state, action) => {
-  return {...state, connected: true};
+  const { socket } = action.data;
+
+  return {...state, socket: socket, connected: true};
 };
 
 export const socketDisconnected = (state, action) => {
@@ -15,13 +18,7 @@ export const socketDisconnected = (state, action) => {
     return state;
   }
 
-  return {...state, connected: false};
-};
-
-export const socketSentEvent = (state, action) => {
-  console.log("Send event", action);
-
-  return state;
+  return {...state, socket: null, connected: false};
 };
 
 export const socketReceivedEvent = (state, action) => {
@@ -45,7 +42,6 @@ export const HANDLERS = {
   [Types.SOCKET_CONNECTED]: socketConnected,
   [Types.SOCKET_DISCONNECTED]: socketDisconnected,
   [Types.SOCKET_RECEIVED_EVENT]: socketReceivedEvent,
-  [Types.SOCKET_SENT_EVENT]: socketSentEvent,
 }
 
 export const socketReducer = createReducer(INITIAL_STATE, HANDLERS);

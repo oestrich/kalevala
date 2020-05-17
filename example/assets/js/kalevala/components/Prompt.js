@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import ConnectionStatus from "./ConnectionStatus";
@@ -53,9 +52,7 @@ class Prompt extends React.Component {
     this.props.promptHistoryAdd();
     this.prompt.setSelectionRange(0, this.prompt.value.length);
 
-    const { socket } = this.context;
-
-    socket.send({
+    this.props.socketSendEvent({
       type: "system/send",
       data: {
         text: this.props.displayText
@@ -98,10 +95,6 @@ class Prompt extends React.Component {
   }
 }
 
-Prompt.contextTypes = {
-  socket: PropTypes.object,
-};
-
 let mapStateToProps = (state) => {
   let displayText = getPromptDisplayText(state);
   return { displayText };
@@ -113,4 +106,5 @@ export default Prompt = connect(mapStateToProps, {
   promptHistoryScrollBackward: Creators.promptHistoryScrollBackward,
   promptHistoryScrollForward: Creators.promptHistoryScrollForward,
   promptSetCurrentText: Creators.promptSetCurrentText,
+  socketSendEvent: Creators.socketSendEvent,
 })(Prompt);

@@ -107,7 +107,7 @@ export class Tag extends React.Component {
 
 export class Tags extends React.Component {
   render() {
-    const { children } = this.props;
+    let { children } = this.props;
 
     if(!(children instanceof Array)){
       children = [children];

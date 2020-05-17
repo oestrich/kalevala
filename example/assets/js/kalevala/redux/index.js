@@ -1,10 +1,9 @@
-import { combineReducers } from 'redux';
+import { applyMiddleware, combineReducers } from 'redux';
+import thunk from 'redux-thunk';
 
 import { Types, Creators } from "./actions";
 import { promptReducer } from "./promptReducer";
 import { socketReducer } from "./socketReducer";
-
-// Selectors
 
 export const getPromptState = (state) => {
   return state.prompt;
@@ -28,7 +27,7 @@ export const getSocketTags = (state) => {
   return socketState.tags;
 };
 
-// Reducers
+export const kalevalaMiddleware = applyMiddleware(thunk);
 
 export const kalevalaReducer = combineReducers({
   prompt: promptReducer,

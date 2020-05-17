@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { getSocketConnectionState } from "../redux";
 
@@ -31,10 +30,6 @@ class ConnectionStatus extends React.Component {
     );
   }
 }
-
-ConnectionStatus.contextTypes = {
-  socket: PropTypes.object,
-};
 
 let mapStateToProps = (state) => {
   const connected = getSocketConnectionState(state);
