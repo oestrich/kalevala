@@ -9,6 +9,7 @@ defmodule Kalevala.Websocket.Handler do
 
   alias Kalevala.Character.Conn.Event
   alias Kalevala.Character.Conn.EventText
+  alias Kalevala.Character.Conn.IncomingEvent
   alias Kalevala.Character.Conn.Text
   alias Kalevala.Character.Foreman
   alias Kalevala.Output
@@ -96,6 +97,12 @@ defmodule Kalevala.Websocket.Handler do
 
   def handle_in(%{"topic" => "system/send", "data" => %{"text" => string}}, state) do
     send(state.foreman_pid, {:recv, :text, string})
+
+    {:ok, state}
+  end
+
+  def handle_in(%{"topic" => topic, "data" => data}, state) do
+    send(state.foreman_pid, {:recv, :event, %IncomingEvent{topic: topic, data: data}})
 
     {:ok, state}
   end

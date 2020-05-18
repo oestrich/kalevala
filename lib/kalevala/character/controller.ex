@@ -21,9 +21,9 @@ defmodule Kalevala.Character.Controller do
   @callback recv(Conn.t(), String.t()) :: Conn.t()
 
   @doc """
-  Called when a telnet option is sent
+  Called when the connection receives an event (e.g. incoming GMCP)
   """
-  @callback option(Conn.t(), any()) :: Conn.t()
+  @callback recv_event(Conn.t(), any()) :: Conn.t()
 
   @doc """
   Called when a `Kalevala.Character.Event` is sent to the foreman process
@@ -49,8 +49,8 @@ defmodule Kalevala.Character.Controller do
       alias Kalevala.Character.Event
 
       @impl true
-      def option(conn, option) do
-        Logger.debug("Received option - #{inspect(option)}")
+      def recv_event(conn, event) do
+        Logger.debug("Received event - #{inspect(event)}")
 
         conn
       end
@@ -69,7 +69,7 @@ defmodule Kalevala.Character.Controller do
         |> Map.put(:output, event.output)
       end
 
-      defoverridable display: 2, event: 2, option: 2
+      defoverridable display: 2, event: 2, recv_event: 2
     end
   end
 end

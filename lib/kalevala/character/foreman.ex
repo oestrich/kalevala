@@ -97,9 +97,9 @@ defmodule Kalevala.Character.Foreman do
     |> handle_conn(state)
   end
 
-  def handle_info({:recv, :option, option}, state) do
+  def handle_info({:recv, :event, event}, state) do
     new_conn(state)
-    |> state.controller.option(option)
+    |> state.controller.recv_event(event)
     |> handle_conn(state)
   end
 

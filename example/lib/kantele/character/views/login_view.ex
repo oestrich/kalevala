@@ -36,29 +36,53 @@ defmodule Kantele.Character.LoginView do
   end
 
   def render("name", _assigns) do
-    ~s(What is your {color foreground="white"}name{/color}? )
+    %EventText{
+      topic: "Login.PromptUsername",
+      data: %{},
+      text: ~s(What is your {color foreground="white"}name{/color}? )
+    }
   end
 
   def render("password", _assigns) do
-    "Password: "
+    %EventText{
+      topic: "Login.PromptPassword",
+      data: %{},
+      text: "Password: "
+    }
   end
 
   def render("signed-in", %{username: username}) do
-    """
+    %EventText{
+      topic: "Login.SignedIn",
+      data: %{username: username},
+      text: """
 
-    Welcome {color foreground="white"}#{username}{/color}. Thanks for signing in.
-    """
+      Welcome {color foreground="white"}#{username}{/color}. Thanks for signing in.
+      """
+    }
   end
 
   def render("character-name", _assigns) do
-    "What is your character name? "
+    %EventText{
+      topic: "Login.PromptCharacter",
+      data: %{},
+      text: "What is your character name? "
+    }
   end
 
   def render("enter-world", %{character: character}) do
-    """
-    Welcome to the world of {color foreground="256:39"}Kantele{/color}, {color foreground="white"}#{
-      character.name
-    }{/color}.
-    """
+    %EventText{
+      topic: "Login.EnterWorld",
+      data: %{
+        character: %{
+          name: character.name
+        }
+      },
+      text: [
+        ~s(Welcome to the world of {color foreground="256:39"}Kantele{/color}, {color foreground="white"}),
+        character.name,
+        ~s({/color}.\n)
+      ]
+    }
   end
 end

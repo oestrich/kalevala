@@ -74,6 +74,18 @@ defmodule Kalevala.Character.Conn.EventText do
   defstruct [:data, :text, :topic]
 end
 
+defmodule Kalevala.Character.Conn.IncomingEvent do
+  @moduledoc """
+  Receive an out of band event
+
+  Telnet: via GMCP
+  Websocket: anything not `system/send`
+  """
+
+  @derive Jason.Encoder
+  defstruct [:topic, :data]
+end
+
 defmodule Kalevala.Character.Conn.Text do
   @moduledoc """
   Struct to print text

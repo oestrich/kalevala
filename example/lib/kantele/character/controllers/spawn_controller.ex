@@ -32,8 +32,5 @@ defmodule Kantele.Character.SpawnController do
   def recv(conn, _text), do: conn
 
   @impl true
-  def option(conn, _text), do: conn
-
-  @impl true
   def display(conn, _text), do: conn
 end

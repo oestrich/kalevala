@@ -74,7 +74,7 @@ export class Socket {
   }
 }
 
-export const makeReduxSocket = (path, store) => {
+export const makeReduxSocket = (path, store, eventHandlerArguments = {}) => {
   const socket = new Socket(path);
 
   return new ReduxSocket(socket, {
@@ -85,7 +85,7 @@ export const makeReduxSocket = (path, store) => {
       store.dispatch(Creators.socketDisconnected());
     },
     receivedEvent: (event) => {
-      store.dispatch(Creators.socketReceivedEvent(event));
+      store.dispatch(Creators.socketReceivedEvent(event, eventHandlerArguments));
     }
   });
 };
