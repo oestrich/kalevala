@@ -32,10 +32,12 @@ class Login extends React.Component {
 
     return (
       <div className="h-full bg-white rounded-t-lg overflow-hidden border-t border-l border-r border-gray-400 p-4 px-3 py-10 bg-gray-200 flex justify-center">
-        <div className="w-full max-w-xs">
+        <div className="w-full max-w-sm">
           <h1 className="text-6xl text-center">Kantele</h1>
 
           <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <p className="mb-4 text-center">Welcome to Kantele, a modern text multiplayer RPG.</p>
+
             <div className="mb-4">
               <input
                 autoFocus={true}
@@ -59,9 +61,7 @@ class Login extends React.Component {
                 onChange={(e) => { this.setState({password: e.target.value}); }}/>
             </div>
 
-            <div className="mb-4">
-              <input type="button" className="btn-primary" value="Login" onClick={loginClick} />
-            </div>
+            <button className="btn-primary w-full" onClick={loginClick}>Login</button>
           </form>
         </div>
       </div>
