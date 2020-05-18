@@ -16,9 +16,9 @@ defmodule Kalevala.Character.ConnTest do
       conn = Conn.render(conn, View, "text")
       conn = Conn.render(conn, View, "text")
 
-      assert conn.lines == [
-               %Kalevala.Character.Conn.Lines{data: "text", newline: false},
-               %Kalevala.Character.Conn.Lines{data: "text", newline: false}
+      assert conn.output == [
+               %Kalevala.Character.Conn.Text{data: "text", newline: false},
+               %Kalevala.Character.Conn.Text{data: "text", newline: false}
              ]
     end
 
@@ -28,9 +28,9 @@ defmodule Kalevala.Character.ConnTest do
       conn = Conn.prompt(conn, View, "text")
       conn = Conn.prompt(conn, View, "text")
 
-      assert conn.lines == [
-               %Kalevala.Character.Conn.Lines{data: "text", newline: true},
-               %Kalevala.Character.Conn.Lines{data: "text", newline: true}
+      assert conn.output == [
+               %Kalevala.Character.Conn.Text{data: "text", newline: true},
+               %Kalevala.Character.Conn.Text{data: "text", newline: true}
              ]
     end
 
@@ -40,9 +40,9 @@ defmodule Kalevala.Character.ConnTest do
       conn = Conn.prompt(conn, View, "text")
       conn = Conn.render(conn, View, "text")
 
-      assert conn.lines == [
-               %Kalevala.Character.Conn.Lines{data: "text", newline: true},
-               %Kalevala.Character.Conn.Lines{data: "text", newline: false}
+      assert conn.output == [
+               %Kalevala.Character.Conn.Text{data: "text", newline: true},
+               %Kalevala.Character.Conn.Text{data: "text", newline: false}
              ]
     end
   end

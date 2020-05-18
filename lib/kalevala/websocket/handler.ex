@@ -8,7 +8,9 @@ defmodule Kalevala.Websocket.Handler do
   @behaviour :cowboy_websocket
 
   alias Kalevala.Character.Conn.Event
-  alias Kalevala.Character.Conn.Lines
+  alias Kalevala.Character.Conn.EventText
+  alias Kalevala.Character.Conn.IncomingEvent
+  alias Kalevala.Character.Conn.Text
   alias Kalevala.Character.Foreman
   alias Kalevala.Output
 
@@ -54,7 +56,6 @@ defmodule Kalevala.Websocket.Handler do
   def websocket_info({:send, data}, state) do
     context = %{
       events: [],
-      lines: [],
       newline: state.options.newline,
       output_processors: state.output_processors
     }
@@ -69,7 +70,7 @@ defmodule Kalevala.Websocket.Handler do
     event =
       Jason.encode!(%{
         "topic" => "system/multiple",
-        "data" => context.lines ++ context.events
+        "data" => context.events
       })
 
     {:reply, {:text, event}, update_newline(state, context.newline)}
@@ -100,6 +101,12 @@ defmodule Kalevala.Websocket.Handler do
     {:ok, state}
   end
 
+  def handle_in(%{"topic" => topic, "data" => data}, state) do
+    send(state.foreman_pid, {:recv, :event, %IncomingEvent{topic: topic, data: data}})
+
+    {:ok, state}
+  end
+
   def handle_in(event, state) do
     {:reply, {:text, Jason.encode!(event)}, state}
   end
@@ -108,7 +115,45 @@ defmodule Kalevala.Websocket.Handler do
     %{context | events: context.events ++ [event]}
   end
 
-  defp process_datum(context, %Lines{data: text, newline: newline}) do
+  defp process_datum(context, event = %EventText{}) do
+    %{data: text, newline: newline} = event.text
+
+    event = %{
+      "topic" => "system/event-text",
+      "data" => %{
+        "topic" => event.topic,
+        "data" => event.data,
+        "text" => process_text(context, text)
+      }
+    }
+
+    context
+    |> append_event(event)
+    |> Map.put(:newline, newline)
+  end
+
+  defp process_datum(context, %Text{data: text, newline: newline}) do
+    event = %{
+      "topic" => "system/display",
+      "data" => process_text(context, text)
+    }
+
+    context
+    |> append_event(event)
+    |> Map.put(:newline, newline)
+  end
+
+  defp process_datum(context, _event), do: context
+
+  defp append_event(context, event) do
+    %{context | events: context.events ++ [event]}
+  end
+
+  defp update_newline(state, status) do
+    %{state | options: %{state.options | newline: status}}
+  end
+
+  defp process_text(context, text) do
     text =
       Enum.reduce(context.output_processors, text, fn processor, text ->
         Output.process(text, processor)
@@ -116,18 +161,10 @@ defmodule Kalevala.Websocket.Handler do
 
     case context.newline do
       true ->
-        lines = [%{"topic" => "system/display", "data" => ["\n", text]}]
-        %{context | lines: context.lines ++ lines, newline: newline}
+        ["\n", text]
 
       false ->
-        lines = [%{"topic" => "system/display", "data" => text}]
-        %{context | lines: context.lines ++ lines, newline: newline}
+        text
     end
-  end
-
-  defp process_datum(context, _event), do: context
-
-  defp update_newline(state, status) do
-    %{state | options: %{state.options | newline: status}}
   end
 end

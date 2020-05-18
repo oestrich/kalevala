@@ -4,7 +4,9 @@ defmodule Kalevala.Telnet.Protocol do
   """
 
   alias Kalevala.Character.Conn.Event
-  alias Kalevala.Character.Conn.Lines
+  alias Kalevala.Character.Conn.EventText
+  alias Kalevala.Character.Conn.IncomingEvent
+  alias Kalevala.Character.Conn.Text
   alias Kalevala.Character.Conn.Option
   alias Kalevala.Character.Foreman
   alias Kalevala.Output
@@ -105,7 +107,18 @@ defmodule Kalevala.Telnet.Protocol do
     state
   end
 
-  defp push(state, output = %Lines{}) do
+  defp push(state, output = %EventText{}) do
+    event = %Event{
+      topic: output.topic,
+      data: output.data
+    }
+
+    state
+    |> push(output.text)
+    |> push(event)
+  end
+
+  defp push(state, output = %Text{}) do
     push_text(state, output.data)
     if output.go_ahead, do: state.transport.send(state.socket, <<255, 249>>)
     update_newline(state, output.newline)
@@ -143,13 +156,19 @@ defmodule Kalevala.Telnet.Protocol do
     state = %{state | buffer: buffer}
 
     Enum.each(options, fn option ->
-      send(state.foreman_pid, {:recv, :option, option})
+      process_option(state, option)
     end)
 
     send(state.foreman_pid, {:recv, :text, string})
 
     {:noreply, update_newline(state, String.length(string) == 0)}
   end
+
+  defp process_option(state, {:gmcp, topic, data}) do
+    send(state.foreman_pid, {:recv, :event, %IncomingEvent{topic: topic, data: data}})
+  end
+
+  defp process_option(_state, _option), do: :ok
 
   defp update_newline(state, status) do
     %{state | options: %{state.options | newline: status}}

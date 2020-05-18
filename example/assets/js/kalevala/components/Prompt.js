@@ -72,6 +72,8 @@ class Prompt extends React.Component {
   }
 
   render() {
+    const promptClasses = "mr-4 ml-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
+
     return (
       <div className="flex p-4">
         <ConnectionStatus />
@@ -80,7 +82,7 @@ class Prompt extends React.Component {
           value={this.props.displayText}
           onChange={this.onTextChange}
           type="text"
-          className="input"
+          className={promptClasses}
           autoFocus={true}
           onKeyDown={this.onKeyDown}
           autoCorrect="off"

@@ -28,7 +28,9 @@ export const getSocketTags = (state) => {
   return socketState.tags;
 };
 
-export const kalevalaMiddleware = applyMiddleware(thunk);
+export const kalevalaMiddleware = (eventHandlers) => {
+  return applyMiddleware(thunk.withExtraArgument({ eventHandlers }));
+};
 
 export const kalevalaReducers = combineReducers({
   prompt: promptReducer,

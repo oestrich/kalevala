@@ -62,9 +62,33 @@ defmodule Kalevala.Character.Conn.Event do
   defstruct [:topic, :data]
 end
 
-defmodule Kalevala.Character.Conn.Lines do
+defmodule Kalevala.Character.Conn.EventText do
   @moduledoc """
-  Struct to print lines
+  An event that also includes text output
+
+  Geared towards text suppression in the web client, to allow for
+  text to be rendered for telnet and send an event in the web client.
+  """
+
+  @derive Jason.Encoder
+  defstruct [:data, :text, :topic]
+end
+
+defmodule Kalevala.Character.Conn.IncomingEvent do
+  @moduledoc """
+  Receive an out of band event
+
+  Telnet: via GMCP
+  Websocket: anything not `system/send`
+  """
+
+  @derive Jason.Encoder
+  defstruct [:topic, :data]
+end
+
+defmodule Kalevala.Character.Conn.Text do
+  @moduledoc """
+  Struct to print text
 
   Used to determine if a new line should be sent before sending out
   new text.
@@ -95,7 +119,7 @@ defmodule Kalevala.Character.Conn do
     :params,
     assigns: %{},
     events: [],
-    lines: [],
+    output: [],
     options: [],
     private: %Private{},
     session: %{}
@@ -109,16 +133,27 @@ defmodule Kalevala.Character.Conn do
 
   # Push text back to the user
   defp push(conn, event = %Kalevala.Character.Conn.Event{}, _newline) do
-    Map.put(conn, :lines, conn.lines ++ [event])
+    Map.put(conn, :output, conn.output ++ [event])
+  end
+
+  defp push(conn, event = %Kalevala.Character.Conn.EventText{}, newline) do
+    text = %Kalevala.Character.Conn.Text{
+      data: event.text,
+      newline: newline
+    }
+
+    event = %{event | text: text}
+
+    Map.put(conn, :output, conn.output ++ [event])
   end
 
   defp push(conn, data, newline) do
-    lines = %Kalevala.Character.Conn.Lines{
+    text = %Kalevala.Character.Conn.Text{
       data: data,
       newline: newline
     }
 
-    Map.put(conn, :lines, conn.lines ++ [lines])
+    Map.put(conn, :output, conn.output ++ [text])
   end
 
   defp merge_assigns(conn, assigns) do

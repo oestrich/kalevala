@@ -1,6 +1,16 @@
 import { Creators as KalevalaCreators } from "../kalevala";
 
 export const Creators = {
+  login: (username, password) => {
+    return (dispatch) => {
+      const event = {
+        topic: "Login",
+        data: { username, password }
+      };
+
+      dispatch(KalevalaCreators.socketSendEvent(event));
+    };
+  },
   moveNorth: () => {
     return (dispatch) => {
       const event = {
@@ -60,5 +70,15 @@ export const Creators = {
 
       dispatch(KalevalaCreators.socketSendEvent(event));
     };
-  }
+  },
+  selectCharacter: (character) => {
+    return (dispatch) => {
+      const event = {
+        topic: "Login.Character",
+        data: { character }
+      };
+
+      dispatch(KalevalaCreators.socketSendEvent(event));
+    };
+  },
 };

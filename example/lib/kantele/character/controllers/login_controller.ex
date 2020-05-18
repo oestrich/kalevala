@@ -21,6 +21,22 @@ defmodule Kantele.Character.LoginController do
   end
 
   @impl true
+  def recv_event(conn, event) do
+    case event.topic do
+      "Login" ->
+        conn
+        |> process_username(event.data["username"])
+        |> process_password(event.data["password"])
+
+      "Login.Character" ->
+        process_character(conn, event.data["character"])
+
+      _ ->
+        conn
+    end
+  end
+
+  @impl true
   def recv(conn, ""), do: conn
 
   def recv(conn, data) do

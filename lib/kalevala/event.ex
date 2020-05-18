@@ -108,5 +108,5 @@ defmodule Kalevala.Event.Display do
   An event to display text/data back to the user
   """
 
-  defstruct lines: [], options: []
+  defstruct output: [], options: []
 end

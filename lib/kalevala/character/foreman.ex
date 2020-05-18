@@ -97,9 +97,9 @@ defmodule Kalevala.Character.Foreman do
     |> handle_conn(state)
   end
 
-  def handle_info({:recv, :option, option}, state) do
+  def handle_info({:recv, :event, event}, state) do
     new_conn(state)
-    |> state.controller.option(option)
+    |> state.controller.recv_event(event)
     |> handle_conn(state)
   end
 
@@ -163,7 +163,7 @@ defmodule Kalevala.Character.Foreman do
     conn
     |> Channel.handle_channels(state)
     |> send_options(state)
-    |> send_lines(state)
+    |> send_output(state)
     |> send_events()
 
     session = Map.merge(state.session, conn.session)
@@ -207,8 +207,8 @@ defmodule Kalevala.Character.Foreman do
     conn
   end
 
-  defp send_lines(conn, state) do
-    state.callback_module.send_lines(state, conn.lines)
+  defp send_output(conn, state) do
+    state.callback_module.send_output(state, conn.output)
 
     conn
   end
@@ -300,7 +300,7 @@ defmodule Kalevala.Character.Foreman.Callbacks do
   @doc """
   Send text to a connection process
   """
-  @callback send_lines(state(), list()) :: :ok
+  @callback send_output(state(), list()) :: :ok
 
   @doc """
   The character updated and presence should be tracked
@@ -368,8 +368,8 @@ defmodule Kalevala.Character.Foreman.Player do
   end
 
   @impl true
-  def send_lines(state, lines) do
-    Enum.each(lines, fn line ->
+  def send_output(state, text) do
+    Enum.each(text, fn line ->
       send(state.private.protocol, {:send, line})
     end)
   end
@@ -436,7 +436,7 @@ defmodule Kalevala.Character.Foreman.NonPlayer do
   def send_options(_state, _options), do: :ok
 
   @impl true
-  def send_lines(_state, _lines), do: :ok
+  def send_output(_state, _output), do: :ok
 
   @impl true
   def track_presence(_state, _conn), do: :ok
