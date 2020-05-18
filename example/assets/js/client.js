@@ -10,7 +10,7 @@ import {
 
 import { Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
 
-import { CharacterSelect, Login, Room, Sidebar } from "./components";
+import { CharacterSelect, Home, Login, Room, Sidebar } from "./components";
 import { Creators } from "./redux";
 import { makeStore } from "./store";
 
@@ -94,7 +94,7 @@ export class Client extends React.Component {
                 </div>
               </Route>
               <Route>
-                <div>Kantele</div>
+                <Home />
               </Route>
             </Switch>
           </SocketProvider>

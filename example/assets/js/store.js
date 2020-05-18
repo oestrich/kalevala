@@ -1,8 +1,13 @@
 import { combineReducers, compose, createStore } from "redux";
 
-import { Creators, kalevalaMiddleware, promptReducer, socketReducer } from "./kalevala";
+import {
+  Creators as KalevalaCreators,
+  kalevalaMiddleware,
+  promptReducer,
+  socketReducer
+} from "./kalevala";
 
-import { eventsReducer } from "./redux";
+import { Creators, eventsReducer, loginReducer } from "./redux";
 
 const composeEnhancers =
   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
@@ -10,14 +15,14 @@ const composeEnhancers =
 
 const eventTextHandlers = {
   "Login.Welcome": (dispatch, getState, event, { history }) => {
-    history.push("/login");
+    dispatch(Creators.loginActive());
   },
   "Login.PromptCharacter": (dispatch, getState, event, { history }) => {
     history.push("/login/character");
   },
   "Login.EnterWorld": (dispatch, getState, event, { history }) => {
     const { text } = event;
-    dispatch(Creators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
 
     history.push("/client");
   },
@@ -33,13 +38,14 @@ const systemEventHandlers = {
       handler(dispatch, getState, event.data, args);
     }
 
-    dispatch(Creators.socketReceivedEvent({ topic, data }, args));
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic, data }, args));
   },
 };
 
 const middleware = compose(kalevalaMiddleware(systemEventHandlers), composeEnhancers());
 
 const reducers = combineReducers({
+  login: loginReducer,
   prompt: promptReducer,
   socket: socketReducer,
   events: eventsReducer

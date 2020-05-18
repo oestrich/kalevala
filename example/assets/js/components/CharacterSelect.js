@@ -30,7 +30,7 @@ class CharacterSelect extends React.Component {
     };
 
     return (
-      <div className="h-full bg-white rounded-t-lg overflow-hidden border-t border-l border-r border-gray-400 p-4 px-3 py-10 bg-gray-200 flex justify-center">
+      <div className="h-full bg-white p-4 px-3 py-10 bg-gray-200 flex justify-center">
         <div className="w-full max-w-sm">
           <h1 className="text-6xl text-center">Kantele</h1>
 

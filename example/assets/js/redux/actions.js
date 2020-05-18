@@ -1,5 +1,9 @@
 import { Creators as KalevalaCreators } from "../kalevala";
 
+export const Types = {
+  LOGIN_ACTIVE: "LOGIN_ACTIVE",
+};
+
 export const Creators = {
   login: (username, password) => {
     return (dispatch) => {
@@ -10,6 +14,9 @@ export const Creators = {
 
       dispatch(KalevalaCreators.socketSendEvent(event));
     };
+  },
+  loginActive: () => {
+    return { type: Types.LOGIN_ACTIVE };
   },
   moveNorth: () => {
     return (dispatch) => {
