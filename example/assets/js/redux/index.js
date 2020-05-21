@@ -18,6 +18,10 @@ export const getLoginActive = (state) => {
   return getLogin(state).active;
 };
 
+export const getLoginStatus = (state) => {
+  return getLogin(state).loggedIn;
+};
+
 export {
   Creators,
   eventsReducer,

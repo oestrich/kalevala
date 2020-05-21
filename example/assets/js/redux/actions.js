@@ -2,6 +2,7 @@ import { Creators as KalevalaCreators } from "../kalevala";
 
 export const Types = {
   LOGIN_ACTIVE: "LOGIN_ACTIVE",
+  LOGGED_IN: "LOGGED_IN",
 };
 
 export const Creators = {
@@ -17,6 +18,9 @@ export const Creators = {
   },
   loginActive: () => {
     return { type: Types.LOGIN_ACTIVE };
+  },
+  loggedIn: () => {
+    return { type: Types.LOGGED_IN };
   },
   moveNorth: () => {
     return (dispatch) => {

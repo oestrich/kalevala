@@ -3,15 +3,21 @@ import { createReducer } from "../kalevala";
 import { Types } from "./actions";
 
 const INITIAL_STATE = {
-  active: false
+  active: false,
+  loggedIn: false,
 };
 
 const loginActive = (state, action) => {
   return {...state, active: true};
 };
 
+const loggedIn = (state, action) => {
+  return {...state, loggedIn: true};
+};
+
 const HANDLERS = {
   [Types.LOGIN_ACTIVE]: loginActive,
+  [Types.LOGGED_IN]: loggedIn,
 };
 
 export const loginReducer = createReducer(INITIAL_STATE, HANDLERS);

@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Provider } from "react-redux";
+import { connect, Provider } from "react-redux";
 import {
   BrowserRouter as Router,
   Route,
@@ -11,7 +11,7 @@ import {
 import { Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
 
 import { CharacterSelect, Home, Login, Room, Sidebar } from "./components";
-import { Creators } from "./redux";
+import { Creators, getLoginStatus } from "./redux";
 import { makeStore } from "./store";
 
 const keys = new Keys();
@@ -69,6 +69,26 @@ class SocketProvider extends React.Component {
 
 SocketProvider = withRouter(SocketProvider);
 
+class ValidateLoggedIn extends React.Component {
+  render() {
+    console.log(this.props.loggedIn)
+    if (this.props.loggedIn) {
+      return null;
+    } else {
+      return (
+        <Redirect to="/" />
+      );
+    }
+  }
+}
+
+const mapStateToProps = (state) => {
+  const loggedIn = getLoginStatus(state);
+  return { loggedIn };
+};
+
+ValidateLoggedIn = connect(mapStateToProps)(ValidateLoggedIn);
+
 export class Client extends React.Component {
   render() {
     return (
@@ -83,6 +103,7 @@ export class Client extends React.Component {
                 <Login />
               </Route>
               <Route path="/client">
+                <ValidateLoggedIn />
                 <div className="flex flex-row h-full">
                   <Sidebar>
                     <Room />

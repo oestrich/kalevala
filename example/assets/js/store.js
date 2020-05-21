@@ -23,6 +23,7 @@ const eventTextHandlers = {
   "Login.EnterWorld": (dispatch, getState, event, { history }) => {
     const { text } = event;
     dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+    dispatch(Creators.loggedIn());
 
     history.push("/client");
   },
