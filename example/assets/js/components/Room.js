@@ -5,7 +5,7 @@ import { Creators, getEventsRoom } from "../redux";
 
 class Exit extends React.Component {
   render() {
-    const activeClassName = this.props.active ? "bg-blue-500 cursor-pointer" : "bg-gray-500 cursor-not-allowed";
+    const activeClassName = this.props.active ? "bg-teal-500 cursor-pointer" : "bg-gray-500 cursor-not-allowed";
     const className = `${this.props.className} ${activeClassName} text-white font-bold py-2 px-4 m-1 text-center rounded`;
 
     return (

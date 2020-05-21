@@ -3,7 +3,7 @@
 @tailwind components;
 
 .btn-primary {
-  @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
+  @apply bg-teal-500 text-white font-bold py-2 px-4 rounded;
 }
 
 .btn-primary:focus {
@@ -11,7 +11,7 @@
 }
 
 .btn-primary:hover {
-  @apply bg-blue-700;
+  @apply bg-teal-700;
 }
 
 .btn-inactive {
