@@ -3,6 +3,8 @@ defmodule Kalevala do
   Documentation for Kalevala.
   """
 
+  alias Kalevala.Character.Foreman
+
   @doc """
   Get the loaded version of Kalevala
   """
