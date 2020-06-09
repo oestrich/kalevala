@@ -71,7 +71,6 @@ SocketProvider = withRouter(SocketProvider);
 
 class ValidateLoggedIn extends React.Component {
   render() {
-    console.log(this.props.loggedIn)
     if (this.props.loggedIn) {
       return null;
     } else {

@@ -24,7 +24,10 @@ defmodule Kantele.Character.MoveEvent do
 
   def notice(conn, %{data: event}) do
     conn
-    |> render(MoveView, "notice", %{reason: event.reason})
+    |> assign(:character, event.character)
+    |> assign(:direction, event.direction)
+    |> assign(:reason, event.reason)
+    |> render(MoveView, "notice")
     |> prompt(CommandView, "prompt")
   end
 

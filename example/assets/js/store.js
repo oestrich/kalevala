@@ -27,6 +27,20 @@ const eventTextHandlers = {
 
     history.push("/client");
   },
+  "Room.CharacterEnter": (dispatch, getState, event, { history }) => {
+    const { data, text } = event;
+    dispatch(Creators.roomCharacterEntered(data.character));
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+  },
+  "Room.CharacterLeave": (dispatch, getState, event, { history }) => {
+    const { data, text } = event;
+    dispatch(Creators.roomCharacterLeft(data.character));
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+  },
+  "Room.Info": (dispatch, getState, event, { history }) => {
+    const { text } = event;
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+  },
 };
 
 const systemEventHandlers = {
@@ -49,7 +63,7 @@ const reducers = combineReducers({
   login: loginReducer,
   prompt: promptReducer,
   socket: socketReducer,
-  events: eventsReducer
+  events: eventsReducer,
 });
 
 export const makeStore = () => {

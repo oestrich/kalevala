@@ -35,6 +35,17 @@ defmodule Kalevala.World.Room.Context do
     Map.put(context, :output, context.output ++ [{to_pid, event}])
   end
 
+  defp push(context, to_pid, event = %Kalevala.Character.Conn.EventText{}, newline) do
+    text = %Kalevala.Character.Conn.Text{
+      data: event.text,
+      newline: newline
+    }
+
+    event = %{event | text: text}
+
+    Map.put(context, :output, context.output ++ [{to_pid, event}])
+  end
+
   defp push(context, to_pid, data, newline) do
     text = %Kalevala.Character.Conn.Text{
       data: data,
