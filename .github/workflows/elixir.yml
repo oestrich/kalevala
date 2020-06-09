@@ -5,25 +5,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+
     - uses: actions/setup-elixir@v1.0.0
       with:
         otp-version: 22.x
         elixir-version: 1.10.1
+
     - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git build-essential
+
     - name: Setup elixir
       run: |
         mix deps.get
         mix compile
       env:
         MIX_ENV: test
-    - name: Verify application
-      run: |
-        mix format --check-formatted
-        mix compile --force --warnings-as-errors
-        mix credo
-        mix test
+
+    - name: Check formatting
+      run: mix format --check-formatted
+      env:
+        MIX_ENV: test
+
+    - name: Check compile warnings
+      run: mix compile --force --warnings-as-errors
+      env:
+        MIX_ENV: test
+
+    - name: Run credo
+      run: mix credo
+      env:
+        MIX_ENV: test
+
+    - name: Run tests
+      run: mix test
       env:
         MIX_ENV: test
