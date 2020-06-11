@@ -71,21 +71,36 @@ Exits = connect(null, {
   moveDown: Creators.moveDown,
 })(Exits);
 
-class Room extends React.Component {
-  render() {
-    const { room } = this.props;
+const Character = ({ name }) => {
+  return (
+    <li style={{color: "#cfad00"}}>{name}</li>
+  );
+};
 
-    if (!room) {
-      return null;
-    }
+const Characters = ({ characters }) => {
+  return (
+    <ul>
+      {characters.map((character) => {
+        return (
+          <Character key={character.id} name={character.name} />
+        );
+      })}
+    </ul>
+  );
+}
 
-    return (
-      <div>
-        <div className="text-gray-300 text-xl p-4">{room.name}</div>
-        <Exits exits={room.exits} />
-      </div>
-    );
+let Room = ({ room }) => {
+  if (!room) {
+    return null;
   }
+
+  return (
+    <div>
+      <div className="text-gray-300 text-xl p-4">{room.name}</div>
+      <Exits exits={room.exits} />
+      <Characters characters={room.characters} />
+    </div>
+  );
 }
 
 let mapStateToProps = (state) => {

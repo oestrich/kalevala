@@ -3,6 +3,8 @@ import { Creators as KalevalaCreators } from "../kalevala";
 export const Types = {
   LOGIN_ACTIVE: "LOGIN_ACTIVE",
   LOGGED_IN: "LOGGED_IN",
+  ROOM_CHARACTER_ENTERED: "ROOM_CHARACTER_ENTERED",
+  ROOM_CHARACTER_LEFT: "ROOM_CHARACTER_LEFT",
 };
 
 export const Creators = {
@@ -81,6 +83,12 @@ export const Creators = {
 
       dispatch(KalevalaCreators.socketSendEvent(event));
     };
+  },
+  roomCharacterEntered: (character) => {
+    return { type: Types.ROOM_CHARACTER_ENTERED, data: { character: character } };
+  },
+  roomCharacterLeft: (character) => {
+    return { type: Types.ROOM_CHARACTER_LEFT, data: { character: character } };
   },
   selectCharacter: (character) => {
     return (dispatch) => {

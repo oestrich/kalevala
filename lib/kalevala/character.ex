@@ -16,6 +16,12 @@ defmodule Kalevala.Character do
     meta: %{}
   ]
 
+  defimpl Jason.Encoder do
+    def encode(character, opts) do
+      Jason.Encode.map(Map.take(character, [:description, :id, :name, :status]), opts)
+    end
+  end
+
   @doc """
   Reduce the size of the meta map before sending in an event
   """

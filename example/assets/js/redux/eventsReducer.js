@@ -1,7 +1,27 @@
-import { createReducer, Types } from "../kalevala";
+import { createReducer, Types as KalevalaTypes } from "../kalevala";
+
+import { Types } from "./actions";
 
 const INITIAL_STATE = {
   room: null
+};
+
+const characterEntered = (state, action) => {
+  const { character } = action.data;
+
+  const characters = [...state.room.characters, character];
+
+  return { ...state, room: { ...state.room, characters } };
+};
+
+const characterLeft = (state, action) => {
+  const { character } = action.data;
+
+  const characters = state.room.characters.filter((existingCharacter) => {
+    return existingCharacter.id != character.id;
+  });
+
+  return { ...state, room: { ...state.room, characters } };
 };
 
 const eventReceived = (state, action) => {
@@ -17,7 +37,9 @@ const eventReceived = (state, action) => {
 };
 
 const HANDLERS = {
-  [Types.SOCKET_RECEIVED_EVENT]: eventReceived,
+  [KalevalaTypes.SOCKET_RECEIVED_EVENT]: eventReceived,
+  [Types.ROOM_CHARACTER_ENTERED]: characterEntered,
+  [Types.ROOM_CHARACTER_LEFT]: characterLeft,
 };
 
 export const eventsReducer = createReducer(INITIAL_STATE, HANDLERS);
