@@ -6,7 +6,7 @@ import { Creators, getEventsRoom } from "../redux";
 class Exit extends React.Component {
   render() {
     const activeClassName = this.props.active ? "bg-teal-500 cursor-pointer" : "bg-gray-500 cursor-not-allowed";
-    const className = `${this.props.className} ${activeClassName} text-white font-bold py-2 px-4 m-1 text-center rounded`;
+    const className = `${this.props.className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
 
     return (
       <div className={className} onClick={this.props.move}>
@@ -21,7 +21,7 @@ class Exits extends React.Component {
     const { exits } = this.props;
 
     return (
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-3 gap-1 text-sm w-64 h-32 items-center">
         <Exit
           className="col-start-1"
           direction="up"
@@ -73,19 +73,19 @@ Exits = connect(null, {
 
 const Character = ({ name }) => {
   return (
-    <li style={{color: "#cfad00"}}>{name}</li>
+    <span className="mr-2 bg-white rounded p-2" style={{color: "#cfad00"}}>{name}</span>
   );
 };
 
 const Characters = ({ characters }) => {
   return (
-    <ul>
+    <div className="flex">
       {characters.map((character) => {
         return (
           <Character key={character.id} name={character.name} />
         );
       })}
-    </ul>
+    </div>
   );
 }
 
@@ -95,10 +95,17 @@ let Room = ({ room }) => {
   }
 
   return (
-    <div>
-      <div className="text-gray-300 text-xl p-4">{room.name}</div>
+    <div className="flex m-4">
+      <div className="w-full mr-4">
+        <div className="p-4 bg-white rounded">
+          <div className="text-xl">{room.name}</div>
+          <div>{room.description}</div>
+        </div>
+        <div className="pt-2">
+          <Characters characters={room.characters} />
+        </div>
+      </div>
       <Exits exits={room.exits} />
-      <Characters characters={room.characters} />
     </div>
   );
 }

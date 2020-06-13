@@ -13,7 +13,19 @@ defmodule Kalevala.Event.Message do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:channel_name, :character, :text, emote: false]
+  defstruct [:channel_name, :character, :id, :text, emote: false]
+
+  @doc """
+  Generate a random ID
+  """
+  def generate_id() do
+    bytes =
+      Enum.reduce(1..8, <<>>, fn _, bytes ->
+        bytes <> <<Enum.random(0..255)>>
+      end)
+
+    Base.encode16(bytes, case: :lower)
+  end
 end
 
 defmodule Kalevala.Event do

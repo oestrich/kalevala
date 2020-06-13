@@ -7,13 +7,22 @@ import {
   socketReducer
 } from "./kalevala";
 
-import { Creators, eventsReducer, loginReducer } from "./redux";
+import {
+  Creators,
+  channelReducer,
+  eventsReducer,
+  loginReducer
+} from "./redux";
 
 const composeEnhancers =
   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
 
 const eventTextHandlers = {
+  "Channel.Broadcast": (dispatch, getState, event, { history }) => {
+    const { channel_name, character, id, text } = event.data;
+    dispatch(Creators.channelBroadcast(channel_name, character, id, text));
+  },
   "Login.Welcome": (dispatch, getState, event, { history }) => {
     dispatch(Creators.loginActive());
   },
@@ -60,6 +69,7 @@ const systemEventHandlers = {
 const middleware = compose(kalevalaMiddleware(systemEventHandlers), composeEnhancers());
 
 const reducers = combineReducers({
+  channel: channelReducer,
   login: loginReducer,
   prompt: promptReducer,
   socket: socketReducer,

@@ -378,6 +378,7 @@ defmodule Kalevala.Character.Conn do
       data: %Kalevala.Event.Message{
         channel_name: channel_name,
         character: Private.character(conn),
+        id: Kalevala.Event.Message.generate_id(),
         text: text
       }
     }
@@ -396,6 +397,7 @@ defmodule Kalevala.Character.Conn do
       data: %Kalevala.Event.Message{
         channel_name: channel_name,
         character: Private.character(conn),
+        id: Kalevala.Event.Message.generate_id(),
         emote: true,
         text: text
       }

@@ -26,7 +26,27 @@ export const socketReceivedEvent = (state, action) => {
 
   switch (event.topic) {
     case "system/display":
-      return {...state, tags: state.tags.concat(event.data)};
+      const lastTags = state.tags[state.tags.length - 1];
+
+      let { data } = event;
+
+      if (lastTags && typeof lastTags == 'object' && lastTags.name == "sent-text") {
+        if (data instanceof Array) {
+          let first = data.shift();
+
+          if (first.startsWith("\n")) {
+            first = first.replace(/\n/, "");
+          }
+
+          data = [first, ...data];
+        } else if (typeof data == "string") {
+          if (first.startsWith("\n")) {
+            data = data.replace(/\n/, "");
+          }
+        };
+      }
+
+      return {...state, tags: state.tags.concat(data)};
 
     case "system/pong":
       console.log("Pong");
@@ -38,10 +58,30 @@ export const socketReceivedEvent = (state, action) => {
   }
 };
 
+export const socketSendEvent = (state, action) => {
+  const { event } = action.data;
+
+  switch (event.topic) {
+    case "system/send":
+      const { text } = event.data;
+
+      const tag = {
+        name: "sent-text",
+        children: [text, "\n"],
+      };
+
+      return {...state, tags: state.tags.concat([tag])};
+
+    default:
+      return state;
+  };
+};
+
 export const HANDLERS = {
   [Types.SOCKET_CONNECTED]: socketConnected,
   [Types.SOCKET_DISCONNECTED]: socketDisconnected,
   [Types.SOCKET_RECEIVED_EVENT]: socketReceivedEvent,
+  [Types.SOCKET_SEND_EVENT]: socketSendEvent,
 }
 
 export const socketReducer = createReducer(INITIAL_STATE, HANDLERS);

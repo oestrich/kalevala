@@ -1,11 +1,27 @@
 import React from "react";
 
-export default class Sidebar extends React.Component {
-  render() {
-    return (
-      <div className="bg-gray-900 text-gray-500 border-r-2 border-blue-200 w-64">
-        {this.props.children}
-      </div>
-    );
-  }
-}
+const borderColor = (side) => {
+  switch (side) {
+    case "bottom":
+      return "border-t-2";
+
+    case "left":
+      return "border-r-2";
+
+    case "right":
+      return "border-l-2";
+
+    case "top":
+      return "border-b-2";
+  };
+};
+
+const Sidebar = ({ children, side, width }) => {
+  return (
+    <div className={`text-black bg-gray-200 border-blue-200 ${borderColor(side)} ${width}`}>
+      {children}
+    </div>
+  );
+};
+
+export {Sidebar};

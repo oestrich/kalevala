@@ -79,6 +79,18 @@ export class ColorTag extends React.Component {
   }
 }
 
+export class SentText extends React.Component {
+  render() {
+    const color = theme.colors["white"];
+
+    return (
+      <span style={{ color: color }}>
+        <Tags children={this.props.children} />
+      </span>
+    );
+  }
+}
+
 export class Tag extends React.Component {
   render() {
     const { tag } = this.props;
@@ -93,6 +105,11 @@ export class Tag extends React.Component {
       case "color":
         return (
           <ColorTag children={tag.children} attributes={tag.attributes} />
+        );
+
+      case "sent-text":
+        return (
+          <SentText children={tag.children} />
         );
 
       default:
@@ -175,7 +192,7 @@ class Terminal extends React.Component {
     };
 
     return (
-      <div ref={el => { this.terminal = el; }} className="text-gray-500 overflow-y-scroll flex-grow width-full p-4 whitespace-pre-wrap z-10 bg-gray-900" style={style}>
+      <div ref={el => { this.terminal = el; }} className="text-gray-500 overflow-y-scroll flex-grow w-full p-4 whitespace-pre-wrap z-10 bg-gray-900" style={style}>
         <Tags children={tags} />
         <div ref={el => { this.el = el; }} />
       </div>

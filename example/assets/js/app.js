@@ -3,10 +3,10 @@ import "../css/app.scss";
 import React from "react";
 import ReactDOM from "react-dom";
 
-import { Client } from "./client";
+import { App } from "./client";
 
 window.Components = {
-  Client
+  App
 }
 
 /**

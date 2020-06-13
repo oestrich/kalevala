@@ -10,10 +10,16 @@ defmodule Kantele.Character.LookView do
       topic: "Room.Info",
       data: %{
         name: room.name,
+        description: render("_description", %{room: room}),
         exits: Enum.map(room.exits, fn room_exit -> room_exit.exit_name end),
         characters: characters
       },
-      text: render("look.text", %{room: room, characters: characters, item_instances: item_instances})
+      text:
+        render("look.text", %{
+          room: room,
+          characters: characters,
+          item_instances: item_instances
+        })
     }
   end
 

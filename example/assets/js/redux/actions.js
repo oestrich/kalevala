@@ -1,6 +1,7 @@
 import { Creators as KalevalaCreators } from "../kalevala";
 
 export const Types = {
+  CHANNEL_BROADCAST: "CHANNEL_BROADCAST",
   LOGIN_ACTIVE: "LOGIN_ACTIVE",
   LOGGED_IN: "LOGGED_IN",
   ROOM_CHARACTER_ENTERED: "ROOM_CHARACTER_ENTERED",
@@ -8,6 +9,9 @@ export const Types = {
 };
 
 export const Creators = {
+  channelBroadcast: (channelName, character, id, text) => {
+    return { type: Types.CHANNEL_BROADCAST, data: { channelName, character, id, text } };
+  },
   login: (username, password) => {
     return (dispatch) => {
       const event = {

@@ -1,6 +1,15 @@
 import { Creators } from "./actions";
+import { channelReducer } from "./channelReducer";
 import { eventsReducer } from "./eventsReducer";
 import { loginReducer } from "./loginReducer";
+
+export const getChannel = (state) => {
+  return state.channel;
+};
+
+export const getChannelMessages = (state) => {
+  return getChannel(state).messages;
+};
 
 export const getEvents = (state) => {
   return state.events;
@@ -24,6 +33,7 @@ export const getLoginStatus = (state) => {
 
 export {
   Creators,
+  channelReducer,
   eventsReducer,
   loginReducer
 };

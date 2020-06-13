@@ -9,18 +9,13 @@ defmodule Kantele.Character.ChannelEvent do
   end
 
   def echo(conn, event) do
-    case event.from_pid == self() do
-      true ->
-        prompt(conn, CommandView, "prompt", %{})
-
-      false ->
-        conn
-        |> assign(:channel_name, "general")
-        |> assign(:character, event.data.character)
-        |> assign(:text, event.data.text)
-        |> render(ChannelView, "listen")
-        |> prompt(CommandView, "prompt", %{})
-    end
+    conn
+    |> assign(:channel_name, event.data.channel_name)
+    |> assign(:character, event.data.character)
+    |> assign(:id, event.data.id)
+    |> assign(:text, event.data.text)
+    |> render(ChannelView, "listen")
+    |> prompt(CommandView, "prompt", %{})
   end
 
   def subscribe_error(conn, _error), do: conn

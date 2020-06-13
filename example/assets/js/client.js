@@ -10,7 +10,7 @@ import {
 
 import { Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
 
-import { CharacterSelect, Home, Login, Room, Sidebar } from "./components";
+import { Channels, CharacterSelect, Home, Login, Room, Sidebar } from "./components";
 import { Creators, getLoginStatus } from "./redux";
 import { makeStore } from "./store";
 
@@ -88,7 +88,29 @@ const mapStateToProps = (state) => {
 
 ValidateLoggedIn = connect(mapStateToProps)(ValidateLoggedIn);
 
-export class Client extends React.Component {
+const Client = () => {
+  return (
+    <>
+      <ValidateLoggedIn />
+      <div className="flex flex-row h-full">
+        <Sidebar side="left" width="w-1/4 max-w-xs">
+        </Sidebar>
+        <div className="flex flex-col flex-grow w-1/2 overflow-y-scroll">
+          <Sidebar side="top" width="w-full">
+            <Room />
+          </Sidebar>
+          <Terminal />
+          <Prompt />
+        </div>
+        <Sidebar side="right" width="w-1/4 max-w-xs">
+          <Channels />
+        </Sidebar>
+      </div>
+    </>
+  );
+};
+
+export class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
@@ -102,16 +124,7 @@ export class Client extends React.Component {
                 <Login />
               </Route>
               <Route path="/client">
-                <ValidateLoggedIn />
-                <div className="flex flex-row h-full">
-                  <Sidebar>
-                    <Room />
-                  </Sidebar>
-                  <div className="flex flex-col flex-grow overflow-y-scroll">
-                    <Terminal />
-                    <Prompt />
-                  </div>
-                </div>
+                <Client />
               </Route>
               <Route>
                 <Home />
