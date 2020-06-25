@@ -1,7 +1,7 @@
 image:
   repository: grapevinehaus/kantele
   # tag:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # web:
 #   host:
