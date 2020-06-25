@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from 'react-redux';
 
 import { parse256Color } from "./colors";
-import { getSocketTags } from "../redux";
+import { getSocketLines } from "../redux";
 
 const theme = {
   colors: {
@@ -27,14 +27,6 @@ const theme = {
     white: "#dbded8",
   },
 };
-
-export class TextTag extends React.Component {
-  render() {
-    const { text } = this.props;
-
-    return text;
-  }
-}
 
 export class ColorTag extends React.Component {
   styleAttributes() {
@@ -96,9 +88,7 @@ export class Tag extends React.Component {
     const { tag } = this.props;
 
     if (typeof tag === "string") {
-      return (
-        <TextTag text={tag} />
-      );
+      return tag;
     }
 
     switch (tag.name) {
@@ -114,9 +104,9 @@ export class Tag extends React.Component {
 
       default:
         return (
-          <span>
+          <>
             <Tags children={tag.children} />
-          </span>
+          </>
         );
     }
   }
@@ -143,9 +133,29 @@ export class Tags extends React.Component {
     }
 
     return (
-      <span>
+      <>
         {children.map(renderChild)}
-      </span>
+      </>
+    );
+  }
+}
+
+class Lines extends React.Component {
+  render() {
+    let { children } = this.props;
+
+    let renderLine = (line) => {
+      return (
+        <div key={line.id}>
+          <Tags children={line.children} />
+        </div>
+      );
+    };
+
+    return (
+      <>
+        {children.map(renderLine)}
+      </>
     );
   }
 }
@@ -179,7 +189,7 @@ class Terminal extends React.Component {
   }
 
   render() {
-    let tags = this.props.tags;
+    let lines = this.props.lines;
 
     let fontFamily = this.props.font;
     let fontSize = this.props.fontSize;
@@ -193,7 +203,7 @@ class Terminal extends React.Component {
 
     return (
       <div ref={el => { this.terminal = el; }} className="text-gray-500 overflow-y-scroll flex-grow w-full p-4 whitespace-pre-wrap z-10 bg-gray-900" style={style}>
-        <Tags children={tags} />
+        <Lines children={lines} />
         <div ref={el => { this.el = el; }} />
       </div>
     );
@@ -201,9 +211,9 @@ class Terminal extends React.Component {
 }
 
 let mapStateToProps = (state) => {
-  const tags = getSocketTags(state);
+  const lines = getSocketLines(state);
 
-  return { font: "Monaco", fontSize: 16, lineHeight: 1.5, tags };
+  return { font: "Monaco", fontSize: 16, lineHeight: 1.5, lines };
 };
 
 export default Terminal = connect(mapStateToProps)(Terminal);

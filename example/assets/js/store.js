@@ -21,7 +21,12 @@ const composeEnhancers =
 const eventTextHandlers = {
   "Channel.Broadcast": (dispatch, getState, event, { history }) => {
     const { channel_name, character, id, text } = event.data;
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: "\n" }, { history }));
     dispatch(Creators.channelBroadcast(channel_name, character, id, text));
+  },
+  "Character.Prompt": (dispatch, getState, event, { history }) => {
+    const { text } = event;
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
   },
   "Login.Welcome": (dispatch, getState, event, { history }) => {
     dispatch(Creators.loginActive());

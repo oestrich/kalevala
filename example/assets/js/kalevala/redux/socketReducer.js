@@ -1,10 +1,13 @@
 import { Types } from "./actions";
 import { createReducer } from "./createReducer";
+import parseText from "../parseText";
+
+const MAX_LINES = 500;
 
 const INITIAL_STATE = {
   socket: null,
   connected: false,
-  tags: [],
+  lines: [],
 }
 
 export const socketConnected = (state, action) => {
@@ -26,31 +29,11 @@ export const socketReceivedEvent = (state, action) => {
 
   switch (event.topic) {
     case "system/display":
-      const lastTags = state.tags[state.tags.length - 1];
-
-      let { data } = event;
-
-      if (lastTags && typeof lastTags == 'object' && lastTags.name == "sent-text") {
-        if (data instanceof Array) {
-          let first = data.shift();
-
-          if (first.startsWith("\n")) {
-            first = first.replace(/\n/, "");
-          }
-
-          data = [first, ...data];
-        } else if (typeof data == "string") {
-          if (first.startsWith("\n")) {
-            data = data.replace(/\n/, "");
-          }
-        };
-      }
-
-      return {...state, tags: state.tags.concat(data)};
+      let lines = parseText(event.data);
+      lines = state.lines.concat(lines);
+      return {...state, lines: lines.slice(Math.max(0, lines.length - MAX_LINES))};
 
     case "system/pong":
-      console.log("Pong");
-
       return state;
 
     default:
@@ -70,7 +53,9 @@ export const socketSendEvent = (state, action) => {
         children: [text, "\n"],
       };
 
-      return {...state, tags: state.tags.concat([tag])};
+      let lines = parseText(tag);
+
+      return {...state, lines: state.lines.concat(lines)};
 
     default:
       return state;

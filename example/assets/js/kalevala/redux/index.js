@@ -22,10 +22,10 @@ export const getSocketConnectionState = (state) => {
   return getSocketState(state).connected;
 };
 
-export const getSocketTags = (state) => {
+export const getSocketLines = (state) => {
   let socketState = getSocketState(state);
 
-  return socketState.tags;
+  return socketState.lines;
 };
 
 export const kalevalaMiddleware = (eventHandlers) => {
