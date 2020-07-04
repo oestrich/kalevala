@@ -1,6 +1,7 @@
 defmodule Kantele.Character.SayView do
   use Kalevala.Character.View
 
+  alias Kalevala.Character.Conn.EventText
   alias Kantele.Character.CharacterView
 
   def render("text", %{text: text}) do
@@ -8,13 +9,27 @@ defmodule Kantele.Character.SayView do
   end
 
   def render("echo", %{text: text}) do
-    ~i(You say, #{render("text", %{text: text})}\n)
+    %EventText{
+      topic: "Room.Say",
+      data: %{
+        text: text
+      },
+      text: ~i(You say, #{render("text", %{text: text})}\n)
+    }
   end
 
-  def render("listen", %{character: character, text: text}) do
-    [
-      CharacterView.render("name", %{character: character}),
-      " says, #{render("text", %{text: text})}\n"
-    ]
+  def render("listen", %{character: character, id: id, text: text}) do
+    %EventText{
+      topic: "Room.Say",
+      data: %{
+        character: character,
+        id: id,
+        text: text
+      },
+      text: [
+        CharacterView.render("name", %{character: character}),
+        " says, #{render("text", %{text: text})}\n"
+      ]
+    }
   end
 end

@@ -9,16 +9,21 @@ defmodule Kantele.Character.SayEvent do
   end
 
   def echo(conn, event) do
+    conn
+    |> assign(:character, event.data.character)
+    |> assign(:id, event.data.id)
+    |> assign(:text, event.data.text)
+    |> render(SayView, say_view(event))
+    |> prompt(CommandView, "prompt", %{})
+  end
+
+  defp say_view(event) do
     case event.from_pid == self() do
       true ->
-        prompt(conn, CommandView, "prompt", %{})
+        "echo"
 
       false ->
-        conn
-        |> assign(:character, event.data.character)
-        |> assign(:text, event.data.text)
-        |> render(SayView, "listen")
-        |> prompt(CommandView, "prompt", %{})
+        "listen"
     end
   end
 
