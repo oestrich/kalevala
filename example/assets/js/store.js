@@ -28,6 +28,10 @@ const eventTextHandlers = {
     const { text } = event;
     dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
   },
+  "Character.Inventory": (dispatch, getState, event, { history }) => {
+    const { text } = event;
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+  },
   "Login.Welcome": (dispatch, getState, event, { history }) => {
     dispatch(Creators.loginActive());
   },

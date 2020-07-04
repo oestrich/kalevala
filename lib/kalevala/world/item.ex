@@ -7,12 +7,17 @@ defmodule Kalevala.World.Item do
 
   defstruct [:id, :name, :description, :callback_module, meta: %{}]
 
-  @type t() :: %__MODULE__{}
+  defimpl Jason.Encoder do
+    alias Kalevala.Meta
 
-  @doc """
-  Reduce the size of the meta map before sending in an event
-  """
-  @callback trim_meta(meta :: map()) :: map()
+    def encode(item, opts) do
+      json = Map.take(item, [:id, :name, :description])
+      json = Map.merge(json, %{meta: Meta.trim(item.meta)})
+      Jason.Encode.map(json, opts)
+    end
+  end
+
+  @type t() :: %__MODULE__{}
 
   @doc """
   Match a string against the item
@@ -40,6 +45,7 @@ defmodule Kalevala.World.Item.ItemNotLoaded do
   To know that the item is _not_ loaded and you should load it
   """
 
+  @derive Jason.Encoder
   defstruct []
 end
 
@@ -52,14 +58,10 @@ defmodule Kalevala.World.Item.Instance do
 
   alias Kalevala.World.Item.ItemNotLoaded
 
-  defstruct [:id, :item_id, :created_at, :callback_module, item: %ItemNotLoaded{}, meta: %{}]
+  @derive {Jason.Encoder, only: [:id, :item_id, :item, :created_at]}
+  defstruct [:id, :item_id, :created_at, item: %ItemNotLoaded{}, meta: %{}]
 
   @type t() :: %__MODULE__{}
-
-  @doc """
-  Reduce the size of the meta map before sending in an event
-  """
-  @callback trim_meta(meta :: map()) :: map()
 
   @doc """
   Generate a random instance ID

@@ -125,7 +125,7 @@ defmodule Kantele.Character.LoginController do
           id: Kalevala.World.Item.Instance.generate_id(),
           item_id: "global:potion",
           created_at: DateTime.utc_now(),
-          callback_module: Kantele.World.Item.Instance
+          meta: %Kantele.World.Item.Meta{}
         }
       ],
       meta: %Kantele.Character.PlayerMeta{

@@ -1,13 +1,20 @@
 defmodule Kantele.Character.InventoryView do
   use Kalevala.Character.View
 
+  alias Kalevala.Character.Conn.EventText
   alias Kantele.Character.ItemView
 
   def render("list", %{item_instances: item_instances}) do
-    ~E"""
-    You are holding:
-    <%= render("_items", %{item_instances: item_instances}) %>
-    """
+    %EventText{
+      topic: "Character.Inventory",
+      data: %{
+        item_instances: item_instances
+      },
+      text: ~E"""
+      You are holding:
+      <%= render("_items", %{item_instances: item_instances}) %>
+      """
+    }
   end
 
   def render("_items", %{item_instances: item_instances}) do

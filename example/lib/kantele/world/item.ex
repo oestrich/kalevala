@@ -10,18 +10,16 @@ defmodule Kantele.World.Item do
   """
 
   use Kalevala.World.Item
-
-  @impl true
-  def trim_meta(_meta), do: %{}
 end
 
-defmodule Kantele.World.Item.Instance do
+defmodule Kantele.World.Item.Meta do
   @moduledoc """
-  Local callbacks for `Kalevala.World.Item.Instance`
+  Item metadata, implements `Kalevala.Meta`
   """
 
-  @behaviour Kalevala.World.Item.Instance
+  defstruct []
 
-  @impl true
-  def trim_meta(_meta), do: %{}
+  defimpl Kalevala.Meta do
+    def trim(_meta), do: %{}
+  end
 end

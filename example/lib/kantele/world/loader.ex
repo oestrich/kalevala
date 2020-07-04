@@ -284,7 +284,7 @@ defmodule Kantele.World.Loader do
       name: item_data.name,
       description: item_data.description,
       callback_module: Kantele.World.Item,
-      meta: %{}
+      meta: %Kantele.World.Item.Meta{}
     }
 
     {key, item}
@@ -408,7 +408,6 @@ defmodule Kantele.World.Loader do
       id: Item.Instance.generate_id(),
       item_id: item_id,
       created_at: DateTime.utc_now(),
-      callback_module: Kantele.World.Item.Instance
     }
 
     {room_key, room} =

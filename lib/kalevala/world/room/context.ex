@@ -4,6 +4,7 @@ defmodule Kalevala.World.Room.Context do
   """
 
   alias Kalevala.Event
+  alias Kalevala.Meta
 
   @type t() :: %__MODULE__{}
 
@@ -15,8 +16,7 @@ defmodule Kalevala.World.Room.Context do
   def new(state) do
     item_instances =
       Enum.map(state.private.item_instances, fn item_instance ->
-        meta = item_instance.callback_module.trim_meta(item_instance)
-        %{item_instance | meta: meta}
+        %{item_instance | meta: Meta.trim(item_instance.meta)}
       end)
 
     characters =
