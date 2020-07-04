@@ -88,7 +88,7 @@ defmodule Kalevala.Character.View.EExKalevala do
   @moduledoc """
   An EEx Engine that returns IO data instead of a string
 
-  Taken from [Phoenix.HTML.Kalevala](https://github.com/phoenixframework/phoenix_html/blob/master/lib/phoenix_html/engine.ex)
+  Taken from [Phoenix.HTML.Engine](https://github.com/phoenixframework/phoenix_html/blob/master/lib/phoenix_html/engine.ex)
   """
 
   @behaviour EEx.Engine
