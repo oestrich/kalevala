@@ -26,6 +26,10 @@ defmodule Kantele.Character.Events do
       event(Message, :echo, interested?: &EmoteEvent.interested?/1)
     end
 
+    module(InventoryEvent) do
+      event("inventory/list", :list)
+    end
+
     module(ItemEvent) do
       event(ItemDrop.Abort, :drop_abort)
       event(ItemDrop.Commit, :drop_commit)

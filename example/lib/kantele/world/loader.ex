@@ -407,7 +407,7 @@ defmodule Kantele.World.Loader do
     instance = %Item.Instance{
       id: Item.Instance.generate_id(),
       item_id: item_id,
-      created_at: DateTime.utc_now(),
+      created_at: DateTime.utc_now()
     }
 
     {room_key, room} =

@@ -106,6 +106,7 @@ defmodule Kantele.Character.LoginController do
     |> render(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
     |> event("room/look", %{})
+    |> event("inventory/list", %{})
   end
 
   defp build_character(name) do

@@ -10,7 +10,15 @@ import {
 
 import { Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
 
-import { Channels, CharacterSelect, Home, Login, Room, Sidebar } from "./components";
+import {
+  Channels,
+  CharacterSelect,
+  Home,
+  Inventory,
+  Login,
+  Room,
+  Sidebar
+} from "./components";
 import { Creators, getLoginStatus } from "./redux";
 import { makeStore } from "./store";
 
@@ -94,6 +102,7 @@ const Client = () => {
       <ValidateLoggedIn />
       <div className="flex flex-row h-full">
         <Sidebar side="left" width="w-1/4 max-w-xs">
+          <Inventory />
         </Sidebar>
         <div className="flex flex-col flex-grow w-1/2 overflow-y-scroll">
           <Sidebar side="top" width="w-full">

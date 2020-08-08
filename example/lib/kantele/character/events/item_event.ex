@@ -20,10 +20,11 @@ defmodule Kantele.Character.ItemEvent do
       end)
 
     item = Items.get!(event.item_instance.item_id)
+    item_instance = %{event.item_instance | item: item}
 
     conn
     |> put_character(%{conn.character | inventory: inventory})
-    |> render(ItemView, "drop-commit", %{item: item})
+    |> render(ItemView, "drop-commit", %{item: item, item_instance: item_instance})
     |> render(CommandView, "prompt")
   end
 
@@ -37,10 +38,11 @@ defmodule Kantele.Character.ItemEvent do
     inventory = [event.item_instance | conn.character.inventory]
 
     item = Items.get!(event.item_instance.item_id)
+    item_instance = %{event.item_instance | item: item}
 
     conn
     |> put_character(%{conn.character | inventory: inventory})
-    |> render(ItemView, "pickup-commit", %{item: item})
+    |> render(ItemView, "pickup-commit", %{item: item, item_instance: item_instance})
     |> render(CommandView, "prompt")
   end
 end

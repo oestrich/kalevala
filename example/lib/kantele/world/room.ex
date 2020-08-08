@@ -50,6 +50,7 @@ defmodule Kantele.World.Room.Events do
       event("combat/stop", :call)
       event("combat/tick", :call)
       event("commands/delayed", :call)
+      event("inventory/list", :call)
     end
 
     module(LookEvent) do

@@ -15,6 +15,10 @@ export const getEvents = (state) => {
   return state.events;
 };
 
+export const getEventsInventory = (state) => {
+  return getEvents(state).inventory;
+};
+
 export const getEventsRoom = (state) => {
   return getEvents(state).room;
 };

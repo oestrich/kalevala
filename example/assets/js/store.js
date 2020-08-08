@@ -2,6 +2,7 @@ import { combineReducers, compose, createStore } from "redux";
 
 import {
   Creators as KalevalaCreators,
+  Types as KalevalaTypes,
   kalevalaMiddleware,
   promptReducer,
   socketReducer
@@ -28,8 +29,34 @@ const eventTextHandlers = {
     const { text } = event;
     dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
   },
-  "Character.Inventory": (dispatch, getState, event, { history }) => {
-    const { text } = event;
+  "Inventory.All": (dispatch, getState, event, { history }) => {
+    const { data, text, topic } = event;
+
+    dispatch(KalevalaCreators.socketReceivedEvent({
+      topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
+      data: { event: { topic, data } },
+    }, { history }));
+
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+  },
+  "Inventory.DropItem": (dispatch, getState, event, { history }) => {
+    const { data, text, topic } = event;
+
+    dispatch(KalevalaCreators.socketReceivedEvent({
+      topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
+      data: { event: { topic, data } },
+    }, { history }));
+
+    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
+  },
+  "Inventory.PickupItem": (dispatch, getState, event, { history }) => {
+    const { data, text, topic } = event;
+
+    dispatch(KalevalaCreators.socketReceivedEvent({
+      topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
+      data: { event: { topic, data } },
+    }, { history }));
+
     dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
   },
   "Login.Welcome": (dispatch, getState, event, { history }) => {
