@@ -89,23 +89,35 @@ const Characters = ({ characters }) => {
   );
 }
 
+let trimTags = (line) => {
+  if (line instanceof Array) {
+    return line.map(trimTags);
+  }
+
+  return line.replace(/{.*}/g, "");
+};
+
 let Room = ({ room }) => {
   if (!room) {
     return null;
   }
 
+  let { characters, description, exits, name } = room;
+
+  description = trimTags(description);
+
   return (
     <div className="flex m-4">
       <div className="w-full mr-4">
         <div className="p-4 bg-white rounded">
-          <div className="text-xl">{room.name}</div>
-          <div>{room.description}</div>
+          <div className="text-xl">{name}</div>
+          <div>{description}</div>
         </div>
         <div className="pt-2">
-          <Characters characters={room.characters} />
+          <Characters characters={characters} />
         </div>
       </div>
-      <Exits exits={room.exits} />
+      <Exits exits={exits} />
     </div>
   );
 }
