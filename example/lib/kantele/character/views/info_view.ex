@@ -1,7 +1,17 @@
 defmodule Kantele.Character.InfoView do
   use Kalevala.Character.View
 
+  alias Kalevala.Character.Conn.EventText
+
   def render("display", %{character: character}) do
+    %EventText{
+      topic: "Character.Info",
+      data: character,
+      text: render("_display", %{character: character})
+    }
+  end
+
+  def render("_display", %{character: character}) do
     vitals = character.meta.vitals
 
     ~i"""

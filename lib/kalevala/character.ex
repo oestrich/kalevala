@@ -18,14 +18,16 @@ defmodule Kalevala.Character do
 
   defimpl Jason.Encoder do
     def encode(character, opts) do
-      Jason.Encode.map(Map.take(character, [:description, :id, :name, :status]), opts)
+      meta = Kalevala.Meta.trim(character.meta)
+
+      character =
+        character
+        |> Map.take([:description, :id, :name, :status])
+        |> Map.put(:meta, meta)
+
+      Jason.Encode.map(character, opts)
     end
   end
-
-  @doc """
-  Reduce the size of the meta map before sending in an event
-  """
-  @callback trim_meta(meta :: map()) :: map()
 
   @doc """
   Generate a random ID

@@ -4,7 +4,6 @@ defmodule Kalevala.Character.Conn.Private do
   alias Kalevala.World.Room
 
   defstruct [
-    :character_module,
     :event_router,
     :next_controller,
     :request_id,
@@ -35,7 +34,7 @@ defmodule Kalevala.Character.Conn.Private do
         nil
 
       false ->
-        meta = conn.private.character_module.trim_meta(character.meta)
+        meta = Kalevala.Meta.trim(character.meta)
         %{character | inventory: :trimmed, meta: meta}
     end
   end

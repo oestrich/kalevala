@@ -18,7 +18,6 @@ defmodule Kalevala.Character.Foreman do
   defstruct [
     :callback_module,
     :character,
-    :character_module,
     :communication_module,
     :controller,
     :supervisor_name,
@@ -60,7 +59,6 @@ defmodule Kalevala.Character.Foreman do
 
     state = %__MODULE__{
       callback_module: opts.callback_module,
-      character_module: opts.character_module,
       communication_module: opts.communication_module,
       controller: opts.initial_controller,
       supervisor_name: opts.supervisor_name
@@ -77,7 +75,6 @@ defmodule Kalevala.Character.Foreman do
       character: state.character,
       session: state.session,
       private: %Conn.Private{
-        character_module: state.character_module,
         request_id: Conn.Private.generate_request_id()
       }
     }

@@ -27,7 +27,6 @@ defmodule Kantele.Application do
       ],
       foreman: [
         supervisor_name: Kantele.Character.Foreman.Supervisor,
-        character_module: Kantele.Character,
         communication_module: Kantele.Communication,
         initial_controller: Kantele.Character.LoginController,
         presence_module: Kantele.Character.Presence,
@@ -51,7 +50,6 @@ defmodule Kantele.Application do
       ],
       foreman: [
         supervisor_name: Kantele.Character.Foreman.Supervisor,
-        character_module: Kantele.Character,
         communication_module: Kantele.Communication,
         initial_controller: Kantele.Character.LoginController,
         presence_module: Kantele.Character.Presence,

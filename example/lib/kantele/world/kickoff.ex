@@ -85,7 +85,6 @@ defmodule Kantele.World.Kickoff do
   defp start_character(character) do
     config = [
       supervisor_name: Kalevala.World.CharacterSupervisor.global_name(character.meta.zone_id),
-      character_module: Kantele.Character,
       communication_module: Kantele.Communication,
       initial_controller: Kantele.Character.SpawnController,
       quit_view: {Kantele.Character.QuitView, "disconnected"}

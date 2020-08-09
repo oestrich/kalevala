@@ -19,7 +19,7 @@ defmodule Kantele.World.Item.Meta do
 
   defstruct []
 
-  defimpl Kalevala.Meta do
+  defimpl Kalevala.Meta.Trim do
     def trim(_meta), do: %{}
   end
 end

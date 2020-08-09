@@ -19,46 +19,34 @@ const composeEnhancers =
   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
 
+const dispatchEventText = (dispatch, getState, event, { history }) => {
+  const { data, text, topic } = event;
+
+  dispatch(KalevalaCreators.socketReceivedEvent({
+    topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
+    data: { event: { topic, data } },
+  }, { history }));
+
+  dispatch(KalevalaCreators.socketReceivedEvent({
+    topic: "system/display",
+    data: text
+  }, { history }));
+};
+
 const eventTextHandlers = {
   "Channel.Broadcast": (dispatch, getState, event, { history }) => {
     const { channel_name, character, id, text } = event.data;
     dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: "\n" }, { history }));
     dispatch(Creators.channelBroadcast(channel_name, character, id, text));
   },
+  "Character.Info": dispatchEventText,
   "Character.Prompt": (dispatch, getState, event, { history }) => {
     const { text } = event;
     dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
   },
-  "Inventory.All": (dispatch, getState, event, { history }) => {
-    const { data, text, topic } = event;
-
-    dispatch(KalevalaCreators.socketReceivedEvent({
-      topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
-      data: { event: { topic, data } },
-    }, { history }));
-
-    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
-  },
-  "Inventory.DropItem": (dispatch, getState, event, { history }) => {
-    const { data, text, topic } = event;
-
-    dispatch(KalevalaCreators.socketReceivedEvent({
-      topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
-      data: { event: { topic, data } },
-    }, { history }));
-
-    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
-  },
-  "Inventory.PickupItem": (dispatch, getState, event, { history }) => {
-    const { data, text, topic } = event;
-
-    dispatch(KalevalaCreators.socketReceivedEvent({
-      topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
-      data: { event: { topic, data } },
-    }, { history }));
-
-    dispatch(KalevalaCreators.socketReceivedEvent({ topic: "system/display", data: text }, { history }));
-  },
+  "Inventory.All": dispatchEventText,
+  "Inventory.DropItem": dispatchEventText,
+  "Inventory.PickupItem": dispatchEventText,
   "Login.Welcome": (dispatch, getState, event, { history }) => {
     dispatch(Creators.loginActive());
   },

@@ -2,13 +2,6 @@ defmodule Kantele.Character do
   @moduledoc """
   Character callbacks for Kalevala
   """
-
-  @behaviour Kalevala.Character
-
-  @impl true
-  def trim_meta(meta) do
-    Map.take(meta, [:vitals])
-  end
 end
 
 defmodule Kantele.Character.PlayerMeta do
@@ -17,6 +10,12 @@ defmodule Kantele.Character.PlayerMeta do
   """
 
   defstruct [:vitals]
+
+  defimpl Kalevala.Meta.Trim do
+    def trim(meta) do
+      Map.take(meta, [:vitals])
+    end
+  end
 end
 
 defmodule Kantele.Character.NonPlayerMeta do
@@ -25,6 +24,12 @@ defmodule Kantele.Character.NonPlayerMeta do
   """
 
   defstruct [:brain, :initial_events, :vitals, :zone_id]
+
+  defimpl Kalevala.Meta.Trim do
+    def trim(meta) do
+      Map.take(meta, [:vitals])
+    end
+  end
 end
 
 defmodule Kantele.Character.Vitals do
