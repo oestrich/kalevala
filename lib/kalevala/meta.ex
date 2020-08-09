@@ -16,6 +16,10 @@ defimpl Kalevala.Meta.Trim, for: Map do
 end
 
 defmodule Kalevala.Meta.Trimmed do
+  @moduledoc """
+  Struct to tag trimmed metadata as already trimmed
+  """
+
   defstruct []
 
   defimpl Kalevala.Meta.Trim do
@@ -30,6 +34,13 @@ defmodule Kalevala.Meta.Trimmed do
 end
 
 defmodule Kalevala.Meta do
+  @moduledoc """
+  Trim extra metadata on an instance metadata
+  """
+
+  @doc """
+  Trim extra metadata on an instance metadata
+  """
   def trim(meta) do
     meta
     |> Kalevala.Meta.Trim.trim()
