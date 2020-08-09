@@ -33,7 +33,7 @@ const eventReceived = (state, action) => {
       const { item_instances } = event.data;
       return {...state, inventory: item_instances};
 
-    case "Inventory.Drop":
+    case "Inventory.DropItem":
       return dropItem(state, event);
 
     case "Inventory.PickupItem":
@@ -49,8 +49,9 @@ const eventReceived = (state, action) => {
 
 const dropItem = (state, event) => {
   const { item_instance } = event.data;
-  console.log(item_instance);
-  return state;
+  let { inventory } = state;
+  inventory = inventory.filter(instance => instance.id != item_instance.id);
+  return {...state, inventory: inventory};
 };
 
 const pickupItem = (state, event) => {
