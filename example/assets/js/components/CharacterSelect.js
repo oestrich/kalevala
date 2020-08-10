@@ -37,6 +37,8 @@ class CharacterSelect extends React.Component {
           <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <p className="text-center mb-4">Enter in a character name to play as. This is how characters will refer to you.</p>
 
+            <p className="mb-4 text-sm text-center italic">Note: At the moment any character name will work.</p>
+
             <div className="mb-4">
               <input
                 autoFocus={true}

@@ -38,6 +38,8 @@ class Login extends React.Component {
           <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <p className="mb-4 text-center">Welcome to Kantele, a modern text multiplayer RPG.</p>
 
+            <p className="mb-4 text-sm text-center italic">Note: At the moment any username and password will work.</p>
+
             <div className="mb-4">
               <input
                 autoFocus={true}
