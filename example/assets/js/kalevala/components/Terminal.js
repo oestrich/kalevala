@@ -5,6 +5,12 @@ import { parse256Color } from "./colors";
 import { getSocketLines } from "../redux";
 import Tooltip from "./Tooltip";
 
+const tooltipTags = {
+  "ep": "Endurance Points",
+  "hp": "Health Points",
+  "sp": "Skill Points",
+};
+
 const theme = {
   colors: {
     black: "#373737",
@@ -94,6 +100,14 @@ export class Tag extends React.Component {
 
     if (this.props.customTags[tag.name]) {
       return this.props.customTags[tag.name](tag);
+    }
+
+    if (tooltipTags[tag.name]) {
+      return (
+        <Tooltip text={tooltipTags[tag.name]}>
+          <Tags children={tag.children} customTags={this.props.customTags} />
+        </Tooltip>
+      );
     }
 
     switch (tag.name) {

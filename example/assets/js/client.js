@@ -102,20 +102,16 @@ import { Tags } from  "./kalevala/components/Terminal";
 const customTags = {
   "character": (tag) => {
     return (
-      <>
-        <Tooltip text={tag.attributes.description}>
-          <Tags children={tag.children} />
-        </Tooltip>
-      </>
+      <Tooltip text={tag.attributes.description}>
+        <Tags children={tag.children} customTags={customTags} />
+      </Tooltip>
     );
   },
   "item": (tag) => {
     return (
-      <>
-        <Tooltip text={tag.attributes.description}>
-          <Tags children={tag.children} />
-        </Tooltip>
-      </>
+      <Tooltip text={tag.attributes.description}>
+        <Tags children={tag.children} customTags={customTags} />
+      </Tooltip>
     );
   }
 };
