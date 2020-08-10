@@ -4,7 +4,7 @@ defmodule Kantele.Character.CharacterView do
   alias Kalevala.Character.Conn.Event
 
   def render("name", %{character: character}) do
-    ~i({character id="#{character.id}"}#{character.name}{/character})
+    ~i({character id="#{character.id}" description="#{character.description}"}#{character.name}{/character})
   end
 
   def render("vitals", %{character: character}) do

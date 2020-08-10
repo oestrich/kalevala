@@ -1,12 +1,15 @@
 import React from "react";
 import { connect } from 'react-redux';
+import { Tooltip } from "../kalevala";
 
 import { getEventsInventory } from "../redux";
 
 const Item = ({ itemInstance }) => {
   return (
-    <div className="block bg-white roudned p-4 m-2">
-      {itemInstance.item.name}
+    <div className="m-2 block bg-white rounded p-4 relative">
+      <Tooltip text={itemInstance.item.description}>
+        {itemInstance.item.name}
+      </Tooltip>
     </div>
   );
 };

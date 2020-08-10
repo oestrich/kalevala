@@ -96,9 +96,33 @@ const mapStateToProps = (state) => {
 
 ValidateLoggedIn = connect(mapStateToProps)(ValidateLoggedIn);
 
+import { Tooltip } from "./kalevala";
+import { Tags } from  "./kalevala/components/Terminal";
+
+const customTags = {
+  "character": (tag) => {
+    return (
+      <>
+        <Tooltip text={tag.attributes.description}>
+          <Tags children={tag.children} />
+        </Tooltip>
+      </>
+    );
+  },
+  "item": (tag) => {
+    return (
+      <>
+        <Tooltip text={tag.attributes.description}>
+          <Tags children={tag.children} />
+        </Tooltip>
+      </>
+    );
+  }
+};
+
 const Client = () => {
   return (
-    <>
+    <div className="relative">
       <ValidateLoggedIn />
       <div className="flex flex-row h-full">
         <Sidebar side="left" width="w-1/4 max-w-xs">
@@ -108,14 +132,14 @@ const Client = () => {
           <Sidebar side="top" width="w-full">
             <Room />
           </Sidebar>
-          <Terminal />
+          <Terminal customTags={customTags} />
           <Prompt />
         </div>
         <Sidebar side="right" width="w-1/4 max-w-xs">
           <Channels />
         </Sidebar>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
+import { Tooltip } from "../kalevala";
 
 import { Creators, getEventsRoom } from "../redux";
 
@@ -71,9 +72,13 @@ Exits = connect(null, {
   moveDown: Creators.moveDown,
 })(Exits);
 
-const Character = ({ name }) => {
+const Character = ({ description, name }) => {
   return (
-    <span className="mr-2 bg-white rounded p-2" style={{color: "#cfad00"}}>{name}</span>
+    <div className="mr-2 bg-white rounded p-2" style={{color: "#cfad00"}}>
+      <Tooltip text={description}>
+        {name}
+      </Tooltip>
+    </div>
   );
 };
 
@@ -82,7 +87,7 @@ const Characters = ({ characters }) => {
     <div className="flex">
       {characters.map((character) => {
         return (
-          <Character key={character.id} name={character.name} />
+          <Character key={character.id} description={character.description} name={character.name} />
         );
       })}
     </div>

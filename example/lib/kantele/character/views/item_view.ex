@@ -12,7 +12,7 @@ defmodule Kantele.Character.ItemView do
   end
 
   def render("name", %{item: item}) do
-    ~i({item id="#{item.id}"}#{item.name}{/item})
+    ~i({item id="#{item.id}" description="#{item.description}"}#{item.name}{/item})
   end
 
   def render("drop-abort", %{reason: :no_item, item_name: item_name}) do

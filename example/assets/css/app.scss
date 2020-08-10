@@ -34,6 +34,14 @@
   @apply outline-none shadow-outline;
 }
 
+.tooltip {
+  @apply absolute hidden mt-1 z-50 bg-black text-white text-sm rounded py-1 px-4 opacity-75 border-solid border border-gray-600;
+}
+
+.tooltip-hover:hover .tooltip {
+  @apply block;
+}
+
 @tailwind utilities;
 
 .blink {

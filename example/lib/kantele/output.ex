@@ -21,12 +21,23 @@ defmodule Kantele.Output.Macros do
 
     quote do
       def parse({:open, unquote(tag_name), attributes}, context) do
-        attributes = Map.merge(attributes, unquote(Macro.escape(options)))
-        Map.put(context, :data, context.data ++ [{:open, "color", attributes}])
+        color_attributes = Map.merge(attributes, unquote(Macro.escape(options)))
+
+        tags = [
+          {:open, "color", color_attributes},
+          {:open, unquote(tag_name), attributes}
+        ]
+
+        Map.put(context, :data, context.data ++ tags)
       end
 
       def parse({:close, unquote(tag_name)}, context) do
-        Map.put(context, :data, context.data ++ [{:close, "color"}])
+        tags = [
+          {:close, unquote(tag_name)},
+          {:close, "color"}
+        ]
+
+        Map.put(context, :data, context.data ++ tags)
       end
     end
   end
