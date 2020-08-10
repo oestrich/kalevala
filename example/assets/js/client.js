@@ -19,6 +19,7 @@ import {
   Room,
   Sidebar
 } from "./components";
+import { customTags } from "./customTags";
 import { Creators, getLoginStatus } from "./redux";
 import { makeStore } from "./store";
 
@@ -95,26 +96,6 @@ const mapStateToProps = (state) => {
 };
 
 ValidateLoggedIn = connect(mapStateToProps)(ValidateLoggedIn);
-
-import { Tooltip } from "./kalevala";
-import { Tags } from  "./kalevala/components/Terminal";
-
-const customTags = {
-  "character": (tag) => {
-    return (
-      <Tooltip text={tag.attributes.description}>
-        <Tags children={tag.children} customTags={customTags} />
-      </Tooltip>
-    );
-  },
-  "item": (tag) => {
-    return (
-      <Tooltip text={tag.attributes.description}>
-        <Tags children={tag.children} customTags={customTags} />
-      </Tooltip>
-    );
-  }
-};
 
 const Client = () => {
   return (
