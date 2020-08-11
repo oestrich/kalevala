@@ -63,9 +63,16 @@ export class ColorTag extends React.Component {
       background = `rgb(${background})`;
     }
 
+    let textDecoration = null;
+
+    if (attributes.underline === "true") {
+      textDecoration = "underline";
+    }
+
     return {
       color: foreground,
       backgroundColor: background,
+      textDecoration,
     };
   }
 
@@ -90,16 +97,16 @@ export class SentText extends React.Component {
   }
 }
 
-export class Tag extends React.Component {
+class Tag extends React.Component {
   render() {
-    const { tag } = this.props;
+    const { customTags, dispatch, tag } = this.props;
 
     if (typeof tag === "string") {
       return tag;
     }
 
     if (this.props.customTags[tag.name]) {
-      return this.props.customTags[tag.name](tag);
+      return this.props.customTags[tag.name](tag, customTags, dispatch);
     }
 
     if (tooltipTags[tag.name]) {
@@ -137,6 +144,10 @@ export class Tag extends React.Component {
     }
   }
 }
+
+Tag = connect(() => { return {} })(Tag);
+
+export { Tag };
 
 export class Tags extends React.Component {
   render() {

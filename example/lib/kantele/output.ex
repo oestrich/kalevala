@@ -110,6 +110,7 @@ defmodule Kantele.Output.SemanticColors do
   import Kantele.Output.Macros, only: [color: 2]
 
   color("character", foreground: "yellow")
+  color("exit", foreground: "white")
   color("item", foreground: "cyan")
   color("text", foreground: "green")
   color("room-title", foreground: "blue", underline: true)
@@ -186,6 +187,46 @@ defmodule Kantele.Output.Tooltips do
 
   tooltip("character", "description")
   tooltip("item", "description")
+
+  @impl true
+  def parse(datum, context) do
+    Map.put(context, :data, context.data ++ [datum])
+  end
+end
+
+defmodule Kantele.Output.Commands do
+  @moduledoc """
+  Wrap tags in command tags to send text by clicking
+  """
+
+  use Kalevala.Output
+
+  @impl true
+  def init(opts) do
+    %Context{
+      data: [],
+      opts: opts,
+      meta: %{}
+    }
+  end
+
+  def parse({:open, "exit", attributes}, context) do
+    tags = [
+      {:open, "command", %{"send" => attributes["name"]}},
+      {:open, "exit", attributes}
+    ]
+
+    Map.put(context, :data, context.data ++ tags)
+  end
+
+  def parse({:close, "exit"}, context) do
+    tags = [
+      {:close, "exit"},
+      {:close, "command"}
+    ]
+
+    Map.put(context, :data, context.data ++ tags)
+  end
 
   @impl true
   def parse(datum, context) do

@@ -45,6 +45,7 @@ defmodule Kantele.Application do
           Kantele.Output.AdminTags,
           Kantele.Output.SemanticColors,
           Kantele.Output.Tooltips,
+          Kantele.Output.Commands,
           Kalevala.Output.Tables,
           Kalevala.Output.Websocket
         ]

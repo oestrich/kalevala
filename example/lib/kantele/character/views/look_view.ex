@@ -51,7 +51,7 @@ defmodule Kantele.Character.LookView do
     exits =
       room.exits
       |> Enum.map(fn room_exit ->
-        ~i({color foreground="white"}#{room_exit.exit_name}{/color})
+        ~i({exit name="#{room_exit.exit_name}"}#{room_exit.exit_name}{/exit})
       end)
       |> View.join(" ")
 
