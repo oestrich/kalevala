@@ -7,7 +7,6 @@ const INITIAL_STATE = {
 };
 
 const channelBroadcast = (state, action) => {
-  console.log(action);
   const { channelName, character, id, text } = action.data;
 
   const message = {

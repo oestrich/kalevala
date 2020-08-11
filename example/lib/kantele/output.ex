@@ -166,9 +166,9 @@ end
 
 defmodule Kantele.Output.Tooltips do
   @moduledoc """
-  Parse admin specific tags
+  Process tags to wrap in a tooltip tag
 
-  Display things like item instance ids when present
+  Parse out a specific key to generate a new tooltip with the appropriate text
   """
 
   use Kalevala.Output

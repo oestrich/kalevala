@@ -29,8 +29,6 @@ const characterLeft = (state, action) => {
 
 const characterLoggedIn = (state, action) => {
   const { character } = action.data;
-  console.log("hi", character);
-
   return { ...state, character: character };
 };
 
@@ -68,7 +66,6 @@ const dropItem = (state, event) => {
 
 const pickupItem = (state, event) => {
   const { item_instance } = event.data;
-  console.log({...state, inventory: [item_instance, ...state.inventory]});
   return {...state, inventory: [item_instance, ...state.inventory]};
 };
 
