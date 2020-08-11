@@ -73,6 +73,31 @@ defmodule Kantele.Output.Macros do
       end
     end
   end
+
+  @doc """
+  Define a tag with a tooltip
+  """
+  defmacro tooltip(tag_name, text_key) do
+    quote do
+      def parse({:open, unquote(tag_name), attributes}, context) do
+        tags = [
+          {:open, "tooltip", %{"text" => Map.get(attributes, unquote(text_key))}},
+          {:open, unquote(tag_name), attributes}
+        ]
+
+        Map.put(context, :data, context.data ++ tags)
+      end
+
+      def parse({:close, unquote(tag_name)}, context) do
+        tags = [
+          {:close, unquote(tag_name)},
+          {:close, "tooltip"}
+        ]
+
+        Map.put(context, :data, context.data ++ tags)
+      end
+    end
+  end
 end
 
 defmodule Kantele.Output.SemanticColors do
@@ -132,6 +157,35 @@ defmodule Kantele.Output.AdminTags do
   metadata("room-title", "95,95,95", fn attributes ->
     ~i( #{attributes["id"]})
   end)
+
+  @impl true
+  def parse(datum, context) do
+    Map.put(context, :data, context.data ++ [datum])
+  end
+end
+
+defmodule Kantele.Output.Tooltips do
+  @moduledoc """
+  Parse admin specific tags
+
+  Display things like item instance ids when present
+  """
+
+  use Kalevala.Output
+
+  import Kantele.Output.Macros, only: [tooltip: 2]
+
+  @impl true
+  def init(opts) do
+    %Context{
+      data: [],
+      opts: opts,
+      meta: %{}
+    }
+  end
+
+  tooltip("character", "description")
+  tooltip("item", "description")
 
   @impl true
   def parse(datum, context) do

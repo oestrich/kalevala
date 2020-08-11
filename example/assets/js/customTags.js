@@ -11,6 +11,4 @@ export const tooltipTag = (tag) => {
 };
 
 export const customTags = {
-  "character": tooltipTag,
-  "item": tooltipTag,
 };

@@ -116,6 +116,13 @@ export class Tag extends React.Component {
           <ColorTag children={tag.children} attributes={tag.attributes} customTags={this.props.customTags} />
         );
 
+      case "tooltip":
+        return (
+          <Tooltip text={tag.attributes.text} customTags={this.props.customTags}>
+            <Tags children={tag.children} customTags={this.props.customTags} />
+          </Tooltip>
+        );
+
       case "sent-text":
         return (
           <SentText children={tag.children} customTags={this.props.customTags} />
