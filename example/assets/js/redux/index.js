@@ -15,6 +15,14 @@ export const getEvents = (state) => {
   return state.events;
 };
 
+export const getEventsCharacter = (state) => {
+  return getEvents(state).character;
+};
+
+export const getEventsVitals = (state) => {
+  return getEvents(state).vitals;
+};
+
 export const getEventsInventory = (state) => {
   return getEvents(state).inventory;
 };

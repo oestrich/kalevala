@@ -69,4 +69,4 @@ let mapStateToProps = (state) => {
 
 Channels = connect(mapStateToProps)(Channels);
 
-export { Channels };
+export default Channels;

@@ -17,7 +17,8 @@ import {
   Inventory,
   Login,
   Room,
-  Sidebar
+  Sidebar,
+  Vitals,
 } from "./components";
 import { customTags } from "./customTags";
 import { Creators, getLoginStatus } from "./redux";
@@ -103,6 +104,7 @@ const Client = () => {
       <ValidateLoggedIn />
       <div className="flex flex-row h-full">
         <Sidebar side="left" width="w-1/4 max-w-xs">
+          <Vitals />
           <Inventory />
         </Sidebar>
         <div className="flex flex-col flex-grow w-1/2 overflow-y-scroll">

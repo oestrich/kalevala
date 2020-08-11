@@ -25,8 +25,8 @@ export const Creators = {
   loginActive: () => {
     return { type: Types.LOGIN_ACTIVE };
   },
-  loggedIn: () => {
-    return { type: Types.LOGGED_IN };
+  loggedIn: (character) => {
+    return { type: Types.LOGGED_IN, data: { character } };
   },
   moveNorth: () => {
     return (dispatch) => {

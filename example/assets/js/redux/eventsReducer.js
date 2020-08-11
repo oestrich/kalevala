@@ -3,8 +3,10 @@ import { createReducer, Types as KalevalaTypes } from "../kalevala";
 import { Types } from "./actions";
 
 const INITIAL_STATE = {
+  character: null,
   inventory: [],
-  room: null
+  room: null,
+  vitals: null,
 };
 
 const characterEntered = (state, action) => {
@@ -25,10 +27,20 @@ const characterLeft = (state, action) => {
   return { ...state, room: { ...state.room, characters } };
 };
 
+const characterLoggedIn = (state, action) => {
+  const { character } = action.data;
+  console.log("hi", character);
+
+  return { ...state, character: character };
+};
+
 const eventReceived = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
+    case "Character.Vitals":
+      return {...state, vitals: event.data};
+
     case "Inventory.All":
       const { item_instances } = event.data;
       return {...state, inventory: item_instances};
@@ -62,6 +74,7 @@ const pickupItem = (state, event) => {
 
 const HANDLERS = {
   [KalevalaTypes.SOCKET_RECEIVED_EVENT]: eventReceived,
+  [Types.LOGGED_IN]: characterLoggedIn,
   [Types.ROOM_CHARACTER_ENTERED]: characterEntered,
   [Types.ROOM_CHARACTER_LEFT]: characterLeft,
 };

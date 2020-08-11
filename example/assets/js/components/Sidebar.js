@@ -18,10 +18,10 @@ const borderColor = (side) => {
 
 const Sidebar = ({ children, side, width }) => {
   return (
-    <div className={`text-black bg-gray-200 border-blue-200 ${borderColor(side)} ${width}`}>
+    <div className={`flex flex-col text-black bg-gray-200 border-blue-200 ${borderColor(side)} ${width}`}>
       {children}
     </div>
   );
 };
 
-export {Sidebar};
+export default Sidebar;
