@@ -9,10 +9,14 @@ class Exit extends React.Component {
     const activeClassName = this.props.active ? "bg-teal-500 cursor-pointer" : "bg-gray-500 cursor-not-allowed";
     const className = `${this.props.className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
 
+    const tooltipText = this.props.active ? `Move ${this.props.direction}` : null;
+
     return (
-      <div className={className} onClick={this.props.move}>
-        {this.props.direction}
-      </div>
+      <Tooltip text={tooltipText} className={className}>
+        <div onClick={this.props.move}>
+          {this.props.direction}
+        </div>
+      </Tooltip>
     );
   }
 }
