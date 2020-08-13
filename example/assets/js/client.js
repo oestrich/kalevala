@@ -18,6 +18,7 @@ import {
   Login,
   Room,
   Sidebar,
+  SidebarSplit,
   Vitals,
 } from "./components";
 import { customTags } from "./customTags";
@@ -105,6 +106,7 @@ const Client = () => {
       <div className="flex flex-row h-full">
         <Sidebar side="left" width="w-1/4 max-w-xs">
           <Vitals />
+          <SidebarSplit />
           <Inventory />
         </Sidebar>
         <div className="flex flex-col flex-grow w-1/2 overflow-y-scroll">

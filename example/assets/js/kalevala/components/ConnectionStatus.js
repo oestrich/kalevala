@@ -6,7 +6,7 @@ import { getSocketConnectionState } from "../redux";
 class ConnectionStatus extends React.Component {
   connectionClassName() {
     if (this.props.connected) {
-      return "bg-green-500";
+      return "bg-teal-500";
     } else {
       return "bg-red-500";
     }

@@ -5,11 +5,11 @@ import { getChannelMessages } from "../redux";
 
 const Message = ({ channelName, character, id, text }) => {
   return (
-    <span className="block bg-white rounded p-4 m-2">
-      <div className="block">
-        <span className="text-gray-600">[{channelName}]</span> <span className="text-yellow-700">{character.name}</span> says,
+    <span className="block bg-gray-800 border border-teal-800 rounded p-4 m-2">
+      <div className="block text-gray-200">
+        <span className="text-gray-500">[{channelName}]</span> <span className="text-yellow-600">{character.name}</span> says,
       </div>
-      <span className="text-green-600">{text}</span>
+      <span className="text-green-500">{text}</span>
     </span>
   );
 };
@@ -47,7 +47,7 @@ class Channels extends React.Component {
 
     return (
       <div className="flex flex-col h-full">
-        <h3 className="text-xl p-4">Communications</h3>
+        <h3 className="text-xl text-gray-200 p-4">Communications</h3>
         <div className="flex-grow overflow-y-scroll" ref={el => { this.messages = el; }}>
           {messages.map(({ channelName, character, id, text }) => {
             return (

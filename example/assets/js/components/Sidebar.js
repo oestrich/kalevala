@@ -18,10 +18,19 @@ const borderColor = (side) => {
 
 const Sidebar = ({ children, side, width }) => {
   return (
-    <div className={`flex flex-col text-black bg-gray-200 border-blue-200 ${borderColor(side)} ${width}`}>
+    <div className={`flex flex-col text-black bg-gray-900 border-teal-900 ${borderColor(side)} ${width}`}>
       {children}
     </div>
   );
 };
 
+const SidebarSplit = () => {
+  return (
+    <div className="w-full px-2">
+      <div className="border border-teal-900 w-full" />
+    </div>
+  );
+};
+
 export default Sidebar;
+export { SidebarSplit };

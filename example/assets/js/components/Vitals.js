@@ -20,7 +20,7 @@ let Vitals = ({ character, vitals }) => {
 
   return (
     <div className="flex flex-col">
-      <h3 className="text-xl px-4 pt-4">{character.name}</h3>
+      <h3 className="text-xl text-gray-200 px-4 pt-4">{character.name}</h3>
       <div className="p-2 w-full">
         <div className="relative my-2 rounded bg-gray-600">
           <div className="bg-red-600 rounded absolute inset-0 z-0" style={{width: `${healthWidth}%`}} />

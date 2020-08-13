@@ -6,7 +6,7 @@ import { Creators, getEventsRoom } from "../redux";
 
 class Exit extends React.Component {
   render() {
-    const activeClassName = this.props.active ? "bg-teal-500 cursor-pointer" : "bg-gray-500 cursor-not-allowed";
+    const activeClassName = this.props.active ? "bg-teal-600 cursor-pointer" : "bg-gray-700 border border-teal-800 cursor-not-allowed";
     const className = `${this.props.className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
 
     const tooltipText = this.props.active ? `Move ${this.props.direction}` : null;
@@ -78,7 +78,7 @@ Exits = connect(null, {
 
 const Character = ({ description, name }) => {
   return (
-    <div className="mr-2 bg-white rounded p-2" style={{color: "#cfad00"}}>
+    <div className="mr-2 bg-gray-800 border border-teal-800 rounded p-2" style={{color: "#cfad00"}}>
       <Tooltip text={description}>
         {name}
       </Tooltip>
@@ -118,7 +118,7 @@ let Room = ({ room }) => {
   return (
     <div className="flex m-4">
       <div className="w-full mr-4">
-        <div className="p-4 bg-white rounded">
+        <div className="p-4 bg-gray-800 text-gray-200 border border-teal-800 rounded">
           <div className="text-xl">{name}</div>
           <div>{description}</div>
         </div>

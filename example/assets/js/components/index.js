@@ -4,7 +4,7 @@ import Home from "./Home";
 import Inventory from "./Inventory";
 import Login from "./Login";
 import Room from "./Room";
-import Sidebar from "./Sidebar";
+import Sidebar, { SidebarSplit } from "./Sidebar";
 import Vitals from "./Vitals";
 
 export {
@@ -15,5 +15,6 @@ export {
   Login,
   Room,
   Sidebar,
+  SidebarSplit,
   Vitals,
 };
