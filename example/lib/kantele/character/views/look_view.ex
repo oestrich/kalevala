@@ -9,10 +9,11 @@ defmodule Kantele.Character.LookView do
     %EventText{
       topic: "Room.Info",
       data: %{
-        name: room.name,
+        characters: characters,
         description: render("_description", %{room: room}),
         exits: Enum.map(room.exits, fn room_exit -> room_exit.exit_name end),
-        characters: characters
+        item_instances: item_instances,
+        name: room.name
       },
       text:
         render("look.text", %{
@@ -78,7 +79,7 @@ defmodule Kantele.Character.LookView do
   def render("_items", %{item_instances: item_instances}) do
     items =
       item_instances
-      |> Enum.map(&ItemView.render("name", %{item_instance: &1}))
+      |> Enum.map(&ItemView.render("name", %{item_instance: &1, context: :room}))
       |> View.join(", ")
 
     View.join(["Items:", items], " ")

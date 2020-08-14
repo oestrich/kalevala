@@ -185,9 +185,6 @@ defmodule Kantele.Output.Tooltips do
     }
   end
 
-  tooltip("character", "description")
-  tooltip("item", "description")
-
   @impl true
   def parse(datum, context) do
     Map.put(context, :data, context.data ++ [datum])

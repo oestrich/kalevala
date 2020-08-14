@@ -1,24 +1,32 @@
-import React from "react";
-import { Creators, Tooltip } from "./kalevala";
-import { Tags } from  "./kalevala/components/Terminal";
+import React, { useState } from "react";
+import { renderTags } from  "./kalevala/components/Terminal";
+
+import { CommandWrapper, ItemWrapper } from "./components";
 
 export const customTags = {
-  "command": (tag, customTags, dispatch) => {
-    const send = (e) => {
-      dispatch(Creators.socketSendEvent({
-        topic: "system/send",
-        data: {
-          text: tag.attributes.send
-        }
-      }));
-    };
-
+  "character": (tag) => {
     return (
-      <Tooltip text={`Send "${tag.attributes.send}"`}>
-        <span className="underline cursor-pointer" onClick={send}>
-          <Tags children={tag.children} customTags={customTags} />
-        </span>
-      </Tooltip>
+      <span className="tooltip-hover inline-block">
+        {renderTags(tag.children)}
+        <div className="tooltip font-sans">
+          <h3 className="text-xl">{tag.attributes.name}</h3>
+          <p>{tag.attributes.description}</p>
+        </div>
+      </span>
+    );
+  },
+  "item": (tag) => {
+    return (
+      <ItemWrapper attributes={tag.attributes}>
+        {renderTags(tag.children)}
+      </ItemWrapper>
+    );
+  },
+  "command": (tag) => {
+    return (
+      <CommandWrapper send={tag.attributes.send}>
+        {renderTags(tag.children)}
+      </CommandWrapper>
     );
   },
 };

@@ -6,13 +6,13 @@ const arrayWrap = (data) => {
   return data;
 };
 
-const generateLineId = () => {
+const generateTagId = () => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
 
 class Line {
-  constructor(text) {
-    this.id = generateLineId();
+  constructor(text, id) {
+    this.id = id || generateTagId();
     this.children = arrayWrap(text);
   }
 }
@@ -36,6 +36,7 @@ const splitString = (string) => {
   let context = strings.reduce(reducer, {strings: [], current: []});
 
   context.strings = context.strings.concat([context.current]);
+  context.strings.id = generateTagId();
 
   return context.strings;
 }
@@ -53,27 +54,53 @@ const flattenChildren = (children) => {
   };
 
   let context = children.reduce(reducer, {children: [], current: []});
-  return context.children.concat([context.current]);
+  children = context.children.concat([context.current]);
+  children.id = generateTagId();
+  return children;
 };
 
 const parseTag = (tag) => {
+  let children;
+
   if (typeof tag === "string") {
-    return splitString(tag);
+    children = splitString(tag).map(strings => {
+      if (strings instanceof Array) {
+        let children = strings.map(string => {
+          return { id: generateTagId(), name: "string", text: string };
+        });
+
+        children.id = generateTagId();
+        return children;
+      }
+
+      // LineBreak
+      return strings;
+    });
+
+    children.id = generateTagId();
+    return children;
   };
 
   if (tag instanceof Array) {
-    return tag.map(parseTag).flat();
+    let children = tag.map(parseTag).flat();
+    children.id = generateTagId();
+    return children;
   }
 
-  let children = tag.children.map(parseTag).flat();
-
-  return flattenChildren(children).map((children) => {
+  children = tag.children.map(parseTag).flat();
+  children = flattenChildren(children).map((children) => {
     if (children === LineBreak) {
       return LineBreak;
     }
 
-    return { ...tag, children: arrayWrap(children) };
+    children = arrayWrap(children);
+    children.id = generateTagId();
+
+    return { ...tag, id: generateTagId(), children };
   });
+
+  children.id = generateTagId();
+  return children;
 };
 
 const parseText = (input) => {
@@ -83,7 +110,7 @@ const parseText = (input) => {
     return tag != LineBreak;
   }).map((tag) => {
     return new Line(tag);
-  });;
+  });
 };
 
 export default parseText;

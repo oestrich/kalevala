@@ -1,4 +1,4 @@
-import parseText, { Line, LineBreak, parseTag } from "./parseText";
+import parseText, { Children, Line, LineBreak, parseTag } from "./parseText";
 
 describe("breaking apart a single tag", () => {
   test("has no line breaks", () => {
@@ -10,7 +10,22 @@ describe("breaking apart a single tag", () => {
 
     let tags = parseTag(tag); 
 
-    expect(tags).toEqual([tag]);
+    let expected = [
+      {
+        id: expect.anything(),
+        name: "color",
+        attributes: { foreground: "red" },
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "text",
+          }
+        ],
+      }
+    ];
+
+    expect(tags).toEqual(expected);
   });
 
   test("one line break", () => {
@@ -24,15 +39,29 @@ describe("breaking apart a single tag", () => {
 
     expect(tags).toEqual([
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["one"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "one",
+          }
+        ],
       },
       LineBreak,
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["line"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "line",
+          }
+        ],
       }
     ]);
   });
@@ -48,21 +77,42 @@ describe("breaking apart a single tag", () => {
 
     expect(tags).toEqual([
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["one line"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "one line",
+          },
+        ],
       },
       LineBreak,
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["two line"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "two line",
+          },
+        ],
       },
       LineBreak,
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["three line"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "three line",
+          },
+        ],
       },
     ]);
   });
@@ -78,21 +128,47 @@ describe("breaking apart a single tag", () => {
 
     expect(tags).toEqual([
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["one"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "one",
+          },
+        ],
       },
       LineBreak,
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["line", "two"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "line",
+          },
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "two",
+          },
+        ],
       },
       LineBreak,
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
-        children: ["line"],
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "line",
+          },
+        ],
       }
     ]);
   });
@@ -115,32 +191,59 @@ describe("breaking apart a single tag", () => {
 
     expect(tags).toEqual([
       {
-        name: "color",
-        attributes: { foreground: "red" },
-        children: ["one"],
-      },
-      LineBreak,
-      {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
         children: [
-          "line",
           {
+            id: expect.anything(),
+            name: "string",
+            text: "one",
+          },
+        ],
+      },
+      LineBreak,
+      {
+        id: expect.anything(),
+        name: "color",
+        attributes: { foreground: "red" },
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "line",
+          },
+          {
+            id: expect.anything(),
             name: "color",
             attributes: { foreground: "green" },
-            children: ["two"]
+            children: [
+              {
+                id: expect.anything(),
+                name: "string",
+                text: "two",
+              },
+            ],
           }
         ],
       },
       LineBreak,
       {
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
         children: [
           {
+            id: expect.anything(),
             name: "color",
             attributes: { foreground: "green" },
-            children: ["line"]
+            children: [
+              {
+                id: expect.anything(),
+                name: "string",
+                text: "line",
+              },
+            ]
           }
         ],
       },
@@ -153,8 +256,16 @@ describe("processing text output from the game into separate lines", () => {
     let lines = parseText(["new lines \n of text"]);
 
     expect(lines).toEqual([
-      new Line("new lines "),
-      new Line(" of text"),
+      new Line({
+        id: expect.anything(),
+        name: "string",
+        text: "new lines ",
+      }, expect.anything()),
+      new Line({
+        id: expect.anything(),
+        name: "string",
+        text: " of text",
+      }, expect.anything()),
     ]);
   });
 
@@ -162,9 +273,33 @@ describe("processing text output from the game into separate lines", () => {
     let lines = parseText(["new lines \n of text", [[" extra"], " \ntext"]]);
 
     expect(lines).toEqual([
-      new Line("new lines "),
-      new Line([" of text", " extra", " "]),
-      new Line("text"),
+      new Line({
+        id: expect.anything(),
+        name: "string",
+        text: "new lines ",
+      }, expect.anything()),
+      new Line([
+        {
+          id: expect.anything(),
+          name: "string",
+          text: " of text",
+        },
+        {
+          id: expect.anything(),
+          name: "string",
+          text: " extra",
+        },
+        {
+          id: expect.anything(),
+          name: "string",
+          text: " ",
+        },
+      ], expect.anything()),
+      new Line({
+        id: expect.anything(),
+        name: "string",
+        text: "text",
+      }, expect.anything()),
     ]);
   });
 
@@ -187,34 +322,65 @@ describe("processing text output from the game into separate lines", () => {
 
     expect(lines).toEqual([
       new Line({
-        name: "color",
-        attributes: { foreground: "red" },
-        children: ["new lines "]
-      }),
-      new Line({
-        name: "color",
-        attributes: { foreground: "red" },
-        children: [
-          " of text",
-          {
-            name: "color",
-            attributes: { foreground: "green" },
-            children: ["separate"]
-          },
-        ],
-      }),
-      new Line({
+        id: expect.anything(),
         name: "color",
         attributes: { foreground: "red" },
         children: [
           {
+            id: expect.anything(),
+            name: "string",
+            text: "new lines ",
+          },
+        ],
+      }, expect.anything()),
+      new Line({
+        id: expect.anything(),
+        name: "color",
+        attributes: { foreground: "red" },
+        children: [
+          {
+            id: expect.anything(),
+            name: "string",
+            text: " of text",
+          },
+          {
+            id: expect.anything(),
             name: "color",
             attributes: { foreground: "green" },
-            children: ["color"],
+            children: [
+              {
+                id: expect.anything(),
+                name: "string",
+                text: "separate",
+              },
+            ]
           },
-          "back to red",
         ],
-      }),
+      }, expect.anything()),
+      new Line({
+        id: expect.anything(),
+        name: "color",
+        attributes: { foreground: "red" },
+        children: [
+          {
+            id: expect.anything(),
+            name: "color",
+            attributes: { foreground: "green" },
+            children: [
+              {
+                id: expect.anything(),
+                name: "string",
+                text: "color",
+              },
+            ],
+          },
+          {
+            id: expect.anything(),
+            name: "string",
+            text: "back to red",
+          },
+        ],
+      }, expect.anything()),
     ]);
   });
 });

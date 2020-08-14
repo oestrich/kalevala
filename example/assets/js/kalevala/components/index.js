@@ -1,8 +1,9 @@
 import Prompt from "./Prompt";
-import Terminal from "./Terminal";
+import Terminal, { CustomTagsContext } from "./Terminal";
 import Tooltip from "./Tooltip";
 
 export {
+  CustomTagsContext,
   Prompt,
   Terminal,
   Tooltip,

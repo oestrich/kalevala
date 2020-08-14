@@ -3,16 +3,20 @@ defmodule Kantele.Character.ItemView do
 
   alias Kalevala.Character.Conn.EventText
 
-  def render("name", %{item_instance: item_instance}) do
+  def render("name", %{item_instance: item_instance} = attributes) do
+    context = Map.get(attributes, :context, :none)
+
     [
       ~i({item-instance id="#{item_instance.id}"}),
-      render("name", %{item: item_instance.item}),
+      render("name", %{item: item_instance.item, context: context}),
       ~i({/item-instance})
     ]
   end
 
-  def render("name", %{item: item}) do
-    ~i({item id="#{item.id}" description="#{item.description}"}#{item.name}{/item})
+  def render("name", %{item: item} = attributes) do
+    context = Map.get(attributes, :context, :none)
+
+    ~i({item id="#{item.id}" name="#{item.name}" description="#{item.description}" context="#{context}"}#{item.name}{/item})
   end
 
   def render("drop-abort", %{reason: :no_item, item_name: item_name}) do

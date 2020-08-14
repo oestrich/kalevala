@@ -5,6 +5,8 @@ import { parse256Color } from "./colors";
 import { getSocketLines } from "../redux";
 import Tooltip from "./Tooltip";
 
+const CustomTagsContext = React.createContext({});
+
 const tooltipTags = {
   "ep": "Endurance Points",
   "hp": "Health Points",
@@ -35,7 +37,26 @@ const theme = {
   },
 };
 
+export const renderTags = (children) => {
+  return (
+    <React.Fragment key={children.id}>
+      {children.map((child) => {
+        return (
+          <Tag key={child.id} tag={child} />
+        );
+      })}
+    </React.Fragment>
+  );
+};
+
 export class ColorTag extends React.Component {
+  /**
+   * This is static, no need to ever re-render
+   */
+  shouldComponentUpdate(nextProps, nextState) {
+    return false;
+  }
+
   styleAttributes() {
     const attributes = this.props.attributes;
 
@@ -79,19 +100,26 @@ export class ColorTag extends React.Component {
   render() {
     return (
       <span style={this.styleAttributes()}>
-        <Tags children={this.props.children} customTags={this.props.customTags} />
+        {renderTags(this.props.children)}
       </span>
     );
   }
 }
 
 export class SentText extends React.Component {
+  /**
+   * This is static, no need to ever re-render
+   */
+  shouldComponentUpdate(nextProps, nextState) {
+    return false;
+  }
+
   render() {
     const color = theme.colors["white"];
 
     return (
       <span style={{ color: color }}>
-        <Tags children={this.props.children} customTags={this.props.customTags} />
+        {renderTags(this.props.children)}
       </span>
     );
   }
@@ -99,20 +127,24 @@ export class SentText extends React.Component {
 
 class Tag extends React.Component {
   render() {
-    const { customTags, dispatch, tag } = this.props;
+    const customTags = this.context;
 
-    if (typeof tag === "string") {
-      return tag;
+    const { dispatch, tag } = this.props;
+
+    if (tag.name === "string") {
+      return tag.text;
     }
 
-    if (this.props.customTags[tag.name]) {
-      return this.props.customTags[tag.name](tag, customTags, dispatch);
+    if (customTags[tag.name]) {
+      const customTag = customTags[tag.name];
+
+      return customTag(tag);
     }
 
     if (tooltipTags[tag.name]) {
       return (
         <Tooltip text={tooltipTags[tag.name]}>
-          <Tags children={tag.children} customTags={this.props.customTags} />
+          {renderTags(tag.children)}
         </Tooltip>
       );
     }
@@ -120,62 +152,30 @@ class Tag extends React.Component {
     switch (tag.name) {
       case "color":
         return (
-          <ColorTag children={tag.children} attributes={tag.attributes} customTags={this.props.customTags} />
+          <ColorTag children={tag.children} attributes={tag.attributes} />
         );
 
       case "tooltip":
         return (
-          <Tooltip text={tag.attributes.text} customTags={this.props.customTags}>
-            <Tags children={tag.children} customTags={this.props.customTags} />
+          <Tooltip text={tag.attributes.text} >
+            {renderTags(this.props.children)}
           </Tooltip>
         );
 
       case "sent-text":
         return (
-          <SentText children={tag.children} customTags={this.props.customTags} />
+          <SentText children={tag.children} />
         );
 
       default:
-        return (
-          <>
-            <Tags children={tag.children} customTags={this.props.customTags} />
-          </>
-        );
+        return renderTags(tag.children);
     }
   }
 }
 
-Tag = connect(() => { return {} })(Tag);
+Tag.contextType = CustomTagsContext;
 
 export { Tag };
-
-export class Tags extends React.Component {
-  render() {
-    let { children } = this.props;
-
-    if(!(children instanceof Array)){
-      children = [children];
-    }
-
-    let renderChild = (child, i) => {
-      if (child instanceof Array) {
-        return (
-          <Tags key={i} children={child} customTags={this.props.customTags} />
-        );
-      } else {
-        return (
-          <Tag key={i} tag={child} customTags={this.props.customTags} />
-        );
-      }
-    }
-
-    return (
-      <>
-        {children.map(renderChild)}
-      </>
-    );
-  }
-}
 
 class Lines extends React.Component {
   render() {
@@ -184,15 +184,15 @@ class Lines extends React.Component {
     let renderLine = (line) => {
       return (
         <div key={line.id}>
-          <Tags children={line.children} customTags={this.props.customTags} />
+          {renderTags(line.children)}
         </div>
       );
     };
 
     return (
-      <>
+      <React.Fragment>
         {children.map(renderLine)}
-      </>
+      </React.Fragment>
     );
   }
 }
@@ -226,11 +226,11 @@ class Terminal extends React.Component {
   }
 
   render() {
-    let lines = this.props.lines;
+    const lines = this.props.lines;
 
-    let fontFamily = this.props.font;
-    let fontSize = this.props.fontSize;
-    let lineHeight = this.props.lineHeight;
+    const fontFamily = this.props.font;
+    const fontSize = this.props.fontSize;
+    const lineHeight = this.props.lineHeight;
 
     const style = {
       fontFamily: `${fontFamily}, monospace`,
@@ -239,8 +239,9 @@ class Terminal extends React.Component {
     };
 
     return (
-      <div ref={el => { this.terminal = el; }} className="relative text-gray-500 overflow-y-scroll flex-grow w-full p-4 whitespace-pre-wrap z-10 bg-gray-900" style={style}>
-        <Lines children={lines} customTags={this.props.customTags} />
+      <div ref={el => { this.terminal = el; }} style={style}
+        className="relative text-gray-500 overflow-y-scroll flex-grow w-full p-4 whitespace-pre-wrap z-10 bg-gray-900">
+        <Lines children={lines} />
         <div ref={el => { this.el = el; }} />
       </div>
     );
@@ -254,3 +255,5 @@ let mapStateToProps = (state) => {
 };
 
 export default Terminal = connect(mapStateToProps)(Terminal);
+
+export { CustomTagsContext };

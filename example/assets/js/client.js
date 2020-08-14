@@ -8,7 +8,13 @@ import {
   withRouter
 } from "react-router-dom";
 
-import { Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
+import {
+  CustomTagsContext,
+  Keys,
+  makeReduxSocket,
+  Prompt,
+  Terminal
+} from "./kalevala";
 
 import {
   Channels,
@@ -113,7 +119,9 @@ const Client = () => {
           <Sidebar side="top" width="w-full">
             <Room />
           </Sidebar>
-          <Terminal customTags={customTags} />
+          <CustomTagsContext.Provider value={customTags}>
+            <Terminal />
+          </CustomTagsContext.Provider>
           <Prompt />
         </div>
         <Sidebar side="right" width="w-1/4 max-w-xs">

@@ -34,6 +34,6 @@ defmodule Kantele.Character.InventoryView do
   end
 
   def render("_item", %{item_instance: item_instance}) do
-    ~i(- #{ItemView.render("name", %{item_instance: item_instance})})
+    ~i(- #{ItemView.render("name", %{item_instance: item_instance, context: :inventory})})
   end
 end
