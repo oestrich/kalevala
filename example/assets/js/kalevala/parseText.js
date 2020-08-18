@@ -54,53 +54,37 @@ const flattenChildren = (children) => {
   };
 
   let context = children.reduce(reducer, {children: [], current: []});
-  children = context.children.concat([context.current]);
-  children.id = generateTagId();
-  return children;
+  return context.children.concat([context.current]);
 };
 
 const parseTag = (tag) => {
   let children;
 
   if (typeof tag === "string") {
-    children = splitString(tag).map(strings => {
+    return splitString(tag).map(strings => {
       if (strings instanceof Array) {
-        let children = strings.map(string => {
+        return strings.map(string => {
           return { id: generateTagId(), name: "string", text: string };
         });
-
-        children.id = generateTagId();
-        return children;
       }
 
       // LineBreak
       return strings;
     });
-
-    children.id = generateTagId();
-    return children;
   };
 
   if (tag instanceof Array) {
-    let children = tag.map(parseTag).flat();
-    children.id = generateTagId();
-    return children;
+    return tag.map(parseTag).flat();
   }
 
   children = tag.children.map(parseTag).flat();
-  children = flattenChildren(children).map((children) => {
+  return flattenChildren(children).map((children) => {
     if (children === LineBreak) {
       return LineBreak;
     }
 
-    children = arrayWrap(children);
-    children.id = generateTagId();
-
-    return { ...tag, id: generateTagId(), children };
+    return { ...tag, id: generateTagId(), children: arrayWrap(children) };
   });
-
-  children.id = generateTagId();
-  return children;
 };
 
 const parseText = (input) => {

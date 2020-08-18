@@ -39,13 +39,13 @@ const theme = {
 
 export const renderTags = (children) => {
   return (
-    <React.Fragment key={children.id}>
+    <>
       {children.map((child) => {
         return (
           <Tag key={child.id} tag={child} />
         );
       })}
-    </React.Fragment>
+    </>
   );
 };
 
