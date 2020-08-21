@@ -58,7 +58,7 @@ defmodule Kalevala.World.Room.Context do
   @doc """
   Render text back to a pid
   """
-  def render(context, to_pid, view, template, assigns) do
+  def render(context, to_pid, view, template, assigns \\ %{}) do
     assigns = Map.merge(context.assigns, assigns)
     data = view.render(template, assigns)
     push(context, to_pid, data, false)

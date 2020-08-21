@@ -56,6 +56,10 @@ defmodule Kantele.World.Room.Events do
     module(LookEvent) do
       event("room/look", :call)
     end
+
+    module(ContextEvent) do
+      event("context/lookup", :call)
+    end
   end
 end
 
@@ -102,6 +106,44 @@ defmodule Kantele.World.Room.LookEvent do
     |> assign(:characters, characters)
     |> assign(:item_instances, item_instances)
     |> render(event.from_pid, LookView, "look", %{})
+  end
+end
+
+defmodule Kantele.World.Room.ContextEvent do
+  import Kalevala.World.Room.Context
+
+  alias Kantele.Character.ContextView
+  alias Kantele.World.Items
+
+  def call(context, %{from_pid: from_pid, data: %{type: :item, id: item_id}}) do
+    item_instance =
+      Enum.find(context.item_instances, fn item_instance ->
+        item_instance.item_id == item_id
+      end)
+
+    case item_instance != nil do
+      true ->
+        handle_context(context, from_pid, item_instance.item_id)
+
+      false ->
+        handle_unknown(context, from_pid, item_id)
+    end
+  end
+
+  defp handle_unknown(context, from_pid, item_id) do
+    context
+    |> assign(:context, "room")
+    |> assign(:id, item_id)
+    |> render(from_pid, ContextView, "unknown")
+  end
+
+  defp handle_context(context, from_pid, item_id) do
+    item = Items.get!(item_id)
+
+    context
+    |> assign(:context, "room")
+    |> assign(:item, item)
+    |> render(from_pid, ContextView, "item")
   end
 end
 

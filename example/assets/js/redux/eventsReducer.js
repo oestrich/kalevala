@@ -4,6 +4,7 @@ import { Types } from "./actions";
 
 const INITIAL_STATE = {
   character: null,
+  contexts: {},
   inventory: [],
   room: null,
   vitals: null,
@@ -39,6 +40,14 @@ const eventReceived = (state, action) => {
     case "Character.Vitals":
       return {...state, vitals: event.data};
 
+    case "Context.Actions":
+      const { contexts } = state;
+      const { actions, context, type, id } = event.data;
+
+      contexts[`${context}:${type}:${id}`] = actions;
+
+      return {...state, contexts: contexts};
+
     case "Inventory.All":
       const { item_instances } = event.data;
       return {...state, inventory: item_instances};
@@ -69,8 +78,18 @@ const pickupItem = (state, event) => {
   return {...state, inventory: [item_instance, ...state.inventory]};
 };
 
+const eventClearActions = (state, event) => {
+  const { contexts } = state;
+  const { context, type, id } = event.data;
+
+  delete contexts[`${context}:${type}:${id}`];
+
+  return {...state, contexts: contexts};
+};
+
 const HANDLERS = {
   [KalevalaTypes.SOCKET_RECEIVED_EVENT]: eventReceived,
+  [KalevalaTypes.SOCKET_CLEAR_ACTIONS]: eventClearActions,
   [Types.LOGGED_IN]: characterLoggedIn,
   [Types.ROOM_CHARACTER_ENTERED]: characterEntered,
   [Types.ROOM_CHARACTER_LEFT]: characterLeft,

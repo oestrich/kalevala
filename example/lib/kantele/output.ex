@@ -174,7 +174,7 @@ defmodule Kantele.Output.Tooltips do
 
   use Kalevala.Output
 
-  import Kantele.Output.Macros, only: [tooltip: 2]
+  # import Kantele.Output.Macros, only: [tooltip: 2]
 
   @impl true
   def init(opts) do

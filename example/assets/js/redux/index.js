@@ -19,6 +19,10 @@ export const getEventsCharacter = (state) => {
   return getEvents(state).character;
 };
 
+export const getEventsContextActions = (state, context, type, id) => {
+  return getEvents(state).contexts[`${context}:${type}:${id}`];
+};
+
 export const getEventsVitals = (state) => {
   return getEvents(state).vitals;
 };

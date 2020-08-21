@@ -54,6 +54,18 @@ defmodule Kantele.Character.Events do
   end
 end
 
+defmodule Kantele.Character.IncomingEvents do
+  @moduledoc false
+
+  use Kalevala.Event.Router
+
+  scope(Kantele.Character) do
+    module(ContextEvent) do
+      event("Context.Lookup", :lookup)
+    end
+  end
+end
+
 defmodule Kantele.Character.NonPlayerEvents do
   @moduledoc false
 

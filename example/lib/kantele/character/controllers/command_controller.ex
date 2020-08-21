@@ -7,6 +7,7 @@ defmodule Kantele.Character.CommandController do
   alias Kantele.Character.Commands
   alias Kantele.Character.CommandView
   alias Kantele.Character.Events
+  alias Kantele.Character.IncomingEvents
 
   @impl true
   def init(conn) do
@@ -39,12 +40,31 @@ defmodule Kantele.Character.CommandController do
   end
 
   @impl true
+  def recv_event(conn, event) do
+    Logger.debug("Received event from client - #{inspect(event)}")
+
+    IncomingEvents.call(conn, event)
+  end
+
+  @impl true
   def event(conn, event), do: Events.call(conn, event)
 
   @impl true
   def display(conn, event) do
-    conn
-    |> super(event)
-    |> prompt(CommandView, "prompt", %{})
+    any_text? =
+      Enum.any?(event.output, fn output ->
+        match?(%Kalevala.Character.Conn.Text{}, output) ||
+          match?(%Kalevala.Character.Conn.EventText{}, output)
+      end)
+
+    case any_text? do
+      true ->
+        conn
+        |> super(event)
+        |> prompt(CommandView, "prompt", %{})
+
+      false ->
+        super(conn, event)
+    end
   end
 end

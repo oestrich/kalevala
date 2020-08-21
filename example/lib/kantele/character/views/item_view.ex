@@ -27,7 +27,7 @@ defmodule Kantele.Character.ItemView do
     %EventText{
       topic: "Inventory.DropItem",
       data: %{item_instance: item_instance},
-      text: ~i(You dropped #{render("name", %{item: item})}.\n)
+      text: ~i(You dropped #{render("name", %{item: item, context: :room})}.\n)
     }
   end
 
@@ -39,7 +39,7 @@ defmodule Kantele.Character.ItemView do
     %EventText{
       topic: "Inventory.PickupItem",
       data: %{item_instance: item_instance},
-      text: ~i(You picked up #{render("name", %{item: item})}.\n)
+      text: ~i(You picked up #{render("name", %{item: item, context: :inventory})}.\n)
     }
   end
 
