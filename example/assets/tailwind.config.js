@@ -12,6 +12,8 @@ module.exports = {
     },
     extend: {},
   },
-  variants: {},
+  variants: {
+    borderRadius: ['responsive', 'hover'],
+  },
   plugins: [],
 }

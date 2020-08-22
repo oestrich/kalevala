@@ -1,5 +1,5 @@
 verbs "drop" {
-  icon = "hand"
+  icon = "save"
   text = "Drop"
   send = "drop ${item}"
 
