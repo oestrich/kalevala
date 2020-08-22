@@ -7,6 +7,7 @@ defmodule Kantele.World.Room do
 
   require Logger
 
+  alias Kalevala.Verb
   alias Kantele.Communication
   alias Kantele.RoomChannel
   alias Kantele.World.Items
@@ -32,35 +33,12 @@ defmodule Kantele.World.Room do
   def load_item(item_instance), do: Items.get!(item_instance.item_id)
 
   @impl true
-  def item_request_drop(_context, event, item_instance) do
-    item = load_item(item_instance)
-
-    has_drop_verb? =
-      Enum.any?(item.verbs, fn verb ->
-        verb.key == :drop
-      end)
-
-    case has_drop_verb? do
-      true ->
-        {:proceed, event, item_instance}
-
-      false ->
-        {:abort, event, :missing_verb}
-    end
-  end
-
-  @impl true
   def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item}
 
   def item_request_pickup(_context, event, item_instance) do
     item = load_item(item_instance)
 
-    has_get_verb? =
-      Enum.any?(item.verbs, fn verb ->
-        verb.key == :get
-      end)
-
-    case has_get_verb? do
+    case Verb.has_matching_verb?(item.verbs, :get, %Verb.Context{location: "room"}) do
       true ->
         {:proceed, event, item_instance}
 

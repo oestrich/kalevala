@@ -1,6 +1,7 @@
 defmodule Kantele.Character.ItemCommand do
   use Kalevala.Character.Command
 
+  alias Kalevala.Verb
   alias Kantele.Character.ItemView
   alias Kantele.World.Items
 
@@ -13,9 +14,20 @@ defmodule Kantele.Character.ItemCommand do
 
     case !is_nil(item_instance) do
       true ->
-        conn
-        |> request_item_drop(item_instance)
-        |> assign(:prompt, false)
+        item = Items.get!(item_instance.item_id)
+
+        case Verb.has_matching_verb?(item.verbs, :drop, %Verb.Context{location: "inventory/self"}) do
+          true ->
+            conn
+            |> request_item_drop(item_instance)
+            |> assign(:prompt, false)
+
+          false ->
+            conn
+            |> assign(:item, item)
+            |> assign(:reason, :missing_verb)
+            |> render(ItemView, "drop-abort")
+        end
 
       false ->
         render(conn, ItemView, "unknown", %{item_name: item_name})

@@ -5,6 +5,8 @@ defmodule Kalevala.World.Item do
   Common data that all items will have
   """
 
+  alias Kalevala.Verb
+
   defstruct [:id, :name, :description, :callback_module, meta: %{}, verbs: []]
 
   defimpl Jason.Encoder do
@@ -42,38 +44,9 @@ defmodule Kalevala.World.Item do
   """
   def context_verbs(item, context) do
     Enum.filter(item.verbs, fn action ->
-      action_match?(action, context)
+      Verb.matches?(action, context)
     end)
   end
-
-  @doc """
-  Check if an action matches the context
-  """
-  def action_match?(%{conditions: conditions}, context) do
-    match_location?(conditions, context)
-  end
-
-  @doc """
-  Check if the location condition matches the context
-
-  No location condition == all locations are good
-
-      iex> Item.match_location?(%{location: ["room"]}, %{location: "room"})
-      true
-
-      iex> Item.match_location?(%{location: ["inventory/self"]}, %{location: "inventory/self"})
-      true
-
-      iex> Item.match_location?(%{location: ["inventory"]}, %{location: "inventory/self"})
-      true
-  """
-  def match_location?(%{location: locations}, context) do
-    Enum.any?(locations, fn location ->
-      String.starts_with?(context.location, location)
-    end)
-  end
-
-  def match_location?(_conditions, _context), do: true
 end
 
 defmodule Kalevala.World.Item.ItemNotLoaded do
