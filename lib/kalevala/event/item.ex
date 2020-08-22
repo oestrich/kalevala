@@ -70,7 +70,7 @@ defmodule Kalevala.Event.ItemPickUp.Abort do
   The item cannot be added to the character's room.
   """
 
-  defstruct [:from, :item_name, :reason]
+  defstruct [:from, :item_instance, :item_name, :reason]
 end
 
 defmodule Kalevala.Event.ItemPickUp.Commit do

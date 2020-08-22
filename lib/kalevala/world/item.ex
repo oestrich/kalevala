@@ -5,7 +5,7 @@ defmodule Kalevala.World.Item do
   Common data that all items will have
   """
 
-  defstruct [:id, :name, :description, :callback_module, meta: %{}]
+  defstruct [:id, :name, :description, :callback_module, actions: [], meta: %{}]
 
   defimpl Jason.Encoder do
     alias Kalevala.Meta
@@ -36,6 +36,44 @@ defmodule Kalevala.World.Item do
       defoverridable matches?: 2
     end
   end
+
+  @doc """
+  Filter the item's actions based on the current context
+  """
+  def context_actions(item, context) do
+    Enum.filter(item.actions, fn action ->
+      action_match?(action, context)
+    end)
+  end
+
+  @doc """
+  Check if an action matches the context
+  """
+  def action_match?(%{conditions: conditions}, context) do
+    match_location?(conditions, context)
+  end
+
+  @doc """
+  Check if the location condition matches the context
+
+  No location condition == all locations are good
+
+      iex> Item.match_location?(%{location: ["room"]}, %{location: "room"})
+      true
+
+      iex> Item.match_location?(%{location: ["inventory/self"]}, %{location: "inventory/self"})
+      true
+
+      iex> Item.match_location?(%{location: ["inventory"]}, %{location: "inventory/self"})
+      true
+  """
+  def match_location?(%{location: locations}, context) do
+    Enum.any?(locations, fn location ->
+      String.starts_with?(context.location, location)
+    end)
+  end
+
+  def match_location?(_conditions, _context), do: true
 end
 
 defmodule Kalevala.World.Item.ItemNotLoaded do

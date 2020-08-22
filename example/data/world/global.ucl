@@ -8,21 +8,57 @@ zones "global" {
 items "axe" {
   name = "Axe"
   description = "A single bladed axe with a long metal handle."
+
+  actions = [
+    "drop",
+    # "equip",
+    "get"
+    # "look",
+    # "steal",
+    # "remove"
+  ]
 }
 
 items "club" {
   name = "Club"
   description = "A large piece of wood, maybe a branch."
+
+  actions = [
+    "drop",
+    # "equip",
+    "get"
+    # "look",
+    # "steal",
+    # "remove"
+  ]
 }
 
 items "dagger" {
   name = "Dagger"
   description = "A small curved dagger."
+
+  actions = [
+    "drop",
+    # "equip",
+    "get"
+    # "look",
+    # "steal",
+    # "remove"
+  ]
 }
 
 items "longsword" {
   name = "Longsword"
   description = "A dual edged sword, with a silver hilt."
+
+  actions = [
+    "drop",
+    # "equip",
+    "get"
+    # "look",
+    # "steal",
+    # "remove"
+  ]
 }
 
 # Healing
@@ -30,4 +66,12 @@ items "longsword" {
 items "potion" {
   name = "Healing Potion"
   description = "A potion to heal what ails you."
+
+  actions = [
+    "drop",
+    "get"
+    # "look",
+    # "quaff",
+    # "steal"
+  ]
 }

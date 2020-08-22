@@ -16,11 +16,13 @@ defmodule Kantele.Character.ItemView do
   def render("name", %{item: item} = attributes) do
     context = Map.get(attributes, :context, :none)
 
-    ~i({item id="#{item.id}" name="#{item.name}" description="#{item.description}" context="#{context}"}#{item.name}{/item})
+    ~i({item id="#{item.id}" name="#{item.name}" description="#{item.description}" context="#{
+      context
+    }"}#{item.name}{/item})
   end
 
-  def render("drop-abort", %{reason: :no_item, item_name: item_name}) do
-    render("unknown", %{item_name: item_name})
+  def render("drop-abort", %{reason: :missing_action, item: item}) do
+    ~i(You cannot drop #{render("name", %{item: item})})
   end
 
   def render("drop-commit", %{item: item, item_instance: item_instance}) do
@@ -31,8 +33,8 @@ defmodule Kantele.Character.ItemView do
     }
   end
 
-  def render("pickup-abort", %{reason: :no_item, item_name: item_name}) do
-    render("unknown", %{item_name: item_name})
+  def render("pickup-abort", %{reason: :missing_action, item: item}) do
+    ~i(You cannot pick up #{render("name", %{item: item})})
   end
 
   def render("pickup-commit", %{item: item, item_instance: item_instance}) do

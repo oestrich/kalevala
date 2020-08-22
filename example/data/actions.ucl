@@ -1,0 +1,80 @@
+actions "drop" {
+  icon = "hand"
+  text = "Drop"
+  send = "drop ${item}"
+
+  conditions = {
+    location = [
+      "inventory/self"
+    ]
+  }
+}
+
+actions "get" {
+  icon = "hand"
+  text = "Get"
+  send = "get ${item}"
+
+  conditions = {
+    location = [
+      "room"
+    ]
+  }
+}
+
+actions "look" {
+  icon = "magnifying-glass"
+  text = "Look"
+  send = "look ${item}"
+
+  conditions = {}
+}
+
+# Leaving these below for inspiration
+
+# actions "equip" {
+#   text = "Equip"
+#   send = "equip ${item}"
+# 
+#   conditions = {
+#     location = [
+#       "inventory/mine"
+#     ]
+#   }
+# }
+
+# actions "remove" {
+#   text = "Remove"
+#   send = "remove ${item}"
+# 
+#   conditions = {
+#     location = [
+#       "character/mine"
+#     ]
+#   }
+# }
+
+
+# actions "remove-cursed" {
+#   text = "Remove"
+#   send = "remove ${item}"
+# 
+#   conditions = {
+#     location = [
+#       "character/mine"
+#     ]
+#   }
+# }
+
+# actions "steal" {
+#   location = [
+#     "inventory/other",
+#     "character/other"
+#   ]
+# }
+
+# actions "quaff" {
+#   location = [
+#     "inventory/mine"
+#   ]
+# }

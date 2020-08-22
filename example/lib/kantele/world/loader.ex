@@ -8,14 +8,32 @@ defmodule Kantele.World.Loader do
   alias Kalevala.World.Room
   alias Kalevala.World.Zone
 
+  @paths %{
+    world_path: "data/world",
+    brains_path: "data/brains",
+    actions_path: "data/actions.ucl"
+  }
+
   @doc """
   Load zone files into Kalevala structs
   """
-  def load(world_path \\ "data/world", brain_path \\ "data/brains") do
-    world_data = load_folder(world_path, ".ucl", &merge_world_data/1)
-    brain_data = load_folder(brain_path, ".ucl", &merge_brain_data/1)
+  def load(paths \\ %{}) do
+    paths = Map.merge(@paths, paths)
 
-    zones = Enum.map(world_data, &parse_zone(&1, brain_data))
+    world_data = load_folder(paths.world_path, ".ucl", &merge_world_data/1)
+    brain_data = load_folder(paths.brains_path, ".ucl", &merge_brain_data/1)
+
+    actions = Elias.parse(File.read!(paths.actions_path)).actions
+    actions = Enum.into(actions, %{}, fn {key, action} ->
+      {key, Map.put(action, :key, key)}
+    end)
+
+    context = %{
+      actions: actions,
+      brains: brain_data
+    }
+
+    zones = Enum.map(world_data, &parse_zone(&1, context))
 
     zones
     |> Enum.map(&parse_exits(&1, world_data, zones))
@@ -65,7 +83,7 @@ defmodule Kantele.World.Loader do
 
   Loads basic data and rooms
   """
-  def parse_zone({key, zone_data}, brains) do
+  def parse_zone({key, zone_data}, context) do
     zone = %Zone{}
 
     name = get_in(zone_data.zones, [String.to_atom(key), :name])
@@ -82,14 +100,14 @@ defmodule Kantele.World.Loader do
 
     characters =
       Enum.into(characters, %{}, fn {key, character_data} ->
-        parse_character(zone, key, character_data, brains)
+        parse_character(zone, key, character_data, context.brains)
       end)
 
     items = Map.get(zone_data, :items, [])
 
     items =
       Enum.into(items, %{}, fn {key, item_data} ->
-        parse_item(zone, key, item_data)
+        parse_item(zone, key, item_data, context.actions)
       end)
 
     %{zone | rooms: rooms, characters: characters, items: items}
@@ -278,11 +296,24 @@ defmodule Kantele.World.Loader do
 
   ID is the zone's id concatenated with the item's key
   """
-  def parse_item(zone, key, item_data) do
+  def parse_item(zone, key, item_data, actions) do
+    item_actions =
+      item_data.actions
+      |> Enum.map(&String.to_atom/1)
+      |> Enum.map(fn action ->
+        Map.get(actions, action)
+      end)
+      |> Enum.map(fn action ->
+        send = String.replace(action.send, "${item}", item_data.name)
+
+        Map.put(action, :send, send)
+      end)
+
     item = %Item{
       id: "#{zone.id}:#{key}",
       name: item_data.name,
       description: item_data.description,
+      actions: item_actions,
       callback_module: Kantele.World.Item,
       meta: %Kantele.World.Item.Meta{}
     }

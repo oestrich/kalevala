@@ -7,9 +7,22 @@ defmodule Kantele.Character.ItemEvent do
   alias Kantele.Character.ItemView
   alias Kantele.World.Items
 
-  def drop_abort(conn, %{data: event}) do
+  def drop_abort(conn, %{data: %{reason: :no_item, item_name: item_name}}) do
     conn
-    |> render(ItemView, "drop-abort", event)
+    |> assign(:item_name, item_name)
+    |> render(ItemView, "unknown")
+    |> render(CommandView, "prompt")
+  end
+
+  def drop_abort(conn, %{data: event}) do
+    %{item_instance: item_instance, reason: reason} = event
+
+    item = Items.get!(item_instance.item_id)
+
+    conn
+    |> assign(:item, item)
+    |> assign(:reason, reason)
+    |> render(ItemView, "drop-abort")
     |> render(CommandView, "prompt")
   end
 
@@ -28,8 +41,21 @@ defmodule Kantele.Character.ItemEvent do
     |> render(CommandView, "prompt")
   end
 
-  def pickup_abort(conn, %{data: event}) do
+  def pickup_abort(conn, %{data: %{reason: :no_item, item_name: item_name}}) do
     conn
+    |> assign(:item_name, item_name)
+    |> render(ItemView, "unknown")
+    |> render(CommandView, "prompt")
+  end
+
+  def pickup_abort(conn, %{data: event}) do
+    %{item_instance: item_instance, reason: reason} = event
+
+    item = Items.get!(item_instance.item_id)
+
+    conn
+    |> assign(:item, item)
+    |> assign(:reason, reason)
     |> render(ItemView, "pickup-abort", event)
     |> render(CommandView, "prompt")
   end

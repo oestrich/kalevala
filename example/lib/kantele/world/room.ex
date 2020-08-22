@@ -30,6 +30,44 @@ defmodule Kantele.World.Room do
 
   @impl true
   def load_item(item_instance), do: Items.get!(item_instance.item_id)
+
+  @impl true
+  def item_request_drop(_context, event, item_instance) do
+    item = load_item(item_instance)
+
+    has_drop_action? =
+      Enum.any?(item.actions, fn action ->
+        action.key == :drop
+      end)
+
+    case has_drop_action? do
+      true ->
+        {:proceed, event, item_instance}
+
+      false ->
+        {:abort, event, :missing_action}
+    end
+  end
+
+  @impl true
+  def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item}
+
+  def item_request_pickup(_context, event, item_instance) do
+    item = load_item(item_instance)
+
+    has_get_action? =
+      Enum.any?(item.actions, fn action ->
+        action.key == :get
+      end)
+
+    case has_get_action? do
+      true ->
+        {:proceed, event, item_instance}
+
+      false ->
+        {:abort, event, :missing_action, item_instance}
+    end
+  end
 end
 
 defmodule Kantele.World.Room.Events do
@@ -112,6 +150,7 @@ end
 defmodule Kantele.World.Room.ContextEvent do
   import Kalevala.World.Room.Context
 
+  alias Kalevala.World.Item
   alias Kantele.Character.ContextView
   alias Kantele.World.Items
 
@@ -140,9 +179,12 @@ defmodule Kantele.World.Room.ContextEvent do
   defp handle_context(context, from_pid, item_id) do
     item = Items.get!(item_id)
 
+    actions = Item.context_actions(item, %{location: "room"})
+
     context
     |> assign(:context, "room")
     |> assign(:item, item)
+    |> assign(:actions, actions)
     |> render(from_pid, ContextView, "item")
   end
 end

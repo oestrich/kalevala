@@ -50,7 +50,7 @@ defmodule Kalevala.World.Room.Item do
   @doc """
   Handle a request for picking up an item
   """
-  def handle_pickup_request({:abort, event, reason}, state, metadata) do
+  def handle_pickup_request({:abort, event, reason, item_instance}, state, metadata) do
     character = event.acting_character
 
     event = %Event{
@@ -59,6 +59,7 @@ defmodule Kalevala.World.Room.Item do
       metadata: metadata,
       data: %ItemPickUp.Abort{
         item_name: event.data.item_name,
+        item_instance: item_instance,
         from: state.data.id,
         reason: reason
       }

@@ -108,7 +108,7 @@ defmodule Kalevala.World.Room do
   accept or reject the request.
   """
   @callback item_request_pickup(Context.t(), Event.item_request_pickup(), World.Item.Instance.t()) ::
-              {:abort, event :: Event.item_request_pickup(), reason :: atom()}
+              {:abort, event :: Event.item_request_pickup(), reason :: atom(), World.Item.Instance.t()}
               | {:proceed, event :: Event.item_request_pickup(), World.Item.Instance.t()}
 
   defmacro __using__(_opts) do
@@ -133,12 +133,16 @@ defmodule Kalevala.World.Room do
         do: {:proceed, event, item_instance}
 
       @impl true
-      def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item}
+      def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item, nil}
 
       def item_request_pickup(_context, event, item_instance),
         do: {:proceed, event, item_instance}
 
-      defoverridable confirm_movement: 2, init: 1, movement_request: 3
+      defoverridable confirm_movement: 2,
+                     init: 1,
+                     item_request_drop: 3,
+                     item_request_pickup: 3,
+                     movement_request: 3
     end
   end
 

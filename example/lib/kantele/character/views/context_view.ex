@@ -3,21 +3,14 @@ defmodule Kantele.Character.ContextView do
 
   alias Kalevala.Character.Conn.Event
 
-  def render("item", %{context: context, item: item}) do
+  def render("item", %{context: context, item: item, actions: actions}) do
     %Event{
       topic: "Context.Actions",
       data: %{
         context: context,
         type: "item",
         id: item.id,
-        actions: [
-          %{
-            icon: :hand,
-            send: "get #{String.downcase(item.name)}",
-            text: "Get",
-            tooltip: "Pick up #{item.name}"
-          }
-        ]
+        actions: actions
       }
     }
   end
