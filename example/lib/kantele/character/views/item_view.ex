@@ -3,7 +3,7 @@ defmodule Kantele.Character.ItemView do
 
   alias Kalevala.Character.Conn.EventText
 
-  def render("name", %{item_instance: item_instance} = attributes) do
+  def render("name", attributes = %{item_instance: item_instance}) do
     context = Map.get(attributes, :context, :none)
 
     [
@@ -13,7 +13,7 @@ defmodule Kantele.Character.ItemView do
     ]
   end
 
-  def render("name", %{item: item} = attributes) do
+  def render("name", attributes = %{item: item}) do
     context = Map.get(attributes, :context, :none)
 
     ~i({item id="#{item.id}" name="#{item.name}" description="#{item.description}" context="#{
