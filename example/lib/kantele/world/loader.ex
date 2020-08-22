@@ -11,7 +11,7 @@ defmodule Kantele.World.Loader do
   @paths %{
     world_path: "data/world",
     brains_path: "data/brains",
-    actions_path: "data/actions.ucl"
+    verbs_path: "data/verbs.ucl"
   }
 
   @doc """
@@ -23,13 +23,10 @@ defmodule Kantele.World.Loader do
     world_data = load_folder(paths.world_path, ".ucl", &merge_world_data/1)
     brain_data = load_folder(paths.brains_path, ".ucl", &merge_brain_data/1)
 
-    actions = Elias.parse(File.read!(paths.actions_path)).actions
-    actions = Enum.into(actions, %{}, fn {key, action} ->
-      {key, Map.put(action, :key, key)}
-    end)
+    verbs = parse_verbs(Elias.parse(File.read!(paths.verbs_path)))
 
     context = %{
-      actions: actions,
+      verbs: verbs,
       brains: brain_data
     }
 
@@ -79,6 +76,24 @@ defmodule Kantele.World.Loader do
   end
 
   @doc """
+  Parse verb data into structs
+  """
+  def parse_verbs(%{verbs: verbs}) do
+    verbs
+    |> Enum.map(fn {key, verb} ->
+      {key, Map.put(verb, :key, key)}
+    end)
+    |> Enum.map(fn {key, verb} ->
+      conditions = struct(Kalevala.Verb.Conditions, verb.conditions)
+      {key, Map.put(verb, :conditions, conditions)}
+    end)
+    |> Enum.map(fn {key, verb} ->
+      {key, struct(Kalevala.Verb, verb)}
+    end)
+    |> Enum.into(%{})
+  end
+
+  @doc """
   Parse a zone
 
   Loads basic data and rooms
@@ -107,7 +122,7 @@ defmodule Kantele.World.Loader do
 
     items =
       Enum.into(items, %{}, fn {key, item_data} ->
-        parse_item(zone, key, item_data, context.actions)
+        parse_item(zone, key, item_data, context.verbs)
       end)
 
     %{zone | rooms: rooms, characters: characters, items: items}
@@ -296,24 +311,23 @@ defmodule Kantele.World.Loader do
 
   ID is the zone's id concatenated with the item's key
   """
-  def parse_item(zone, key, item_data, actions) do
-    item_actions =
-      item_data.actions
+  def parse_item(zone, key, item_data, verbs) do
+    item_verbs =
+      item_data.verbs
       |> Enum.map(&String.to_atom/1)
-      |> Enum.map(fn action ->
-        Map.get(actions, action)
+      |> Enum.map(fn verb ->
+        Map.get(verbs, verb)
       end)
-      |> Enum.map(fn action ->
-        send = String.replace(action.send, "${item}", item_data.name)
-
-        Map.put(action, :send, send)
+      |> Enum.map(fn verb ->
+        send = String.replace(verb.send, "${item}", item_data.name)
+        Map.put(verb, :send, send)
       end)
 
     item = %Item{
       id: "#{zone.id}:#{key}",
       name: item_data.name,
       description: item_data.description,
-      actions: item_actions,
+      verbs: item_verbs,
       callback_module: Kantele.World.Item,
       meta: %Kantele.World.Item.Meta{}
     }

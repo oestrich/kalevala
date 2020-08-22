@@ -1,4 +1,4 @@
-actions "drop" {
+verbs "drop" {
   icon = "hand"
   text = "Drop"
   send = "drop ${item}"
@@ -10,7 +10,7 @@ actions "drop" {
   }
 }
 
-actions "get" {
+verbs "get" {
   icon = "hand"
   text = "Get"
   send = "get ${item}"
@@ -22,7 +22,7 @@ actions "get" {
   }
 }
 
-actions "look" {
+verbs "look" {
   icon = "magnifying-glass"
   text = "Look"
   send = "look ${item}"
@@ -32,7 +32,7 @@ actions "look" {
 
 # Leaving these below for inspiration
 
-# actions "equip" {
+# verbs "equip" {
 #   text = "Equip"
 #   send = "equip ${item}"
 # 
@@ -43,7 +43,7 @@ actions "look" {
 #   }
 # }
 
-# actions "remove" {
+# verbs "remove" {
 #   text = "Remove"
 #   send = "remove ${item}"
 # 
@@ -55,7 +55,7 @@ actions "look" {
 # }
 
 
-# actions "remove-cursed" {
+# verbs "remove-cursed" {
 #   text = "Remove"
 #   send = "remove ${item}"
 # 
@@ -66,14 +66,14 @@ actions "look" {
 #   }
 # }
 
-# actions "steal" {
+# verbs "steal" {
 #   location = [
 #     "inventory/other",
 #     "character/other"
 #   ]
 # }
 
-# actions "quaff" {
+# verbs "quaff" {
 #   location = [
 #     "inventory/mine"
 #   ]

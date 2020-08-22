@@ -9,7 +9,7 @@ items "axe" {
   name = "Axe"
   description = "A single bladed axe with a long metal handle."
 
-  actions = [
+  verbs = [
     "drop",
     # "equip",
     "get"
@@ -23,7 +23,7 @@ items "club" {
   name = "Club"
   description = "A large piece of wood, maybe a branch."
 
-  actions = [
+  verbs = [
     "drop",
     # "equip",
     "get"
@@ -37,7 +37,7 @@ items "dagger" {
   name = "Dagger"
   description = "A small curved dagger."
 
-  actions = [
+  verbs = [
     "drop",
     # "equip",
     "get"
@@ -51,7 +51,7 @@ items "longsword" {
   name = "Longsword"
   description = "A dual edged sword, with a silver hilt."
 
-  actions = [
+  verbs = [
     "drop",
     # "equip",
     "get"
@@ -67,7 +67,7 @@ items "potion" {
   name = "Healing Potion"
   description = "A potion to heal what ails you."
 
-  actions = [
+  verbs = [
     "drop",
     "get"
     # "look",

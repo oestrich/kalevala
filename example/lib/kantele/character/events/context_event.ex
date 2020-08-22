@@ -19,12 +19,12 @@ defmodule Kantele.Character.ContextEvent do
       true ->
         item = Items.get!(item_id)
 
-        actions = Item.context_actions(item, %{location: "inventory/self"})
+        verbs = Item.context_verbs(item, %{location: "inventory/self"})
 
         conn
         |> assign(:context, "inventory")
         |> assign(:item, item)
-        |> assign(:actions, actions)
+        |> assign(:verbs, verbs)
         |> render(ContextView, "item")
 
       false ->

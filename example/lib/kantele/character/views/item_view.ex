@@ -21,7 +21,7 @@ defmodule Kantele.Character.ItemView do
     }"}#{item.name}{/item})
   end
 
-  def render("drop-abort", %{reason: :missing_action, item: item}) do
+  def render("drop-abort", %{reason: :missing_verb, item: item}) do
     ~i(You cannot drop #{render("name", %{item: item})})
   end
 
@@ -33,7 +33,7 @@ defmodule Kantele.Character.ItemView do
     }
   end
 
-  def render("pickup-abort", %{reason: :missing_action, item: item}) do
+  def render("pickup-abort", %{reason: :missing_verb, item: item}) do
     ~i(You cannot pick up #{render("name", %{item: item})})
   end
 

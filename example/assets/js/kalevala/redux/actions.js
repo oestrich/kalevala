@@ -4,10 +4,10 @@ export const Types = {
   PROMPT_HISTORY_SCROLL_BACKWARD: "PROMPT_HISTORY_SCROLL_BACKWARD",
   PROMPT_HISTORY_SCROLL_FORWARD: "PROMPT_HISTORY_SCROLL_FORWARD",
   PROMPT_SET_CURRENT_TEXT: "PROMPT_SET_CURRENT_TEXT",
-  SOCKET_CLEAR_ACTIONS: "SOCKET_CLEAR_ACTIONS",
+  SOCKET_CLEAR_VERBS: "SOCKET_CLEAR_VERBS",
   SOCKET_CONNECTED: "SOCKET_CONNECTED",
   SOCKET_DISCONNECTED: "SOCKET_DISCONNECTED",
-  SOCKET_GET_CONTEXT_ACTIONS: "SOCKET_GET_CONTEXT_ACTIONS",
+  SOCKET_GET_CONTEXT_VERBS: "SOCKET_GET_CONTEXT_VERBS",
   SOCKET_RECEIVED_EVENT: "SOCKET_RECEIVED_EVENT",
   SOCKET_SEND_EVENT: "SOCKET_SEND_EVENT",
 };
@@ -34,12 +34,12 @@ export const Creators = {
   socketDisconnected: () => {
     return { type: Types.SOCKET_DISCONNECTED };
   },
-  socketGetContextActions: (context, type, id) => {
+  socketGetContextVerbs: (context, type, id) => {
     return (dispatch, getState) => {
       const { socket } = getState().socket;
 
       dispatch({
-        type: Types.SOCKET_CLEAR_ACTIONS,
+        type: Types.SOCKET_CLEAR_VERBS,
         data: { context, type, id },
       });
 

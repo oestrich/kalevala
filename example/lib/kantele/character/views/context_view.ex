@@ -3,14 +3,14 @@ defmodule Kantele.Character.ContextView do
 
   alias Kalevala.Character.Conn.Event
 
-  def render("item", %{context: context, item: item, actions: actions}) do
+  def render("item", %{context: context, item: item, verbs: verbs}) do
     %Event{
-      topic: "Context.Actions",
+      topic: "Context.Verbs",
       data: %{
         context: context,
         type: "item",
         id: item.id,
-        actions: actions
+        verbs: verbs
       }
     }
   end

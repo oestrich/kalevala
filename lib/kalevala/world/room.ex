@@ -108,7 +108,8 @@ defmodule Kalevala.World.Room do
   accept or reject the request.
   """
   @callback item_request_pickup(Context.t(), Event.item_request_pickup(), World.Item.Instance.t()) ::
-              {:abort, event :: Event.item_request_pickup(), reason :: atom(), World.Item.Instance.t()}
+              {:abort, event :: Event.item_request_pickup(), reason :: atom(),
+               World.Item.Instance.t()}
               | {:proceed, event :: Event.item_request_pickup(), World.Item.Instance.t()}
 
   defmacro __using__(_opts) do

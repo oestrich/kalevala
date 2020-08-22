@@ -35,17 +35,17 @@ defmodule Kantele.World.Room do
   def item_request_drop(_context, event, item_instance) do
     item = load_item(item_instance)
 
-    has_drop_action? =
-      Enum.any?(item.actions, fn action ->
-        action.key == :drop
+    has_drop_verb? =
+      Enum.any?(item.verbs, fn verb ->
+        verb.key == :drop
       end)
 
-    case has_drop_action? do
+    case has_drop_verb? do
       true ->
         {:proceed, event, item_instance}
 
       false ->
-        {:abort, event, :missing_action}
+        {:abort, event, :missing_verb}
     end
   end
 
@@ -55,17 +55,17 @@ defmodule Kantele.World.Room do
   def item_request_pickup(_context, event, item_instance) do
     item = load_item(item_instance)
 
-    has_get_action? =
-      Enum.any?(item.actions, fn action ->
-        action.key == :get
+    has_get_verb? =
+      Enum.any?(item.verbs, fn verb ->
+        verb.key == :get
       end)
 
-    case has_get_action? do
+    case has_get_verb? do
       true ->
         {:proceed, event, item_instance}
 
       false ->
-        {:abort, event, :missing_action, item_instance}
+        {:abort, event, :missing_verb, item_instance}
     end
   end
 end
@@ -179,12 +179,12 @@ defmodule Kantele.World.Room.ContextEvent do
   defp handle_context(context, from_pid, item_id) do
     item = Items.get!(item_id)
 
-    actions = Item.context_actions(item, %{location: "room"})
+    verbs = Item.context_verbs(item, %{location: "room"})
 
     context
     |> assign(:context, "room")
     |> assign(:item, item)
-    |> assign(:actions, actions)
+    |> assign(:verbs, verbs)
     |> render(from_pid, ContextView, "item")
   end
 end

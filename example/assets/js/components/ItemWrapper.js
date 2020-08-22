@@ -4,32 +4,32 @@ import { connect } from 'react-redux';
 import { Creators } from "../kalevala";
 
 import { ContextMenu } from "./ContextMenu";
-import { getEventsContextActions } from "../redux";
+import { getEventsContextVerbs } from "../redux";
 
 class ItemContext extends React.Component {
   componentDidMount() {
     const { context, dispatch, id } = this.props;
 
-    this.props.dispatch(Creators.socketGetContextActions(context, "item", id));
+    this.props.dispatch(Creators.socketGetContextVerbs(context, "item", id));
   }
 
   render() {
-    const { actions, dispatch } = this.props;
+    const { verbs, dispatch } = this.props;
 
-    if (actions === undefined) {
+    if (verbs === undefined) {
       return null;
     }
 
     return (
-      <ContextMenu actions={actions} dispatch={dispatch} />
+      <ContextMenu verbs={verbs} dispatch={dispatch} />
     );
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const actions = getEventsContextActions(state, ownProps.context, "item", ownProps.id);
+  const verbs = getEventsContextVerbs(state, ownProps.context, "item", ownProps.id);
 
-  return { actions };
+  return { verbs };
 };
 
 ItemContext = connect(mapStateToProps)(ItemContext);

@@ -2,29 +2,29 @@ import React from "react";
 
 import { Creators } from "../kalevala";
 
-export const Action = ({ action, dispatch }) => {
+export const Verb = ({ verb, dispatch }) => {
   const onClick = (e) => {
     dispatch(Creators.socketSendEvent({
       topic: "system/send",
       data: {
-        text: action.send
+        text: verb.send
       }
     }));
   };
 
   return (
     <span className="inline-block bg-teal-600 cursor-pointer rounded p-2 px-4 mr-2" onClick={onClick}>
-      {action.text}
+      {verb.text}
     </span>
   );
 };
 
-export const ContextMenu = ({ actions, dispatch }) => {
+export const ContextMenu = ({ verbs, dispatch }) => {
   return (
     <>
-      {actions.map(action => {
+      {verbs.map(verb => {
         return (
-          <Action key={action.send} action={action} dispatch={dispatch} />
+          <Verb key={verb.send} verb={verb} dispatch={dispatch} />
         );
       })}
     </>

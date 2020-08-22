@@ -40,11 +40,11 @@ const eventReceived = (state, action) => {
     case "Character.Vitals":
       return {...state, vitals: event.data};
 
-    case "Context.Actions":
+    case "Context.Verbs":
       const { contexts } = state;
-      const { actions, context, type, id } = event.data;
+      const { verbs, context, type, id } = event.data;
 
-      contexts[`${context}:${type}:${id}`] = actions;
+      contexts[`${context}:${type}:${id}`] = verbs;
 
       return {...state, contexts: contexts};
 
@@ -78,7 +78,7 @@ const pickupItem = (state, event) => {
   return {...state, inventory: [item_instance, ...state.inventory]};
 };
 
-const eventClearActions = (state, event) => {
+const eventClearVerbs = (state, event) => {
   const { contexts } = state;
   const { context, type, id } = event.data;
 
@@ -89,7 +89,7 @@ const eventClearActions = (state, event) => {
 
 const HANDLERS = {
   [KalevalaTypes.SOCKET_RECEIVED_EVENT]: eventReceived,
-  [KalevalaTypes.SOCKET_CLEAR_ACTIONS]: eventClearActions,
+  [KalevalaTypes.SOCKET_CLEAR_VERBS]: eventClearVerbs,
   [Types.LOGGED_IN]: characterLoggedIn,
   [Types.ROOM_CHARACTER_ENTERED]: characterEntered,
   [Types.ROOM_CHARACTER_LEFT]: characterLeft,

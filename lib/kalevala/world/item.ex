@@ -5,7 +5,7 @@ defmodule Kalevala.World.Item do
   Common data that all items will have
   """
 
-  defstruct [:id, :name, :description, :callback_module, actions: [], meta: %{}]
+  defstruct [:id, :name, :description, :callback_module, meta: %{}, verbs: []]
 
   defimpl Jason.Encoder do
     alias Kalevala.Meta
@@ -38,10 +38,10 @@ defmodule Kalevala.World.Item do
   end
 
   @doc """
-  Filter the item's actions based on the current context
+  Filter the item's verbs based on the current context
   """
-  def context_actions(item, context) do
-    Enum.filter(item.actions, fn action ->
+  def context_verbs(item, context) do
+    Enum.filter(item.verbs, fn action ->
       action_match?(action, context)
     end)
   end
