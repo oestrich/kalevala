@@ -318,10 +318,6 @@ defmodule Kantele.World.Loader do
       |> Enum.map(fn verb ->
         Map.get(verbs, verb)
       end)
-      |> Enum.map(fn verb ->
-        send = String.replace(verb.send, "${item}", item_data.name)
-        Map.put(verb, :send, send)
-      end)
 
     item = %Item{
       id: "#{zone.id}:#{key}",

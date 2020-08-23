@@ -6,19 +6,17 @@ defmodule Kantele.Character.ItemView do
   def render("name", attributes = %{item_instance: item_instance}) do
     context = Map.get(attributes, :context, :none)
 
+    item = item_instance.item
+
     [
-      ~i({item-instance id="#{item_instance.id}"}),
-      render("name", %{item: item_instance.item, context: context}),
+      ~i({item-instance id="#{item_instance.id}" context="#{context}" name="#{item.name}" description="#{item.description}"}),
+      render("name", %{item: item}),
       ~i({/item-instance})
     ]
   end
 
-  def render("name", attributes = %{item: item}) do
-    context = Map.get(attributes, :context, :none)
-
-    ~i({item id="#{item.id}" name="#{item.name}" description="#{item.description}" context="#{
-      context
-    }"}#{item.name}{/item})
+  def render("name", %{item: item}) do
+    ~i({item id="#{item.id}"}#{item.name}{/item})
   end
 
   def render("drop-abort", %{reason: :missing_verb, item: item}) do

@@ -1,7 +1,7 @@
 verbs "drop" {
   icon = "drop"
   text = "Drop"
-  send = "drop ${item}"
+  send = "drop ${id}"
 
   conditions = {
     location = [
@@ -13,7 +13,7 @@ verbs "drop" {
 verbs "get" {
   icon = "grab"
   text = "Get"
-  send = "get ${item}"
+  send = "get ${id}"
 
   conditions = {
     location = [
@@ -25,7 +25,7 @@ verbs "get" {
 verbs "look" {
   icon = "magnifying-glass"
   text = "Look"
-  send = "look ${item}"
+  send = "look ${object}"
 
   conditions = {}
 }

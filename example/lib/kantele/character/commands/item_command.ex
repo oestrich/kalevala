@@ -9,7 +9,7 @@ defmodule Kantele.Character.ItemCommand do
     item_instance =
       Enum.find(conn.character.inventory, fn item_instance ->
         item = Items.get!(item_instance.item_id)
-        item.callback_module.matches?(item, item_name)
+        item_instance.id == item_name || item.callback_module.matches?(item, item_name)
       end)
 
     case !is_nil(item_instance) do

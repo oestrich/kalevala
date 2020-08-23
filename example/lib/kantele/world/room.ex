@@ -33,7 +33,20 @@ defmodule Kantele.World.Room do
   def load_item(item_instance), do: Items.get!(item_instance.item_id)
 
   @impl true
-  def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item}
+  def item_request_pickup(context, event, nil) do
+    item_instance =
+      Enum.find(context.item_instances, fn item_instance ->
+        item_instance.id == event.data.item_name
+      end)
+
+    case item_instance != nil do
+      true ->
+        item_request_pickup(context, event, item_instance)
+
+      false ->
+        {:abort, event, :no_item, nil}
+    end
+  end
 
   def item_request_pickup(_context, event, item_instance) do
     item = load_item(item_instance)
@@ -128,40 +141,44 @@ end
 defmodule Kantele.World.Room.ContextEvent do
   import Kalevala.World.Room.Context
 
+  alias Kalevala.Verb
   alias Kalevala.World.Item
   alias Kantele.Character.ContextView
   alias Kantele.World.Items
 
-  def call(context, %{from_pid: from_pid, data: %{type: :item, id: item_id}}) do
+  def call(context, %{from_pid: from_pid, data: %{type: :item, id: id}}) do
     item_instance =
       Enum.find(context.item_instances, fn item_instance ->
-        item_instance.item_id == item_id
+        item_instance.id == id
       end)
 
     case item_instance != nil do
       true ->
-        handle_context(context, from_pid, item_instance.item_id)
+        handle_context(context, from_pid, item_instance)
 
       false ->
-        handle_unknown(context, from_pid, item_id)
+        handle_unknown(context, from_pid, id)
     end
   end
 
-  defp handle_unknown(context, from_pid, item_id) do
+  defp handle_unknown(context, from_pid, id) do
     context
     |> assign(:context, "room")
-    |> assign(:id, item_id)
+    |> assign(:type, "item")
+    |> assign(:id, id)
     |> render(from_pid, ContextView, "unknown")
   end
 
-  defp handle_context(context, from_pid, item_id) do
-    item = Items.get!(item_id)
+  defp handle_context(context, from_pid, item_instance) do
+    item = Items.get!(item_instance.item_id)
+    item_instance = %{item_instance | item: item}
 
     verbs = Item.context_verbs(item, %{location: "room"})
+    verbs = Verb.replace_variables(verbs, %{id: item_instance.id})
 
     context
     |> assign(:context, "room")
-    |> assign(:item, item)
+    |> assign(:item_instance, item_instance)
     |> assign(:verbs, verbs)
     |> render(from_pid, ContextView, "item")
   end

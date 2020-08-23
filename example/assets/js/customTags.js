@@ -15,7 +15,7 @@ export const customTags = {
       </span>
     );
   },
-  "item": (tag) => {
+  "item-instance": (tag) => {
     return (
       <ItemWrapper attributes={tag.attributes}>
         {renderTags(tag.children)}

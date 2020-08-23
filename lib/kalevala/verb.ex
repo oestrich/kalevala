@@ -30,6 +30,14 @@ defmodule Kalevala.Verb do
   @derive Jason.Encoder
   defstruct [:conditions, :icon, :key, :send, :text]
 
+  def replace_variables(verbs, variables) do
+    Enum.map(verbs, fn verb ->
+      Enum.reduce(variables, verb, fn {key, value}, verb ->
+        Map.put(verb, :send, String.replace(verb.send, "${#{key}}", value))
+      end)
+    end)
+  end
+
   @doc """
   Check if a list of verbs contains a verb that matches the context
   """
