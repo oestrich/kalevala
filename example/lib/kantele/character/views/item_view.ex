@@ -23,11 +23,11 @@ defmodule Kantele.Character.ItemView do
     ~i(You cannot drop #{render("name", %{item: item})})
   end
 
-  def render("drop-commit", %{item: item, item_instance: item_instance}) do
+  def render("drop-commit", %{item_instance: item_instance}) do
     %EventText{
       topic: "Inventory.DropItem",
       data: %{item_instance: item_instance},
-      text: ~i(You dropped #{render("name", %{item: item, context: :room})}.\n)
+      text: ~i(You dropped #{render("name", %{item_instance: item_instance, context: :room})}.\n)
     }
   end
 
@@ -35,11 +35,11 @@ defmodule Kantele.Character.ItemView do
     ~i(You cannot pick up #{render("name", %{item: item})})
   end
 
-  def render("pickup-commit", %{item: item, item_instance: item_instance}) do
+  def render("pickup-commit", %{item_instance: item_instance}) do
     %EventText{
       topic: "Inventory.PickupItem",
       data: %{item_instance: item_instance},
-      text: ~i(You picked up #{render("name", %{item: item, context: :inventory})}.\n)
+      text: ~i(You picked up #{render("name", %{item_instance: item_instance, context: :inventory})}.\n)
     }
   end
 
