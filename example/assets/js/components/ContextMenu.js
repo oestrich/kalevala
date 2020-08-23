@@ -1,12 +1,18 @@
 import React from "react";
 
-import { Hand, Save } from "heroicons-react";
-
 import { Creators } from "../kalevala";
 
+const Icon = ({ icon }) => {
+  return (
+    <div className="w-6 mr-2">
+      <img src={`/images/${icon}`} />
+    </div>
+  );
+};
+
 const verbIcons = {
-  hand: () => <Hand />,
-  save: () => <Save />,
+  drop: () => <Icon icon="card-discard.svg" />,
+  grab: () => <Icon icon="card-play.svg" />,
 };
 
 export const Verb = ({ verb, dispatch }) => {

@@ -3415,11 +3415,6 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-heroicons-react@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/heroicons-react/-/heroicons-react-1.1.0.tgz#53e263622ea0d6d4733f0f1263092f7aae3b594b"
-  integrity sha512-uMMY7sdYvhc0OfIkf2afEvfQWwdFVugCgwT74ljoo/K6TfJ536T9Q1eN3slEFrAtKFaAkAqlborpnv02dtrWBg==
-
 hex-color-regex@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"

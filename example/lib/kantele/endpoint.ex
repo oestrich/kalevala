@@ -3,7 +3,7 @@ defmodule Kantele.Websocket.Endpoint do
 
   use Plug.Router
 
-  plug(Plug.Static, at: "/", gzip: true, only: ["js", "css", "robots.txt"], from: :kantele)
+  plug(Plug.Static, at: "/", gzip: true, only: ["css", "images", "js", "robots.txt"], from: :kantele)
 
   plug(:match)
   plug(:dispatch)
