@@ -60,18 +60,6 @@ export default class ItemWrapper extends React.Component {
     }, 500);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    Object.entries(this.props).forEach(([key, val]) =>
-      prevProps[key] !== val && console.log(`ItemWrapper - Prop '${key}' changed`, val)
-    );
-
-    if (this.state) {
-      Object.entries(this.state).forEach(([key, val]) =>
-        prevState[key] !== val && console.log(`ItemWrapper - State '${key}' changed`)
-      );
-    }
-  }
-
   render() {
     const { attributes, children } = this.props;
     const { showTooltip } = this.state;
