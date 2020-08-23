@@ -6,9 +6,9 @@ import { Creators } from "../kalevala";
 import { ContextMenu } from "./ContextMenu";
 import { getEventsContextVerbs } from "../redux";
 
-class ItemContext extends React.Component {
+export class ItemContext extends React.Component {
   componentDidMount() {
-    const { context, dispatch, id } = this.props;
+    const { context, id } = this.props;
 
     this.props.dispatch(Creators.socketGetContextVerbs(context, "item", id));
   }

@@ -1,27 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from 'react-redux';
-import { Tooltip } from "../kalevala";
+import { Creators, Tooltip } from "../kalevala";
 
-import { getEventsInventory } from "../redux";
+import { getEventsContextVerbs, getEventsInventory } from "../redux";
 
-const Item = ({ itemInstance }) => {
+import { ContextMenu } from "./ContextMenu";
+import ItemWrapper from "./ItemWrapper";
+
+const Item = ({ itemInstance, verbs }) => {
+  const attributes = {
+    context: "inventory",
+    description: itemInstance.item.description,
+    id: itemInstance.id,
+    name: itemInstance.item.name,
+  };
+
   return (
     <div className="m-2 block bg-gray-800 border border-teal-800 rounded p-4 relative">
-      <Tooltip text={itemInstance.item.description}>
+      <ItemWrapper attributes={attributes}>
         <span className="text-gray-100">{itemInstance.item.name}</span>
-      </Tooltip>
+      </ItemWrapper>
     </div>
   );
 };
 
-let Inventory = ({ inventory }) => {
+let Inventory = ({ dispatch, inventory }) => {
   return (
     <div className="flex flex-col h-full">
       <h3 className="text-xl text-gray-200 px-4 pt-4">Inventory</h3>
       <div className="flex-grow overflow-y-scroll">
         {inventory.map((itemInstance) => {
           return (
-            <Item key={itemInstance.id} itemInstance={itemInstance} />
+            <Item key={itemInstance.id} dispatch={dispatch} itemInstance={itemInstance} />
           );
         })}
       </div>
@@ -31,6 +41,7 @@ let Inventory = ({ inventory }) => {
 
 let mapStateToProps = (state) => {
   const inventory = getEventsInventory(state);
+
   return { inventory };
 };
 
