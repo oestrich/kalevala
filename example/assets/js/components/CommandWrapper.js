@@ -14,7 +14,7 @@ let CommandWrapper = ({ children, dispatch, send }) => {
   };
 
   return (
-    <Tooltip text={`Send "${send}"`}>
+    <Tooltip tip={`Send "${send}"`}>
       <span className="underline cursor-pointer" onClick={onClick}>
         {children}
       </span>

@@ -24,19 +24,19 @@ let Vitals = ({ character, vitals }) => {
       <div className="p-2 w-full">
         <div className="relative my-2 rounded bg-gray-600">
           <div className="bg-red-600 rounded absolute inset-0 z-0" style={{width: `${healthWidth}%`}} />
-          <Tooltip text="Health Points" className="w-full right">
+          <Tooltip tip="Health Points" className="w-full right">
             <span className="relative z-10 block p-2 text-white text-lg text-right">{health_points} / {max_health_points} hp</span>
           </Tooltip>
         </div>
         <div className="relative my-2 rounded bg-gray-600">
           <div className="bg-blue-600 rounded absolute inset-0 z-0" style={{width: `${skillWidth}%`}} />
-          <Tooltip text="Skill Points" className="w-full right">
+          <Tooltip tip="Skill Points" className="w-full right">
             <span className="relative z-10 block p-2 text-white text-lg text-right">{skill_points} / {max_skill_points} sp</span>
           </Tooltip>
         </div>
         <div className="relative my-2 rounded bg-gray-600">
           <div className="bg-purple-600 rounded absolute inset-0 z-0" style={{width: `${enduranceWidth}%`}} />
-          <Tooltip text="Endurance Points" className="w-full right">
+          <Tooltip tip="Endurance Points" className="w-full right">
             <span className="relative z-10 block p-2 text-white text-lg text-right">{endurance_points} / {max_endurance_points} ep</span>
           </Tooltip>
         </div>

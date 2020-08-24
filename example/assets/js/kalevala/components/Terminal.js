@@ -143,7 +143,7 @@ class Tag extends React.Component {
 
     if (tooltipTags[tag.name]) {
       return (
-        <Tooltip text={tooltipTags[tag.name]}>
+        <Tooltip tip={tooltipTags[tag.name]}>
           {renderTags(tag.children)}
         </Tooltip>
       );
@@ -157,7 +157,7 @@ class Tag extends React.Component {
 
       case "tooltip":
         return (
-          <Tooltip text={tag.attributes.text} >
+          <Tooltip tip={tag.attributes.text} >
             {renderTags(this.props.children)}
           </Tooltip>
         );

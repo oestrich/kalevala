@@ -4,22 +4,26 @@ import { Tooltip } from "../kalevala";
 
 import { Creators, getEventsRoom } from "../redux";
 
-class Exit extends React.Component {
-  render() {
-    const activeClassName = this.props.active ? "bg-teal-600 cursor-pointer" : "bg-gray-700 border border-teal-800 cursor-not-allowed";
-    const className = `${this.props.className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
-
-    const tooltipText = this.props.active ? `Move ${this.props.direction}` : null;
-
-    return (
-      <Tooltip text={tooltipText} className={className}>
-        <div onClick={this.props.move}>
-          {this.props.direction}
-        </div>
-      </Tooltip>
-    );
+const exitTooltip = ({ active, direction }) => {
+  if (active) {
+    return `Move ${direction}`;
+  } else {
+    return null;
   }
 }
+
+const Exit = ({ active, className, direction, move }) => {
+  const activeClassName = active ? "bg-teal-600 cursor-pointer" : "bg-gray-700 border border-teal-800 cursor-not-allowed";
+  const fullClassName = `${className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
+
+  return (
+    <Tooltip tip={exitTooltip({ active, direction })} className={fullClassName}>
+      <div onClick={move}>
+        {direction}
+      </div>
+    </Tooltip>
+  );
+};
 
 class Exits extends React.Component {
   render() {
@@ -79,7 +83,7 @@ Exits = connect(null, {
 const Character = ({ description, name }) => {
   return (
     <div className="mr-2 bg-gray-800 border border-teal-800 rounded p-2" style={{color: "#cfad00"}}>
-      <Tooltip text={description}>
+      <Tooltip tip={description}>
         {name}
       </Tooltip>
     </div>

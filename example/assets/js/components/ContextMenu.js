@@ -2,13 +2,7 @@ import React from "react";
 
 import { Creators } from "../kalevala";
 
-const Icon = ({ icon }) => {
-  return (
-    <div className="w-6 mr-2">
-      <img src={`/images/${icon}`} />
-    </div>
-  );
-};
+import Icon from "./Icon";
 
 const verbIcons = {
   drop: () => <Icon icon="card-discard.svg" />,
