@@ -9,6 +9,8 @@ tmp
 
 /example/_build
 /example/deps
+/example/priv/static
+/example/assets/node_modules
 
 # Generate on crash by the VM
 /erl_crash.dump

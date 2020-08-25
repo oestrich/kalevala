@@ -1,4 +1,4 @@
-FROM grapevinehaus/elixir:1.10.0-alpine-1 as builder
+FROM hexpm/elixir:1.10.2-erlang-22.2.8-alpine-3.11.3 as builder
 WORKDIR /app/example
 ENV MIX_ENV=prod
 RUN apk add --no-cache gcc git make musl-dev
