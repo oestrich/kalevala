@@ -9,7 +9,9 @@ defmodule Kantele.Character.ItemView do
     item = item_instance.item
 
     [
-      ~i({item-instance id="#{item_instance.id}" context="#{context}" name="#{item.name}" description="#{item.description}"}),
+      ~i({item-instance id="#{item_instance.id}" context="#{context}" name="#{item.name}" description="#{
+        item.description
+      }"}),
       render("name", %{item: item}),
       ~i({/item-instance})
     ]
@@ -39,7 +41,8 @@ defmodule Kantele.Character.ItemView do
     %EventText{
       topic: "Inventory.PickupItem",
       data: %{item_instance: item_instance},
-      text: ~i(You picked up #{render("name", %{item_instance: item_instance, context: :inventory})}.\n)
+      text:
+        ~i(You picked up #{render("name", %{item_instance: item_instance, context: :inventory})}.\n)
     }
   end
 
