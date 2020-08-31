@@ -1,4 +1,6 @@
 defmodule Kantele.Character.Commands do
+  @moduledoc false
+
   use Kalevala.Character.Command.Router, scope: Kantele.Character
 
   module(CombatCommand) do

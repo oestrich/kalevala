@@ -34,11 +34,14 @@ defmodule Kantele.World do
 
   @impl true
   def init(_opts) do
+    config = Application.get_env(:kantele, :world, [])
+    kickoff = Keyword.get(config, :kickoff, true)
+
     children = [
       {Kantele.World.Cache, [name: Kantele.World.Cache]},
       {Kantele.World.Items, [name: Kantele.World.Items]},
       {Kalevala.World, [name: Kantele.World]},
-      {Kantele.World.Kickoff, [name: Kantele.World.Kickoff]}
+      {Kantele.World.Kickoff, [name: Kantele.World.Kickoff, start: kickoff]}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
