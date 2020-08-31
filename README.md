@@ -82,12 +82,12 @@ In the example below, you can `Kantele.Character.Commands.call(conn, "say hello"
 
 ```elixir
 defmodule Kantele.Character.Commands do
-  use Kalevala.Character.Commands.Router
+  use Kalevala.Character.Commands.Router, scope: Kantele
 
-  scope(Kantele) do
-    module(SayCommand) do
-      command("say :message", :run)
-    end
+  module(SayCommand) do
+    parse("say", :run, fn command ->
+      command |> spaces() |> text(:message)
+    end)
   end
 end
 
