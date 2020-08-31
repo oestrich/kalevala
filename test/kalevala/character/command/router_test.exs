@@ -31,9 +31,10 @@ defmodule Kalevala.Character.Command.RouterTest do
 
       assert parsed_command.module == TestGame.MoveCommand
       assert parsed_command.function == :run
+
       assert parsed_command.params == %{
-        "command" => "north"
-      }
+               "command" => "north"
+             }
     end
 
     test "a command with a single variable" do
@@ -41,10 +42,11 @@ defmodule Kalevala.Character.Command.RouterTest do
 
       assert parsed_command.module == TestGame.SayCommand
       assert parsed_command.function == :run
+
       assert parsed_command.params == %{
-        "command" => "say",
-        "message" => "hello there"
-      }
+               "command" => "say",
+               "message" => "hello there"
+             }
     end
 
     test "a command with a word before text" do
@@ -52,11 +54,12 @@ defmodule Kalevala.Character.Command.RouterTest do
 
       assert parsed_command.module == TestGame.TellCommand
       assert parsed_command.function == :run
+
       assert parsed_command.params == %{
-        "command" => "tell",
-        "name" => "villager",
-        "message" => "hello"
-      }
+               "command" => "tell",
+               "name" => "villager",
+               "message" => "hello"
+             }
     end
 
     test "a command with a quoted word before text" do
@@ -64,11 +67,12 @@ defmodule Kalevala.Character.Command.RouterTest do
 
       assert parsed_command.module == TestGame.TellCommand
       assert parsed_command.function == :run
+
       assert parsed_command.params == %{
-        "command" => "tell",
-        "name" => "town crier",
-        "message" => "hello"
-      }
+               "command" => "tell",
+               "name" => "town crier",
+               "message" => "hello"
+             }
     end
   end
 end
