@@ -1,73 +1,84 @@
 defmodule Kantele.Character.Commands do
   @moduledoc false
 
-  use Kalevala.Character.Command.Router
+  use Kalevala.Character.Command.Router, scope: Kantele.Character
 
-  scope(Kantele.Character) do
-    module(CombatCommand) do
-      command("combat start", :start)
-      command("combat stop", :stop)
-      command("combat tick", :tick)
-    end
-
-    module(DelayedCommand) do
-      command("delay :command", :run)
-    end
-
-    module(EmoteCommand) do
-      command("emote :text", :broadcast)
-      command("emotes", :list)
-    end
-
-    module(ItemCommand) do
-      command("drop :item_name", :drop)
-      command("get :item_name", :get)
-    end
-
-    module(LookCommand) do
-      command("look", :run)
-    end
-
-    module(InventoryCommand) do
-      command("i", :run)
-      command("inv", :run)
-      command("inventory", :run)
-    end
-
-    module(MoveCommand) do
-      command("north", :north)
-      command("south", :south)
-      command("east", :east)
-      command("west", :west)
-      command("up", :up)
-      command("down", :down)
-    end
-
-    module(QuitCommand) do
-      command("quit", :run)
-      command(<<4>>, :run, display: false)
-    end
-
-    module(SayCommand) do
-      command("say :text", :run)
-    end
-
-    module(ChannelCommand) do
-      command("general :text", :general)
-    end
-
-    module(InfoCommand) do
-      command("info", :run)
-    end
-
-    module(ReloadCommand) do
-      command("reload", :run)
-    end
-
-    module(WhoCommand) do
-      command("who", :run)
-    end
-
-    dynamic(EmoteCommand, [])
+  module(CombatCommand) do
+    parse("combat start", :start)
+    parse("combat stop", :stop)
+    parse("combat tick", :tick)
   end
+
+  module(DelayedCommand) do
+    parse("delay", :run, fn command ->
+      command |> spaces() |> text(:parse)
+    end)
+  end
+
+  module(EmoteCommand) do
+    parse("emote", :broadcast, fn command ->
+      command |> spaces() |> text(:text)
+    end)
+
+    parse("emotes", :list)
+  end
+
+  module(ItemCommand) do
+    parse("drop", :drop, fn command ->
+      command |> spaces() |> text(:item_name)
+    end)
+
+    parse("get", :get, fn command ->
+      command |> spaces() |> text(:item_name)
+    end)
+  end
+
+  module(LookCommand) do
+    parse("look", :run)
+  end
+
+  module(InventoryCommand) do
+    parse("i", :run)
+    parse("inv", :run)
+    parse("inventory", :run)
+  end
+
+  module(MoveCommand) do
+    parse("north", :north)
+    parse("south", :south)
+    parse("east", :east)
+    parse("west", :west)
+    parse("up", :up)
+    parse("down", :down)
+  end
+
+  module(QuitCommand) do
+    parse("quit", :run)
+  end
+
+  module(SayCommand) do
+    parse("say", :run, fn command ->
+      command |> text(:text)
+    end)
+  end
+
+  module(ChannelCommand) do
+    parse("general", :general, fn command ->
+      command |> spaces() |> text(:text)
+    end)
+  end
+
+  module(InfoCommand) do
+    parse("info", :run)
+  end
+
+  module(ReloadCommand) do
+    parse("reload", :run)
+  end
+
+  module(WhoCommand) do
+    parse("who", :run)
+  end
+
+  dynamic(EmoteCommand, :emote, [])
 end

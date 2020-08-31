@@ -5,8 +5,6 @@ defmodule Kalevala.Character.Command.DynamicCommand do
   Generated from the `dynamic` command router DSL.
   """
 
-  defstruct [:module, :function, :params]
-
   @doc """
   Called when parsing text from a user
 
@@ -16,77 +14,56 @@ defmodule Kalevala.Character.Command.DynamicCommand do
               {:dynamic, function :: atom(), params :: map()} | :skip
 end
 
-defmodule Kalevala.Character.Command.StaticCommand do
+defmodule Kalevala.Character.Command.ParsedCommand do
   @moduledoc """
-  A parsed static command
-
-  Generated from the command router DSL.
+  A parsed command
   """
 
-  defstruct [:pattern, :params]
+  defstruct [:module, :function, :params]
 end
 
 defmodule Kalevala.Character.Command.Router do
   @moduledoc """
-  Parse player input and match against known patterns
+  Parse player input to known commands
   """
 
-  alias Kalevala.Character.Command.DynamicCommand
-  alias Kalevala.Character.Command.StaticCommand
-  alias Kalevala.Character.Conn
+  alias Kalevala.Character.Command.ParsedCommand
 
-  defmacro __using__(_opts) do
+  defmacro __using__(scope: scope) do
+    {:__aliases__, _, top_module} = scope
+
     quote do
-      import Kalevala.Character.Command.Router
+      import NimbleParsec
+      import Kalevala.Character.Command.RouterMacros
 
-      @behaviour Kalevala.Character.Command.Router
+      Module.register_attribute(__MODULE__, :parse_functions, accumulate: true)
 
-      @impl true
+      @before_compile Kalevala.Character.Command.Router
+
+      @scope unquote(top_module)
+    end
+  end
+
+  defmacro __before_compile__(_env) do
+    quote do
       def call(conn, text) do
-        Kalevala.Character.Command.Router.call(__MODULE__, conn, text)
+        unquote(__MODULE__).call(__MODULE__, conn, text)
+      end
+
+      @sorted_parse_functions Enum.reverse(@parse_functions)
+
+      def parse(text) do
+        unquote(__MODULE__).parse(__MODULE__, @sorted_parse_functions, text)
       end
     end
   end
 
-  @typedoc "Parsed params for a command"
-  @type params() :: map()
-
-  @typedoc "Route tuple"
-  @type command() :: {String.t(), String.t(), atom()}
-
-  @typedoc "Parsed command"
-  @type parsed_command :: %StaticCommand{} | %DynamicCommand{}
-
-  @doc """
-  Parse an input string with the conn as the context
-  """
-  @callback call(conn :: Conn.t(), text :: String.t()) :: :ok
-
-  @doc """
-  Parse an input string into matching pattern and params
-  """
-  @callback parse(text :: String.t()) :: {:ok, parsed_command()} | {:error, :unknown}
-
-  @doc """
-  Return a list of all commands
-  """
-  @callback commands() :: [command()]
-
-  @doc """
-  Pattern match the pattern and run the command
-  """
-  @callback recv(pattern :: String.t(), params()) :: map()
-
   @doc false
   def call(module, conn, text) do
     case module.parse(text) do
-      {:ok, %DynamicCommand{module: module, function: function, params: params}} ->
+      {:ok, %ParsedCommand{module: module, function: function, params: params}} ->
         conn = Map.put(conn, :params, params)
         apply(module, function, [conn, conn.params])
-
-      {:ok, %StaticCommand{pattern: pattern, params: params}} ->
-        conn = Map.put(conn, :params, params)
-        module.recv(pattern, conn)
 
       {:error, :unknown} ->
         {:error, :unknown}
@@ -94,175 +71,188 @@ defmodule Kalevala.Character.Command.Router do
   end
 
   @doc false
-  def parse(patterns, text) do
-    text = String.trim(text)
+  def parse(module, parse_functions, text) do
+    parsed_command =
+      Enum.find_value(parse_functions, fn command ->
+        case apply(module, command, [text]) do
+          {:ok, {module, function}, params} ->
+            %Kalevala.Character.Command.ParsedCommand{
+              module: module,
+              function: function,
+              params: process_params(params)
+            }
 
-    match =
-      Enum.find_value(patterns, fn pattern ->
-        case match_pattern(pattern, text) do
-          :skip ->
+          {:error, _error} ->
             false
-
-          command = %{} ->
-            command
         end
       end)
 
-    case match != nil do
+    case is_nil(parsed_command) do
       true ->
-        {:ok, match}
-
-      false ->
         {:error, :unknown}
-    end
-  end
-
-  defp match_pattern({:dynamic, module, arguments}, text) do
-    case apply(module, :parse, [text, arguments]) do
-      {:dynamic, function, params} ->
-        %DynamicCommand{
-          module: module,
-          function: function,
-          params: params
-        }
-
-      :skip ->
-        :skip
-    end
-  end
-
-  defp match_pattern(original_pattern, text) do
-    pattern =
-      original_pattern
-      |> String.split(" ")
-      |> Enum.map(fn
-        ":" <> var ->
-          "(?<#{var}>.*)"
-
-        segment ->
-          Regex.escape(segment)
-      end)
-      |> Enum.join(" ")
-
-    pattern = "^" <> pattern <> "$"
-
-    captures =
-      pattern
-      |> Regex.compile!()
-      |> Regex.named_captures(text)
-
-    case captures != nil do
-      true ->
-        %StaticCommand{
-          pattern: original_pattern,
-          params: captures
-        }
 
       false ->
-        :skip
+        {:ok, parsed_command}
+    end
+  end
+
+  defp process_params(params) do
+    params
+    |> Enum.map(fn {key, value} ->
+      {to_string(key), value}
+    end)
+    |> Enum.into(%{})
+  end
+end
+
+defmodule Kalevala.Character.Command.RouterMacros do
+  @moduledoc """
+  Set of macros to build a command router using NimbleParsec
+  """
+
+  @doc """
+  Sets the `@module` tag for parse functions nested inside
+  """
+  defmacro module({:__aliases__, _meta, module}, do: block) do
+    quote do
+      @module @scope ++ unquote(module)
+      unquote(block)
     end
   end
 
   @doc """
-  Macro to generate the receive functions
+  Parse a new command
 
-      scope(App) do
-        module(HelpCommand) do
-          command("help", :base)
-          command("help :topic", :topic)
-        end
-      end
+  `command` starts out the parse and any whitespace afterwards will be ignored
   """
-  defmacro scope(module, opts) do
-    quote do
-      Module.register_attribute(__MODULE__, :patterns, accumulate: true)
-      Module.register_attribute(__MODULE__, :commands, accumulate: true)
+  defmacro parse(command, fun, parse_fun \\ nil) do
+    internal_function_name = :"parsep_#{command}"
+    function_name = :"parse_#{command}"
 
-      unquote(parse_modules(module, opts[:do]))
-
-      @impl true
-      def commands() do
-        Enum.sort(@commands)
-      end
-
-      @reversed_patterns Enum.reverse(@patterns)
-
-      @impl true
-      def parse(text) do
-        Kalevala.Character.Command.Router.parse(@reversed_patterns, text)
-      end
-
-      defoverridable parse: 1, recv: 2
-    end
-  end
-
-  @doc false
-  def parse_modules({:__aliases__, _, top_module}, {:__block__, [], modules}) do
-    Enum.map(modules, fn module ->
-      parse_module(top_module, module)
-    end)
-  end
-
-  def parse_modules({:__aliases__, _, top_module}, {:module, opts, args}) do
-    parse_module(top_module, {:module, opts, args})
-  end
-
-  def parse_modules({:__aliases__, _, top_module}, {:dynamic, opts, args}) do
-    parse_module(top_module, {:dynamic, opts, args})
-  end
-
-  @doc false
-  def parse_module(top_module, {:module, _, args}) do
-    [module, args] = args
-    module = {:__aliases__, elem(module, 1), top_module ++ elem(module, 2)}
-
-    parse_commands(module, args[:do])
-  end
-
-  def parse_module(top_module, {:dynamic, _, args}) do
-    [module, options] = args
-    module = {:__aliases__, elem(module, 1), top_module ++ elem(module, 2)}
+    parse_fun = parse_fun || (&__MODULE__.default_parse_function/1)
 
     quote do
-      @patterns {:dynamic, unquote(module), unquote(options)}
-    end
-  end
+      defparsecp(
+        unquote(internal_function_name),
+        unquote(parse_fun).(command(unquote(command)))
+      )
 
-  def parse_module(_top_module, _) do
-    raise "Unknown function encountered"
-  end
+      @parse_functions unquote(function_name)
 
-  @doc false
-  def parse_commands(module, {:__block__, [], commands}) do
-    Enum.map(commands, fn command ->
-      parse_command(module, command)
-    end)
-  end
+      def unquote(function_name)(text) do
+        scope = [:"Elixir" | @module]
+        module = String.to_atom(Enum.join(scope, "."))
 
-  def parse_commands(module, {:command, opts, args}) do
-    parse_command(module, {:command, opts, args})
-  end
-
-  @doc false
-  def parse_command(module, {:command, _, args}) do
-    [pattern, fun, opts] = parse_command_args(args)
-
-    quote do
-      @patterns unquote(pattern)
-      @commands {unquote(module), unquote(pattern), unquote(fun), unquote(opts)}
-
-      @impl true
-      def recv(unquote(pattern), conn) do
-        unquote(module).unquote(fun)(conn, conn.params)
+        unquote(__MODULE__).parse_text(
+          module,
+          unquote(fun),
+          unquote(internal_function_name)(text)
+        )
       end
     end
   end
 
-  def parse_command(_module, _) do
-    raise "Unknown function encountered"
+  def parse_text(module, fun, {:ok, parsed, _leftover, _unknown1, _unknown2, _unknown3}) do
+    {:ok, {module, fun}, parsed}
   end
 
-  defp parse_command_args([pattern, fun]), do: [pattern, fun, []]
+  def parse_text(_module, _fun, {:error, error, _leftover, _unknown1, _unknown2, _unknown3}) do
+    {:error, error}
+  end
 
-  defp parse_command_args([pattern, fun, opts]), do: [pattern, fun, opts]
+  @doc false
+  def default_parse_function(command), do: command
+
+  @doc """
+  Handle dynamic parsing
+
+  This runs the `parse/2` function on the given module at runtime. This enables
+  parsing things against runtime only data.
+  """
+  defmacro dynamic({:__aliases__, _meta, module}, command, arguments) do
+    function_name = :"parse_dynamic_#{command}"
+
+    quote do
+      @parse_functions unquote(function_name)
+
+      def unquote(function_name)(text) do
+        scope = [:"Elixir" | @scope] ++ unquote(module)
+        module = String.to_atom(Enum.join(scope, "."))
+
+        unquote(__MODULE__).parse_dynamic_text(module, unquote(arguments), text)
+      end
+    end
+  end
+
+  def parse_dynamic_text(module, arguments, text) do
+    case module.parse(text, arguments) do
+      {:dynamic, function, params} ->
+        {:ok, {module, function}, params}
+
+      :skip ->
+        {:error, :unknown}
+    end
+  end
+
+  @doc """
+  Wraps NimbleParsec macros to generate a tagged command
+  """
+  defmacro command(command) do
+    quote do
+      string(unquote(command))
+      |> label("#{unquote(command)} command")
+      |> unwrap_and_tag(:command)
+    end
+  end
+
+  @doc """
+  Wraps NimbleParsec macros to allow for grabbing spaces
+
+  Grabs between other pieces of the command
+  """
+  defmacro spaces(parsec) do
+    quote do
+      unquote(parsec)
+      |> ignore(utf8_string([?\s], min: 1))
+      |> label("spaces")
+    end
+  end
+
+  @doc """
+  Wraps NimbleParsec macros to generate a tagged word
+
+  Words are codepoints that don't include a space, or everything inside of quotes.
+
+  Both of the following count as a word:
+  - villager
+  - "town crier"
+  """
+  defmacro word(parsec, tag) do
+    quote do
+      unquote(parsec)
+      |> concat(
+        choice([
+          ignore(string("\""))
+          |> utf8_string([not: ?"], min: 1)
+          |> ignore(string("\""))
+          |> reduce({Enum, :join, [""]}),
+          utf8_string([not: 32, not: ?"], min: 1)
+        ])
+        |> unwrap_and_tag(unquote(tag))
+        |> label("#{unquote(tag)} word")
+      )
+    end
+  end
+
+  @doc """
+  Wraps NimbleParsec macros to generate tagged text
+
+  This grabs as much as it can
+  """
+  defmacro text(parsec, tag) do
+    quote do
+      unquote(parsec)
+      |> concat(unwrap_and_tag(utf8_string([], min: 1), unquote(tag)))
+    end
+  end
 end

@@ -10,7 +10,10 @@ defmodule Kantele.World.Kickoff do
 
   @doc false
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, [], opts)
+    config = Keyword.take(opts, [:start])
+    otp_opts = Keyword.take(opts, [:name])
+
+    GenServer.start_link(__MODULE__, config, otp_opts)
   end
 
   @doc false
@@ -19,8 +22,12 @@ defmodule Kantele.World.Kickoff do
   end
 
   @impl true
-  def init(_) do
+  def init(start: true) do
     {:ok, %{}, {:continue, :load}}
+  end
+
+  def init(_) do
+    {:ok, %{}}
   end
 
   @impl true

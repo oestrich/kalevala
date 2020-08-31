@@ -11,6 +11,11 @@ rooms "town_square" {
       keyword = "Lohikäärme"
       short = "To the east is Lohikäärme, a small inn."
       long = "To the east is Lohikäärme, a small inn."
+    },
+    {
+      keyword = "Seppä"
+      short = "To the west is Seppä, the blacksmith."
+      long = "To the west is Seppä, the blacksmith."
     }
   ]
 }
@@ -20,6 +25,7 @@ room_exits "town_square" {
 
   north = rooms.marketplace.id
   east = rooms.inn.id
+  west = rooms.blacksmith.id
 }
 
 room_characters "town_square" {
@@ -125,6 +131,28 @@ room_exits "guild_hall" {
   west = rooms.marketplace.id
 }
 
+rooms "blacksmith" {
+  name = "Seppä"
+  description = "The local blacksmith."
+}
+
+room_exits "blacksmith" {
+  room_id = rooms.blacksmith.id
+
+  east = rooms.town_square.id
+}
+
+room_characters "blacksmith" {
+  room_id = rooms.blacksmith.id
+
+  characters = [
+    {
+      id = characters.villager.id
+      name = "Anni"
+    }
+  ]
+}
+
 characters "town_crier" {
   name = "Town Crier"
   description = "A small man with a loud voice."
@@ -147,33 +175,7 @@ characters "villager" {
   name = "Villager"
   description = "A villager of Sammatti."
 
-  brain = {
-    type = "first"
-    nodes = [
-      {
-        ref = brains.generic_hello
-      },
-      {
-        type = "conditional"
-        nodes = [
-          {
-            type = "conditions/room-enter"
-            data = {
-              self_trigger = false
-            }
-          },
-          {
-            type = "actions/say"
-            data = {
-              channel_name = "rooms:${room_id}"
-              delay = 500
-              text = "Welcome, ${character.name}!"
-            }
-          }
-        ]
-      }
-    ]
-  }
+  brain = brains.villager
 }
 
 characters "wandering_villager" {
@@ -190,61 +192,5 @@ characters "wandering_villager" {
     }
   ]
 
-  brain = {
-    type = "first"
-    nodes = [
-      {
-        type = "conditional"
-        nodes = [
-          {
-            type = "conditions/message-match"
-            data = {
-              self_trigger = false
-              text = "\bhi\b"
-            }
-          },
-          {
-            type = "sequence"
-            nodes = [
-              {
-                type = "actions/say"
-                data = {
-                  channel_name = "${channel_name}"
-                  text = "Hello!"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type = "conditional"
-        nodes = [
-          {
-            type = "conditions/event-match"
-            data = {
-              topic = "characters/move"
-              data = {
-                id = "wander"
-              }
-            }
-          },
-          {
-            type = "actions/wander"
-          },
-          {
-            type = "actions/delay-event"
-            data = {
-              minimum_delay = 3000
-              random_delay = 18000
-              topic = "characters/move"
-              data = {
-                id = "${id}"
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+  brain = brains.wandering_villager
 }
