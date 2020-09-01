@@ -11,6 +11,9 @@ defmodule Kantele.Character.LoginController do
   alias Kantele.Character.MoveEvent
   alias Kantele.Character.MoveView
   alias Kantele.Character.QuitView
+  alias Kantele.Character.TellEvent
+  alias Kantele.CharacterChannel
+  alias Kantele.Communication
 
   @impl true
   def init(conn) do
@@ -102,6 +105,7 @@ defmodule Kantele.Character.LoginController do
     |> render(CharacterView, "vitals", %{})
     |> move(:to, character.room_id, MoveView, "enter", %{})
     |> subscribe("rooms:#{character.room_id}", [], &MoveEvent.subscribe_error/2)
+    |> register_and_subscribe_character_channel(character)
     |> subscribe("general", [], &ChannelEvent.subscribe_error/2)
     |> render(LoginView, "enter-world", %{})
     |> put_controller(CommandController)
@@ -140,5 +144,13 @@ defmodule Kantele.Character.LoginController do
         }
       }
     }
+  end
+
+  defp register_and_subscribe_character_channel(conn, character) do
+    options = [character_id: character.id]
+    :ok = Communication.register("characters:#{character.id}", CharacterChannel, options)
+
+    options = [character: character]
+    subscribe(conn, "characters:#{character.id}", options, &TellEvent.subscribe_error/2)
   end
 end

@@ -58,7 +58,17 @@ defmodule Kantele.Character.Commands do
 
   module(SayCommand) do
     parse("say", :run, fn command ->
-      command |> text(:text)
+      command |> spaces() |> text(:text)
+    end)
+  end
+
+  module(TellCommand) do
+    parse("tell", :run, fn command ->
+      command
+      |> spaces()
+      |> word(:name)
+      |> spaces()
+      |> text(:text)
     end)
   end
 

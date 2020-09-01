@@ -30,6 +30,14 @@ defmodule Kalevala.Character do
   end
 
   @doc """
+  Check if a keyword matches the character
+  """
+  def matches?(character, keyword) do
+    character.id == keyword ||
+      String.downcase(character.name) == String.downcase(keyword)
+  end
+
+  @doc """
   Generate a random ID
   """
   def generate_id() do
