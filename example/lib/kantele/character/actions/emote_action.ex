@@ -12,7 +12,7 @@ defmodule Kantele.Character.EmoteAction do
     conn
     |> assign(:text, params["text"])
     |> render(EmoteView, "echo")
-    |> publish_emote(params["channel_name"], params["text"], [], &publish_error/2)
+    |> publish_message(params["channel_name"], params["text"], [type: "emote"], &publish_error/2)
   end
 
   def publish_error(conn, _error), do: conn

@@ -5,7 +5,7 @@ defmodule Kantele.Character.SayEvent do
   alias Kantele.Character.SayView
 
   def interested?(event) do
-    !event.data.emote && match?("rooms:" <> _, event.data.channel_name)
+    event.data.type == "speech" && match?("rooms:" <> _, event.data.channel_name)
   end
 
   def echo(conn, event) do
@@ -24,16 +24,6 @@ defmodule Kantele.Character.SayEvent do
 
       false ->
         "listen"
-    end
-  end
-
-  def echo_chamber(conn, event) do
-    case event.from_pid == self() do
-      true ->
-        conn
-
-      false ->
-        publish_message(conn, event.data.channel_name, event.data.text, [], &publish_error/2)
     end
   end
 

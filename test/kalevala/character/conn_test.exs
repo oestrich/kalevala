@@ -144,20 +144,20 @@ defmodule Kalevala.Character.ConnTest do
 
       assert event.topic == Kalevala.Event.Message
       assert event.data.channel_name == "general"
-      refute event.data.emote
+      assert event.data.type == "speech"
       assert event.data.text == "hello"
     end
 
     test "publish an emote" do
       conn = %Conn{}
 
-      conn = Conn.publish_emote(conn, "general", "hello", [], &error_function/1)
+      conn = Conn.publish_message(conn, "general", "hello", [type: "emote"], &error_function/1)
 
       [{:publish, "general", event, _opts, _err}] = conn.private.channel_changes
 
       assert event.topic == Kalevala.Event.Message
       assert event.data.channel_name == "general"
-      assert event.data.emote
+      assert event.data.type == "emote"
       assert event.data.text == "hello"
     end
   end

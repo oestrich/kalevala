@@ -368,6 +368,12 @@ defmodule Kalevala.Character.Conn do
 
   @doc """
   Request to publish a message to a channel
+
+  Available options for altering the message, these also get passed along to
+  the channel callbacks.
+
+  - `type`, defaults to `"speech"`
+  - `meta`, defaults to `%{}`
   """
   def publish_message(conn, channel_name, text, options, error_fun) do
     event = %Kalevala.Event{
@@ -378,27 +384,9 @@ defmodule Kalevala.Character.Conn do
         channel_name: channel_name,
         character: Private.character(conn),
         id: Kalevala.Event.Message.generate_id(),
-        text: text
-      }
-    }
-
-    publish_channel_message(conn, channel_name, event, options, error_fun)
-  end
-
-  @doc """
-  Request to publish an emote to a channel
-  """
-  def publish_emote(conn, channel_name, text, options, error_fun) do
-    event = %Kalevala.Event{
-      acting_character: Private.character(conn),
-      from_pid: self(),
-      topic: Kalevala.Event.Message,
-      data: %Kalevala.Event.Message{
-        channel_name: channel_name,
-        character: Private.character(conn),
-        id: Kalevala.Event.Message.generate_id(),
-        emote: true,
-        text: text
+        meta: Keyword.get(options, :meta, %{}),
+        text: text,
+        type: Keyword.get(options, :type, "speech")
       }
     }
 

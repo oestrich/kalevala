@@ -234,7 +234,9 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
 
   @impl true
   def match?(event = %{topic: Message}, conn, data) do
-    self_check(event, conn, data) && Regex.match?(data.text, event.data.text)
+    data.interested?.(event) &&
+      self_check(event, conn, data) &&
+      Regex.match?(data.text, event.data.text)
   end
 
   def match?(_event, _conn, _data), do: false

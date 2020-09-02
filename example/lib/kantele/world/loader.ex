@@ -236,6 +236,7 @@ defmodule Kantele.World.Loader do
     %Kalevala.Character.Brain.Condition{
       type: Kalevala.Character.Conditions.MessageMatch,
       data: %{
+        interested?: &Kantele.Character.SayEvent.interested?/1,
         self_trigger: data.self_trigger == "true",
         text: regex
       }

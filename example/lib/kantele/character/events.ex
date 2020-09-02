@@ -11,6 +11,7 @@ defmodule Kantele.Character.Events do
   alias Kantele.Character.EmoteEvent
   alias Kantele.Character.SayEvent
   alias Kantele.Character.TellEvent
+  alias Kantele.Character.WhisperEvent
 
   scope(Kantele.Character) do
     module(DelayedEvent) do
@@ -46,6 +47,11 @@ defmodule Kantele.Character.Events do
     module(TellEvent) do
       event("tell/send", :broadcast)
       event(Message, :echo, interested?: &TellEvent.interested?/1)
+    end
+
+    module(WhisperEvent) do
+      event("whisper/send", :broadcast)
+      event(Message, :echo, interested?: &WhisperEvent.interested?/1)
     end
 
     module(ChannelEvent) do

@@ -67,9 +67,8 @@ defmodule Kantele.World.Room.Events do
   use Kalevala.Event.Router
 
   scope(Kantele.World.Room) do
-    module(RandomExitEvent) do
-      event("room/flee", :call)
-      event("room/wander", :call)
+    module(ContextEvent) do
+      event("context/lookup", :call)
     end
 
     module(ForwardEvent) do
@@ -83,12 +82,17 @@ defmodule Kantele.World.Room.Events do
       event("room/look", :call)
     end
 
-    module(ContextEvent) do
-      event("context/lookup", :call)
+    module(RandomExitEvent) do
+      event("room/flee", :call)
+      event("room/wander", :call)
     end
 
     module(TellEvent) do
       event("tell/send", :call)
+    end
+
+    module(WhisperEvent) do
+      event("whisper/send", :call)
     end
   end
 end
@@ -206,6 +210,23 @@ defmodule Kantele.World.Room.TellEvent do
 
   defp find_character(characters, name) do
     Enum.find(characters, fn character ->
+      Kalevala.Character.matches?(character, name)
+    end)
+  end
+end
+
+defmodule Kantele.World.Room.WhisperEvent do
+  import Kalevala.World.Room.Context
+
+  def call(context, event) do
+    name = event.data.name
+    character = find_local_character(context, name)
+    data = Map.put(event.data, :character, character)
+    event(context, event.from_pid, self(), event.topic, data)
+  end
+
+  defp find_local_character(context, name) do
+    Enum.find(context.characters, fn character ->
       Kalevala.Character.matches?(character, name)
     end)
   end

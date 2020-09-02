@@ -85,6 +85,16 @@ defmodule Kantele.Character.Commands do
     parse("version", :run)
   end
 
+  module(WhisperCommand) do
+    parse("whisper", :run, fn command ->
+      command
+      |> spaces()
+      |> word(:name)
+      |> spaces()
+      |> text(:text)
+    end)
+  end
+
   module(WhoCommand) do
     parse("who", :run)
   end

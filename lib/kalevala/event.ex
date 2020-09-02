@@ -13,7 +13,7 @@ defmodule Kalevala.Event.Message do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:channel_name, :character, :id, :text, emote: false]
+  defstruct [:channel_name, :character, :id, :text, meta: %{}, type: "speech"]
 
   @doc """
   Generate a random ID

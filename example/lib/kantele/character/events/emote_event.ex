@@ -5,7 +5,7 @@ defmodule Kantele.Character.EmoteEvent do
   alias Kantele.Character.EmoteView
 
   def interested?(event) do
-    event.data.emote && match?("rooms:" <> _, event.data.channel_name)
+    event.data.type == "emote" && match?("rooms:" <> _, event.data.channel_name)
   end
 
   def echo(conn, event) do
