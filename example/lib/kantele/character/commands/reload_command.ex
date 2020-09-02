@@ -11,7 +11,15 @@ defmodule Kantele.Character.ReloadCommand do
 
   alias Kantele.Character.ReloadView
 
-  def run(conn, _params) do
+  def recompile(conn, _params) do
+    if Code.ensure_loaded?(Mix) do
+      IEx.Helpers.recompile()
+    end
+
+    render(conn, ReloadView, "recompiled")
+  end
+
+  def reload(conn, _params) do
     if Code.ensure_loaded?(Mix) do
       IEx.Helpers.recompile()
     end

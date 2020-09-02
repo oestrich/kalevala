@@ -77,11 +77,16 @@ defmodule Kantele.Character.Commands do
   end
 
   module(ReloadCommand) do
-    parse("reload", :run)
+    parse("recompile", :recompile)
+    parse("reload", :reload)
   end
 
   module(WhoCommand) do
     parse("who", :run)
+  end
+
+  module(VersionCommand) do
+    parse("version", :run)
   end
 
   dynamic(EmoteCommand, :emote, [])
