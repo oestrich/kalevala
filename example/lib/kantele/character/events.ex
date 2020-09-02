@@ -41,6 +41,7 @@ defmodule Kantele.Character.Events do
     end
 
     module(SayEvent) do
+      event("say/send", :broadcast)
       event(Message, :echo, interested?: &SayEvent.interested?/1)
     end
 

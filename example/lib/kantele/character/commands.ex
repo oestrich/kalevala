@@ -67,7 +67,17 @@ defmodule Kantele.Character.Commands do
 
   module(SayCommand) do
     parse("say", :run, fn command ->
-      command |> spaces() |> text(:text)
+      command
+      |> spaces()
+      |> optional(
+        repeat(
+          choice([
+            symbol("@") |> word(:at) |> spaces(),
+            symbol(">") |> word(:adverb) |> spaces()
+          ])
+        )
+      )
+      |> text(:text)
     end)
   end
 

@@ -3,6 +3,12 @@ defmodule Kantele.Character.SayCommand do
 
   alias Kantele.Character.SayAction
 
+  def run(conn, params = %{"at" => _at}) do
+    conn
+    |> event("say/send", params)
+    |> assign(:prompt, false)
+  end
+
   def run(conn, params) do
     params = Map.put(params, "channel_name", "rooms:#{conn.character.room_id}")
 

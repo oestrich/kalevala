@@ -7,7 +7,22 @@ defmodule Kantele.Character.SayAction do
 
   @impl true
   def run(conn, params) do
-    publish_message(conn, params["channel_name"], params["text"], [], &publish_error/2)
+    publish_message(
+      conn,
+      params["channel_name"],
+      params["text"],
+      [meta: meta(params)],
+      &publish_error/2
+    )
+  end
+
+  defp meta(params) do
+    params
+    |> Map.take(["adverb", "at_character"])
+    |> Enum.map(fn {key, value} ->
+      {String.to_atom(key), value}
+    end)
+    |> Enum.into(%{})
   end
 
   def publish_error(conn, _error), do: conn

@@ -236,11 +236,18 @@ defmodule Kalevala.Character.Command.RouterMacros do
           |> utf8_string([not: ?"], min: 1)
           |> ignore(string("\""))
           |> reduce({Enum, :join, [""]}),
-          utf8_string([not: 32, not: ?"], min: 1)
+          utf8_string([not: ?\s, not: ?"], min: 1)
         ])
         |> unwrap_and_tag(unquote(tag))
         |> label("#{unquote(tag)} word")
       )
+    end
+  end
+
+  defmacro symbol(parsec \\ NimbleParsec.empty(), character) do
+    quote do
+      unquote(parsec)
+      |> ignore(string(unquote(character)))
     end
   end
 

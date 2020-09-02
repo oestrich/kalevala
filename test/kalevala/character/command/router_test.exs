@@ -10,7 +10,14 @@ defmodule Kalevala.Character.Command.RouterTest do
 
     module(SayCommand) do
       parse("say", :run, fn command ->
-        command |> spaces() |> text(:message)
+        command
+        |> spaces()
+        |> optional(
+          symbol(">")
+          |> word(:at)
+          |> spaces()
+        )
+        |> text(:message)
       end)
     end
 
@@ -45,6 +52,24 @@ defmodule Kalevala.Character.Command.RouterTest do
 
       assert parsed_command.params == %{
                "command" => "say",
+               "message" => "hello there"
+             }
+    end
+
+    test "a command with an optional word" do
+      {:ok, parsed_command} = Router.parse("say >villager hello there")
+
+      assert parsed_command.params == %{
+               "command" => "say",
+               "at" => "villager",
+               "message" => "hello there"
+             }
+
+      {:ok, parsed_command} = Router.parse("say >\"town crier\" hello there")
+
+      assert parsed_command.params == %{
+               "command" => "say",
+               "at" => "town crier",
                "message" => "hello there"
              }
     end
