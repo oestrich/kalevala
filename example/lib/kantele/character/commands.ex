@@ -3,12 +3,6 @@ defmodule Kantele.Character.Commands do
 
   use Kalevala.Character.Command.Router, scope: Kantele.Character
 
-  module(CombatCommand) do
-    parse("combat start", :start)
-    parse("combat stop", :stop)
-    parse("combat tick", :tick)
-  end
-
   module(DelayedCommand) do
     parse("delay", :run, fn command ->
       command |> spaces() |> text(:parse)

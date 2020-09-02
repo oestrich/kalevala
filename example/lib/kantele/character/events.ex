@@ -13,12 +13,6 @@ defmodule Kantele.Character.Events do
   alias Kantele.Character.TellEvent
 
   scope(Kantele.Character) do
-    module(CombatEvent) do
-      event("combat/start", :start)
-      event("combat/stop", :stop)
-      event("combat/tick", :tick)
-    end
-
     module(DelayedEvent) do
       event("commands/delayed", :run)
     end
