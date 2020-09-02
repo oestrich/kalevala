@@ -3,6 +3,12 @@ defmodule Kantele.Character.Commands do
 
   use Kalevala.Character.Command.Router, scope: Kantele.Character
 
+  module(ChannelCommand) do
+    parse("general", :general, fn command ->
+      command |> spaces() |> text(:text)
+    end)
+  end
+
   module(DelayedCommand) do
     parse("delay", :run, fn command ->
       command |> spaces() |> text(:parse)
@@ -27,14 +33,18 @@ defmodule Kantele.Character.Commands do
     end)
   end
 
-  module(LookCommand) do
-    parse("look", :run)
+  module(InfoCommand) do
+    parse("info", :run)
   end
 
   module(InventoryCommand) do
     parse("i", :run)
     parse("inv", :run)
     parse("inventory", :run)
+  end
+
+  module(LookCommand) do
+    parse("look", :run)
   end
 
   module(MoveCommand) do
@@ -48,6 +58,11 @@ defmodule Kantele.Character.Commands do
 
   module(QuitCommand) do
     parse("quit", :run)
+  end
+
+  module(ReloadCommand) do
+    parse("recompile", :recompile)
+    parse("reload", :reload)
   end
 
   module(SayCommand) do
@@ -66,27 +81,12 @@ defmodule Kantele.Character.Commands do
     end)
   end
 
-  module(ChannelCommand) do
-    parse("general", :general, fn command ->
-      command |> spaces() |> text(:text)
-    end)
-  end
-
-  module(InfoCommand) do
-    parse("info", :run)
-  end
-
-  module(ReloadCommand) do
-    parse("recompile", :recompile)
-    parse("reload", :reload)
+  module(VersionCommand) do
+    parse("version", :run)
   end
 
   module(WhoCommand) do
     parse("who", :run)
-  end
-
-  module(VersionCommand) do
-    parse("version", :run)
   end
 
   dynamic(EmoteCommand, :emote, [])
