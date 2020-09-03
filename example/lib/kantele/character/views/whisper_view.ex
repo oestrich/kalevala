@@ -7,14 +7,14 @@ defmodule Kantele.Character.WhisperView do
     [
       "You whisper to ",
       CharacterView.render("name", %{character: character}),
-      ~i(, {color foreground="green"}"#{text}"{/color})
+      ~i(, {color foreground="green"}"#{text}"{/color}\n)
     ]
   end
 
   def render("listen", %{whispering_character: character, text: text}) do
     [
       CharacterView.render("name", %{character: character}),
-      ~i( whispers to you, {color foreground="green"}"#{text}"{/color})
+      ~i( whispers to you, {color foreground="green"}"#{text}"{/color}\n)
     ]
   end
 
@@ -23,11 +23,11 @@ defmodule Kantele.Character.WhisperView do
       CharacterView.render("name", %{character: whispering_character}),
       " whispers to ",
       CharacterView.render("name", %{character: character}),
-      "."
+      ".\n"
     ]
   end
 
   def render("character-not-found", %{name: name}) do
-    ~i(Character {color foreground="white"}#{name}{/color} could not be found.)
+    ~i(Character {color foreground="white"}#{name}{/color} could not be found.\n)
   end
 end

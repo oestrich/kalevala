@@ -72,6 +72,8 @@ defmodule Kalevala.Character.Command.Router do
 
   @doc false
   def parse(module, parse_functions, text) do
+    text = String.trim(text)
+
     parsed_command =
       Enum.find_value(parse_functions, fn command ->
         case apply(module, command, [text]) do
