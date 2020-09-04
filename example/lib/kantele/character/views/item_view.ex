@@ -34,7 +34,7 @@ defmodule Kantele.Character.ItemView do
   end
 
   def render("pickup-abort", %{reason: :missing_verb, item: item}) do
-    ~i(You cannot pick up #{render("name", %{item: item})})
+    ~i(You cannot pick up #{render("name", %{item: item})}\n)
   end
 
   def render("pickup-commit", %{item_instance: item_instance}) do

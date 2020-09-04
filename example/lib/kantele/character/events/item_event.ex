@@ -11,7 +11,7 @@ defmodule Kantele.Character.ItemEvent do
     conn
     |> assign(:item_name, item_name)
     |> render(ItemView, "unknown")
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
   end
 
   def drop_abort(conn, %{data: event}) do
@@ -23,7 +23,7 @@ defmodule Kantele.Character.ItemEvent do
     |> assign(:item, item)
     |> assign(:reason, reason)
     |> render(ItemView, "drop-abort")
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
   end
 
   def drop_commit(conn, %{data: event}) do
@@ -38,14 +38,14 @@ defmodule Kantele.Character.ItemEvent do
     conn
     |> put_character(%{conn.character | inventory: inventory})
     |> render(ItemView, "drop-commit", %{item: item, item_instance: item_instance})
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
   end
 
   def pickup_abort(conn, %{data: %{reason: :no_item, item_name: item_name}}) do
     conn
     |> assign(:item_name, item_name)
     |> render(ItemView, "unknown")
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
   end
 
   def pickup_abort(conn, %{data: event}) do
@@ -57,7 +57,7 @@ defmodule Kantele.Character.ItemEvent do
     |> assign(:item, item)
     |> assign(:reason, reason)
     |> render(ItemView, "pickup-abort", event)
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
   end
 
   def pickup_commit(conn, %{data: event}) do
@@ -69,6 +69,6 @@ defmodule Kantele.Character.ItemEvent do
     conn
     |> put_character(%{conn.character | inventory: inventory})
     |> render(ItemView, "pickup-commit", %{item: item, item_instance: item_instance})
-    |> render(CommandView, "prompt")
+    |> prompt(CommandView, "prompt")
   end
 end
