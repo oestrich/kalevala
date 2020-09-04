@@ -17,7 +17,13 @@ class Line {
   }
 }
 
-const LineBreak = {};
+export class NewLine {
+  constructor(id) {
+    this.id = id || generateTagId();
+  }
+}
+
+const LineBreak = new NewLine();
 
 const splitString = (string) => {
   let strings = string.split("\n").map(s => [LineBreak, s]).flat().slice(1);
@@ -35,10 +41,7 @@ const splitString = (string) => {
 
   let context = strings.reduce(reducer, {strings: [], current: []});
 
-  context.strings = context.strings.concat([context.current]);
-  context.strings.id = generateTagId();
-
-  return context.strings;
+  return context.strings.concat([context.current]);
 }
 
 const flattenChildren = (children) => {
@@ -91,9 +94,13 @@ const parseText = (input) => {
   let children = arrayWrap(input).map(parseTag).flat();
 
   return flattenChildren(children).filter((tag) => {
-    return tag != LineBreak;
+    return !(tag.length == 1 && tag[0].name == "string" && tag[0].text == "");
   }).map((tag) => {
-    return new Line(tag);
+    if (tag == LineBreak) {
+      return new NewLine();
+    } else {
+      return new Line(tag);
+    }
   });
 };
 

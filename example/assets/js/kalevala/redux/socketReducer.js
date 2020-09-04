@@ -1,6 +1,6 @@
 import { Types } from "./actions";
 import { createReducer } from "./createReducer";
-import parseText from "../parseText";
+import parseText, { NewLine } from "../parseText";
 
 const MAX_LINES = 500;
 
@@ -31,7 +31,27 @@ export const socketReceivedEvent = (state, action) => {
     case "system/display":
       let lines = parseText(event.data);
       lines = state.lines.concat(lines);
-      return {...state, lines: lines.slice(Math.max(0, lines.length - MAX_LINES))};
+
+      let context = {
+        lines: [],
+        newLines: 0,
+      };
+
+      for (let i = lines.length - 1; i >= 0; i--) {
+        let line = lines[i];
+
+        if (context.newLines > MAX_LINES) {
+          return context;
+        }
+
+        if (line instanceof NewLine) {
+          context = {lines: [line, ...context.lines], newLines: context.newLines + 1};
+        } else {
+          context = {...context, lines: [line, ...context.lines]};
+        }
+      }
+
+      return {...state, lines: context.lines};
 
     case "system/pong":
       return state;
@@ -50,7 +70,7 @@ export const socketSendEvent = (state, action) => {
 
       const tag = {
         name: "sent-text",
-        children: [text, "\n"],
+        children: [text],
       };
 
       let lines = parseText(tag);

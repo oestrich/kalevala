@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { parse256Color } from "./colors";
 import { getSocketLines } from "../redux";
+import { NewLine } from "../parseText";
 import Tooltip from "./Tooltip";
 
 const CustomTagsContext = React.createContext({});
@@ -182,10 +183,14 @@ class Lines extends React.Component {
     let { children } = this.props;
 
     let renderLine = (line) => {
+      if (line instanceof NewLine) {
+        return (<br key={line.id} />);
+      }
+
       return (
-        <div key={line.id}>
+        <span key={line.id}>
           {renderTags(line.children)}
-        </div>
+        </span>
       );
     };
 

@@ -1,4 +1,4 @@
-import parseText, { Children, Line, LineBreak, parseTag } from "./parseText";
+import parseText, { Children, Line, LineBreak, NewLine, parseTag } from "./parseText";
 
 describe("breaking apart a single tag", () => {
   test("has no line breaks", () => {
@@ -261,6 +261,26 @@ describe("processing text output from the game into separate lines", () => {
         name: "string",
         text: "new lines ",
       }, expect.anything()),
+      new NewLine(expect.anything()),
+      new Line({
+        id: expect.anything(),
+        name: "string",
+        text: " of text",
+      }, expect.anything()),
+    ]);
+  });
+
+  test("does not eat double newlines", () => {
+    let lines = parseText(["new lines \n\n of text"]);
+
+    expect(lines).toEqual([
+      new Line({
+        id: expect.anything(),
+        name: "string",
+        text: "new lines ",
+      }, expect.anything()),
+      new NewLine(expect.anything()),
+      new NewLine(expect.anything()),
       new Line({
         id: expect.anything(),
         name: "string",
@@ -278,6 +298,7 @@ describe("processing text output from the game into separate lines", () => {
         name: "string",
         text: "new lines ",
       }, expect.anything()),
+      new NewLine(expect.anything()),
       new Line([
         {
           id: expect.anything(),
@@ -295,6 +316,7 @@ describe("processing text output from the game into separate lines", () => {
           text: " ",
         },
       ], expect.anything()),
+      new NewLine(expect.anything()),
       new Line({
         id: expect.anything(),
         name: "string",
@@ -333,6 +355,7 @@ describe("processing text output from the game into separate lines", () => {
           },
         ],
       }, expect.anything()),
+      new NewLine(expect.anything()),
       new Line({
         id: expect.anything(),
         name: "color",
@@ -357,6 +380,7 @@ describe("processing text output from the game into separate lines", () => {
           },
         ],
       }, expect.anything()),
+      new NewLine(expect.anything()),
       new Line({
         id: expect.anything(),
         name: "color",
