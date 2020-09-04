@@ -9,9 +9,10 @@ defmodule Kantele.World.Loader do
   alias Kalevala.World.Zone
 
   @paths %{
-    world_path: "data/world",
     brains_path: "data/brains",
-    verbs_path: "data/verbs.ucl"
+    help_path: "data/help",
+    verbs_path: "data/verbs.ucl",
+    world_path: "data/world"
   }
 
   @doc """
@@ -73,6 +74,26 @@ defmodule Kantele.World.Loader do
   defp zone_rooms_to_list(zone) do
     rooms = Map.values(zone.rooms)
     %{zone | rooms: rooms}
+  end
+
+  @doc """
+  Load help files
+  """
+  def load_help(path \\ @paths.help_path) do
+    File.ls!(path)
+    |> Enum.map(fn file ->
+      File.read!(Path.join(path, file))
+    end)
+    |> Enum.map(fn text ->
+      [ucl, content] = String.split(text, "---")
+
+      help_topic =
+        ucl
+        |> Elias.parse()
+        |> Map.put(:content, String.trim(content))
+
+      struct(Kalevala.Help.HelpTopic, help_topic)
+    end)
   end
 
   @doc """

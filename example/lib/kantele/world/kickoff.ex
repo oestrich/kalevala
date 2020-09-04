@@ -51,6 +51,10 @@ defmodule Kantele.World.Kickoff do
     Enum.each(world.rooms, &start_room/1)
     Enum.each(world.characters, &start_character/1)
 
+    Enum.each(Loader.load_help(), fn help_topic ->
+      Kalevala.Help.put(help_topic)
+    end)
+
     {:noreply, state}
   end
 

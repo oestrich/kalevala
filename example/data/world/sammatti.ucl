@@ -14,8 +14,8 @@ rooms "town_square" {
     },
     {
       keyword = "Seppä"
-      short = "To the west is Seppä, the blacksmith."
-      long = "To the west is Seppä, the blacksmith."
+      short = "To the west is Seppä, the local blacksmith."
+      long = "To the west is Seppä, the local blacksmith."
     }
   ]
 }
@@ -192,5 +192,6 @@ characters "wandering_villager" {
     }
   ]
 
-  brain = brains.wandering_villager
+  #brain = brains.wandering_villager
+  brain = brains.villager
 }

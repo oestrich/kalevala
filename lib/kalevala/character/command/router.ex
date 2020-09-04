@@ -128,8 +128,8 @@ defmodule Kalevala.Character.Command.RouterMacros do
   `command` starts out the parse and any whitespace afterwards will be ignored
   """
   defmacro parse(command, fun, parse_fun \\ nil) do
-    internal_function_name = :"parsep_#{command}"
-    function_name = :"parse_#{command}"
+    internal_function_name = :"parsep_#{command}_#{fun}"
+    function_name = :"parse_#{command}_#{fun}"
 
     parse_fun = parse_fun || (&__MODULE__.default_parse_function/1)
 

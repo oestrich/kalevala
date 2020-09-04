@@ -62,6 +62,7 @@ defmodule Kantele.Application do
     children = [
       {Kantele.Config, [name: Kantele.Config]},
       {Kantele.Communication, []},
+      {Kalevala.Help, [name: Kantele.Help]},
       {Kantele.World, []},
       {Kantele.Character.Presence, []},
       {Kantele.Character.Emotes, [name: Kantele.Character.Emotes]},

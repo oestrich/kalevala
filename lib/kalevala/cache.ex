@@ -37,7 +37,7 @@ defmodule Kalevala.Cache do
       @doc false
       def child_spec(opts) do
         %{
-          id: Kalevala.Cache,
+          id: Keyword.get(opts, :id, Kalevala.Cache),
           start: {__MODULE__, :start_link, [opts]}
         }
       end

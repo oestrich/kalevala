@@ -23,6 +23,14 @@ defmodule Kantele.Character.Commands do
     parse("emotes", :list)
   end
 
+  module(HelpCommand) do
+    parse("help", :show, fn command ->
+      command |> spaces() |> text(:topic)
+    end)
+
+    parse("help", :index)
+  end
+
   module(ItemCommand) do
     parse("drop", :drop, fn command ->
       command |> spaces() |> text(:item_name)
