@@ -26,6 +26,8 @@ room_exits "town_square" {
   north = rooms.marketplace.id
   east = rooms.inn.id
   west = rooms.blacksmith.id
+
+  south = "kissa-jarvi.rooms.gates.id"
 }
 
 room_characters "town_square" {
@@ -192,6 +194,5 @@ characters "wandering_villager" {
     }
   ]
 
-  #brain = brains.wandering_villager
-  brain = brains.villager
+  brain = brains.wandering_villager
 }

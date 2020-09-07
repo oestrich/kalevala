@@ -125,7 +125,7 @@ brains "town_crier" {
         {
           type = "actions/delay-event"
           data = {
-            minimum_delay = 30000
+            minimum_delay = 90000
             random_delay = 180000
             topic = "characters/emote"
             data = {

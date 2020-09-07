@@ -71,7 +71,7 @@ brains "wandering_villager" {
         {
           type = "actions/delay-event"
           data = {
-            minimum_delay = 3000
+            minimum_delay = 18000
             random_delay = 18000
             topic = "characters/move"
             data = {

@@ -129,7 +129,7 @@ defmodule Kantele.World.Loader do
 
     rooms =
       Enum.into(rooms, %{}, fn {key, room_data} ->
-        parse_room(zone, key, room_data)
+        parse_room(zone, key, room_data, zone_data)
       end)
 
     characters = Map.get(zone_data, :characters, [])
@@ -154,30 +154,39 @@ defmodule Kantele.World.Loader do
 
   ID is the zone's id concatenated with the room's key
   """
-  def parse_room(zone, key, room_data) do
+  def parse_room(zone, key, room_data, zone_data) do
     room = %Room{
       id: "#{zone.id}:#{key}",
       zone_id: zone.id,
       name: room_data.name,
       description: room_data.description,
-      features: parse_features(room_data)
+      features: parse_features(room_data, zone_data)
     }
 
     {key, room}
   end
 
-  def parse_features(%{features: features}) when is_list(features) do
+  def parse_features(%{features: features}, zone_data) when is_list(features) do
     Enum.map(features, fn feature ->
-      %Room.Feature{
-        id: feature.keyword,
-        keyword: feature.keyword,
-        short_description: feature.short,
-        description: feature.long
-      }
+      parse_feature(feature, zone_data)
     end)
   end
 
-  def parse_features(_), do: []
+  def parse_features(_room, _zone_data), do: []
+
+  defp parse_feature(%{ref: "features." <> ref}, zone_data) do
+    feature = Map.get(zone_data.features, String.to_atom(ref))
+    parse_feature(feature, zone_data)
+  end
+
+  defp parse_feature(feature, _zone_data) do
+    %Room.Feature{
+      id: feature.keyword,
+      keyword: feature.keyword,
+      short_description: feature.short,
+      description: feature.long
+    }
+  end
 
   @doc """
   Parse character data
