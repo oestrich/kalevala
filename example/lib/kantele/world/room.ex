@@ -3,8 +3,6 @@ defmodule Kantele.World.Room do
   Callbacks for a Kalevala room
   """
 
-  use Kalevala.World.Room
-
   require Logger
 
   alias Kalevala.Verb
@@ -13,7 +11,18 @@ defmodule Kantele.World.Room do
   alias Kantele.World.Items
   alias Kantele.World.Room.Events
 
-  @impl true
+  defstruct [
+    :id,
+    :zone_id,
+    :name,
+    :description,
+    exits: [],
+    features: []
+  ]
+
+  @doc """
+  Called after a room is initialized, used in the Callbacks protocol
+  """
   def initialized(room) do
     options = [room_id: room.id]
 
@@ -24,16 +33,31 @@ defmodule Kantele.World.Room do
     end
   end
 
-  @impl true
-  def event(context, event) do
-    Events.call(context, event)
-  end
+  @doc """
+  Forward an event to the Events router
 
-  @impl true
+  Used in the `Callbacks` protocol.
+  """
+  def event(context, event), do: Events.call(context, event)
+
+  @doc """
+  Load an item based on room information
+
+  Used in the `Callbacks` protocol.
+  """
   def load_item(item_instance), do: Items.get!(item_instance.item_id)
 
-  @impl true
-  def item_request_pickup(context, event, nil) do
+  @doc """
+  Handle requesting picking up an item
+
+  Used in the `Callbacks` protocol.
+
+  Checks if the item has the verb to pick up in a room before allowing.
+
+  If the instance id is `nil` then the event `item_name` is considered and id
+  and searched accordingly before checking for the appropriate verb.
+  """
+  def item_request_pickup(room, context, event, nil) do
     item_instance =
       Enum.find(context.item_instances, fn item_instance ->
         item_instance.id == event.data.item_name
@@ -41,14 +65,14 @@ defmodule Kantele.World.Room do
 
     case item_instance != nil do
       true ->
-        item_request_pickup(context, event, item_instance)
+        item_request_pickup(room, context, event, item_instance)
 
       false ->
         {:abort, event, :no_item, nil}
     end
   end
 
-  def item_request_pickup(_context, event, item_instance) do
+  def item_request_pickup(_room, _context, event, item_instance) do
     item = load_item(item_instance)
 
     case Verb.has_matching_verb?(item.verbs, :get, %Verb.Context{location: "room"}) do
@@ -58,6 +82,48 @@ defmodule Kantele.World.Room do
       false ->
         {:abort, event, :missing_verb, item_instance}
     end
+  end
+
+  defimpl Kalevala.World.Zone.Child do
+    def zone_id(room), do: room.zone_id
+  end
+
+  defimpl Kalevala.World.Room.Callbacks do
+    require Logger
+
+    alias Kalevala.World.BasicRoom
+    alias Kantele.World.Room
+
+    @impl true
+    def init(room), do: room
+
+    @impl true
+    def initialized(room), do: Room.initialized(room)
+
+    @impl true
+    def event(_room, context, event), do: Room.event(context, event)
+
+    @impl true
+    def exits(room), do: room.exits
+
+    @impl true
+    def movement_request(_room, context, event, room_exit),
+      do: BasicRoom.movement_request(context, event, room_exit)
+
+    @impl true
+    def confirm_movement(_room, context, event),
+      do: BasicRoom.confirm_movement(context, event)
+
+    @impl true
+    def item_request_drop(_room, context, event, item_instance),
+      do: BasicRoom.item_request_drop(context, event, item_instance)
+
+    @impl true
+    def load_item(_room, item_instance), do: Room.load_item(item_instance)
+
+    @impl true
+    def item_request_pickup(room, context, event, item_instance),
+      do: Room.item_request_pickup(room, context, event, item_instance)
   end
 end
 

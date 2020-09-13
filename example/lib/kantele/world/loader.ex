@@ -5,8 +5,9 @@ defmodule Kantele.World.Loader do
 
   alias Kalevala.Character
   alias Kalevala.World.Item
-  alias Kalevala.World.Room
+  alias Kalevala.World.Room.Feature
   alias Kalevala.World.Zone
+  alias Kantele.World.Room
 
   @paths %{
     brains_path: "data/brains",
@@ -180,7 +181,7 @@ defmodule Kantele.World.Loader do
   end
 
   defp parse_feature(feature, _zone_data) do
-    %Room.Feature{
+    %Feature{
       id: feature.keyword,
       keyword: feature.keyword,
       short_description: feature.short,

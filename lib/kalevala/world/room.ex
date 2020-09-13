@@ -25,127 +25,11 @@ defmodule Kalevala.World.Room do
 
   alias Kalevala.Event
   alias Kalevala.Event.Message
-  alias Kalevala.World
+  alias Kalevala.World.Room.Callbacks
   alias Kalevala.World.Room.Context
   alias Kalevala.World.Room.Events
-  alias Kalevala.World.Room.Exit
+  alias Kalevala.World.Room.Handler
   alias Kalevala.World.Room.Private
-
-  defstruct [
-    :id,
-    :zone_id,
-    :name,
-    :description,
-    exits: [],
-    features: []
-  ]
-
-  @type t() :: %__MODULE__{}
-
-  @doc """
-  Called when the room is initializing
-  """
-  @callback init(room :: t()) :: t()
-
-  @doc """
-  Called after the room process is started
-
-  Directly after `init` is completed.
-  """
-  @callback initialized(room :: t()) :: :ok
-
-  @doc """
-  Callback for when a new event is received
-  """
-  @callback event(Context.t(), event :: Event.t()) :: Context.t()
-
-  @doc """
-  Callback for the room to hook into movement between exits
-
-  The character is requesting to move via an exit, a tuple allowing or rejecting
-  the movement before being pitched up to the Zone should be returned.
-
-  Can immediately terminate a room before being checked in a more detailed fashion
-  with `confirm_movement/2` below.
-  """
-  @callback movement_request(Context.t(), Event.movement_request(), Exit.t() | nil) ::
-              {:abort, event :: Event.t(), reason :: atom()}
-              | {:proceed, event :: Event.t(), room_exit :: Exit.t()}
-
-  @doc """
-  Callback for confirming or aborting character movement
-
-  Called while the Zone is checking each side of the exit to know if the movement
-  is indeed allowed. Returning the original event allows movement to proceed, otherwise
-  return an aborted event to prevent movement.
-
-  Hook to allow for the room to reject movement for custom reasons, e.g. an NPC
-  is blocking the exit and needs to be convinced first, or there is a trap blocking
-  the exit.
-  """
-  @callback confirm_movement(Context.t(), event :: Event.movement_voting()) ::
-              {Context.t(), Event.movement_voting()}
-
-  @doc """
-  Convert item instances into items
-  """
-  @callback load_item(World.Item.Instance.t()) :: World.Item.t()
-
-  @doc """
-  Callback for allowing an item drop off
-
-  A character is requesting to pick up an item, this let's the room
-  accept or reject the request.
-  """
-  @callback item_request_drop(Context.t(), Event.item_request_drop(), World.Item.Instance.t()) ::
-              {:abort, event :: Event.item_request_drop(), reason :: atom()}
-              | {:proceed, event :: Event.item_request_drop(), World.Item.Instance.t()}
-
-  @doc """
-  Callback for allowing an item pick up
-
-  A character is requesting to pick up an item, this let's the room
-  accept or reject the request.
-  """
-  @callback item_request_pickup(Context.t(), Event.item_request_pickup(), World.Item.Instance.t()) ::
-              {:abort, event :: Event.item_request_pickup(), reason :: atom(),
-               World.Item.Instance.t()}
-              | {:proceed, event :: Event.item_request_pickup(), World.Item.Instance.t()}
-
-  defmacro __using__(_opts) do
-    quote do
-      import Kalevala.World.Room.Context
-
-      @behaviour Kalevala.World.Room
-
-      @impl true
-      def init(room), do: room
-
-      @impl true
-      def movement_request(_context, event, nil), do: {:abort, event, :no_exit}
-
-      def movement_request(_context, event, room_exit), do: {:proceed, event, room_exit}
-
-      @impl true
-      def confirm_movement(context, event), do: {context, event}
-
-      @impl true
-      def item_request_drop(_context, event, item_instance),
-        do: {:proceed, event, item_instance}
-
-      @impl true
-      def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item, nil}
-
-      def item_request_pickup(_context, event, item_instance),
-        do: {:proceed, event, item_instance}
-
-      defoverridable confirm_movement: 2,
-                     init: 1,
-                     item_request_drop: 3,
-                     item_request_pickup: 3,
-                     movement_request: 3
-    end
-  end
 
   @doc """
   Confirm movement for a character
@@ -173,7 +57,7 @@ defmodule Kalevala.World.Room do
   end
 
   @doc false
-  def global_name(room = %__MODULE__{}), do: global_name(room.id)
+  def global_name(%{id: id}), do: global_name(id)
 
   def global_name(room_id), do: {:global, {__MODULE__, room_id}}
 
@@ -190,12 +74,11 @@ defmodule Kalevala.World.Room do
     Logger.info("Room starting - #{options.room.id}")
 
     config = options.config
-    room = config.callback_module.init(options.room)
+    room = Callbacks.init(options.room)
 
     state = %{
       data: room,
       supervisor_name: config.supervisor_name,
-      callback_module: config.callback_module,
       private: %Private{
         item_instances: options.item_instances
       }
@@ -206,16 +89,13 @@ defmodule Kalevala.World.Room do
 
   @impl true
   def handle_continue(:initialized, state) do
-    state.callback_module.initialized(state.data)
+    Callbacks.initialized(state.data)
     {:noreply, state}
   end
 
   @impl true
   def handle_call(event = %Event{topic: Event.Movement.Voting}, _from, state) do
-    {context, event} =
-      state
-      |> Context.new()
-      |> state.callback_module.confirm_movement(event)
+    {context, event} = Handler.confirm_movement(state, event)
 
     Context.handle_context(context)
 
@@ -241,12 +121,175 @@ defmodule Kalevala.World.Room do
 
   def handle_info(message = %Message{}, state) do
     context =
-      Context.new(state)
-      |> state.callback_module.event(message)
+      state
+      |> Handler.event(message)
       |> Context.handle_context()
 
     state = Map.put(state, :data, context.data)
 
     {:noreply, state}
   end
+end
+
+defmodule Kalevala.World.Room.Handler do
+  @moduledoc false
+
+  alias Kalevala.World.Room.Callbacks
+  alias Kalevala.World.Room.Context
+
+  def event(state, event) do
+    Callbacks.event(state.data, Context.new(state), event)
+  end
+
+  # Items
+
+  def load_item(state, item_instance) do
+    Callbacks.load_item(state.data, item_instance)
+  end
+
+  def item_request_drop(state, event, item_instance) do
+    Callbacks.item_request_drop(state.data, Context.new(state), event, item_instance)
+  end
+
+  def item_request_pickup(state, event, item_instance) do
+    Callbacks.item_request_pickup(state.data, Context.new(state), event, item_instance)
+  end
+
+  # Movement
+
+  def exits(state), do: Callbacks.exits(state.data)
+
+  def movement_request(state, event, room_exit) do
+    Callbacks.movement_request(state.data, Context.new(state), event, room_exit)
+  end
+
+  def confirm_movement(state, event) do
+    Callbacks.confirm_movement(state.data, Context.new(state), event)
+  end
+end
+
+defprotocol Kalevala.World.Room.Callbacks do
+  @doc """
+  Called when the room is initializing
+  """
+  def init(room)
+
+  @doc """
+  Called after the room process is started
+
+  Directly after `init` is completed.
+  """
+  def initialized(room)
+
+  @doc """
+  Callback for when a new event is received
+  """
+  def event(room, context, event)
+
+  @doc """
+  Load the exits for a given room
+
+  Used when a character is trying to move, the appropriate exit is chosen
+  and forwarded into movement request callbacks. Since this is a common thing
+  that will happen 99% of the time, Kalevala handles it.
+  """
+  def exits(room)
+
+  @doc """
+  Convert item instances into items
+  """
+  def load_item(room, item_instance)
+
+  @doc """
+  Callback for allowing an item drop off
+
+  A character is requesting to pick up an item, this let's the room
+  accept or reject the request.
+  """
+  def item_request_drop(room, context, item_request_drop, item_instance)
+
+  @doc """
+  Callback for allowing an item pick up
+
+  A character is requesting to pick up an item, this let's the room
+  accept or reject the request.
+  """
+  def item_request_pickup(room, context, item_request_pickup, item_instance)
+
+  @doc """
+  Callback for the room to hook into movement between exits
+
+  The character is requesting to move via an exit, a tuple allowing or rejecting
+  the movement before being pitched up to the Zone should be returned.
+
+  Can immediately terminate a room before being checked in a more detailed fashion
+  with `confirm_movement/2` below.
+  """
+  def movement_request(room, context, movement_request, room_exit)
+
+  @doc """
+  Callback for confirming or aborting character movement
+
+  Called while the Zone is checking each side of the exit to know if the movement
+  is indeed allowed. Returning the original event allows movement to proceed, otherwise
+  return an aborted event to prevent movement.
+
+  Hook to allow for the room to reject movement for custom reasons, e.g. an NPC
+  is blocking the exit and needs to be convinced first, or there is a trap blocking
+  the exit.
+  """
+  def confirm_movement(room, context, event)
+end
+
+defmodule Kalevala.World.BasicRoom do
+  @moduledoc """
+  A basic room
+
+  These are the minimum fields a room should have. You likely want more, so
+  we have a protocol `Kalevala.World.Room.Callbacks` to let you create your own
+  local struct.
+
+  The following functions provide default implementations you can use for the
+  `defimpl` of that protocol.
+
+  ```elixir
+  defimpl Kalevala.World.Room.Callbacks do
+    alias Kalevala.World.BasicRoom
+
+    @impl true
+    def movement_request(_room, context, event, room_exit),
+      do: BasicRoom.movement_request(context, event, room_exit)
+
+    @impl true
+    def confirm_movement(_room, context, event),
+      do: BasicRoom.confirm_movement(context, event)
+
+    @impl true
+    def item_request_drop(_room, context, event, item_instance),
+      do: BasicRoom.item_request_drop(context, event, item_instance)
+
+    @impl true
+    def item_request_pickup(_room, context, event, item_instance),
+      do: BasicRoom.item_request_pickup(context, event, item_instance)
+
+    # ...
+  end
+  ```
+  """
+
+  defstruct [:id]
+
+  def movement_request(_context, event, nil), do: {:abort, event, :no_exit}
+
+  def movement_request(_context, event, room_exit), do: {:proceed, event, room_exit}
+
+  def confirm_movement(context, event), do: {context, event}
+
+  def item_request_drop(_context, event, item_instance),
+    do: {:proceed, event, item_instance}
+
+  def item_request_pickup(_context, event, nil), do: {:abort, event, :no_item, nil}
+
+  def item_request_pickup(_context, event, item_instance),
+    do: {:proceed, event, item_instance}
 end

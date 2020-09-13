@@ -99,3 +99,10 @@ defmodule Kalevala.World.Zone.Movement do
     send(character.pid, Voting.commit(event))
   end
 end
+
+defprotocol Kalevala.World.Zone.Child do
+  @doc """
+  Load the a Zone's ID out of the struct
+  """
+  def zone_id(struct)
+end
