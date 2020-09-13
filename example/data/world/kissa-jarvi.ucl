@@ -78,6 +78,7 @@ room_exits "path-3" {
   room_id = rooms.path-3.id
 
   west = rooms.path-2.id
+  east = rooms.path-4.id
   south = rooms.lake-5.id
 }
 
@@ -89,6 +90,24 @@ room_characters "path-3" {
       id = characters.wolf.id
     }
   ]
+}
+
+rooms "path-4" {
+  name = "Kissa Path"
+  description = "A dirt road leading away from Sammatti."
+
+  features = [
+    {
+      ref = features.stones
+    }
+  ]
+}
+
+room_exits "path-4" {
+  room_id = rooms.path-4.id
+
+  west = rooms.path-3.id
+  south = rooms.lake-6.id
 }
 
 rooms "lake-1" {
@@ -181,6 +200,24 @@ room_exits "lake-5" {
 
   north = rooms.path-3.id
   west = rooms.lake-4.id
+}
+
+rooms "lake-6" {
+  name = "Kissa Järvi"
+  description = "A long shallow lake."
+
+  features = [
+    {
+      ref = features.water
+    }
+  ]
+}
+
+room_exits "lake-6" {
+  room_id = rooms.lake-6.id
+
+  north = rooms.path-4.id
+  west = rooms.lake-5.id
 }
 
 features "water" {
