@@ -6,7 +6,9 @@ If you want to start your own Kalevala game, copying Kantele is a great place to
 
 ## Setup
 
-Elixir and NodeJS are both required to run Kantele, the versions used are listed below. NodeJS is used to compile the web client. 
+Elixir and NodeJS are both required to run Kantele, the versions used are listed below. It's recommended to use [asdf](https://asdf-vm.com/) to install Elixir and NodeJS.
+
+NodeJS is used to compile the web client. 
 
 - Elixir: 1.10
 - NodeJS: 12.16
