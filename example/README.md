@@ -4,6 +4,31 @@ Kantele is an example implementation of Kalevala. Kantele stresses everything th
 
 If you want to start your own Kalevala game, copying Kantele is a great place to start until Kalevala ships with a new game generator.
 
+## Setup
+
+Elixir and NodeJS are both required to run Kantele, the versions used are listed below. NodeJS is used to compile the web client. 
+
+- Elixir: 1.10
+- NodeJS: 12.16
+
+```bash
+mix deps.get
+mix compile
+(cd assets && yarn install && yarn build)
+```
+
+Run the game with
+
+```bash
+mix run --no-halt
+```
+
+The game will be listening on 3 ports:
+
+- telnet 4444
+- secure telnet 4443 (using the self signed cert in `priv`)
+- http 4500
+
 ## Game Data
 
 Game data is held in the `data` folder. These files are in the [UCL](https://github.com/vstakhov/libucl) format. They are parsed by [Elias](https://github.com/oestrich/elias), a custom parser for UCL.
