@@ -6,7 +6,15 @@ defmodule Kantele.Application do
   use Application
 
   def start(_type, _args) do
-    listener_config = [
+    foreman_options = [
+      supervisor_name: Kantele.Character.Foreman.Supervisor,
+      communication_module: Kantele.Communication,
+      initial_controller: Kantele.Character.LoginController,
+      presence_module: Kantele.Character.Presence,
+      quit_view: {Kantele.Character.QuitView, "disconnected"}
+    ]
+
+    telnet_config = [
       telnet: [
         port: 4444
       ],
@@ -25,13 +33,7 @@ defmodule Kantele.Application do
           Kalevala.Output.StripTags
         ]
       ],
-      foreman: [
-        supervisor_name: Kantele.Character.Foreman.Supervisor,
-        communication_module: Kantele.Communication,
-        initial_controller: Kantele.Character.LoginController,
-        presence_module: Kantele.Character.Presence,
-        quit_view: {Kantele.Character.QuitView, "disconnected"}
-      ]
+      foreman: foreman_options
     ]
 
     websocket_config = [
@@ -50,13 +52,7 @@ defmodule Kantele.Application do
           Kalevala.Output.Websocket
         ]
       ],
-      foreman: [
-        supervisor_name: Kantele.Character.Foreman.Supervisor,
-        communication_module: Kantele.Communication,
-        initial_controller: Kantele.Character.LoginController,
-        presence_module: Kantele.Character.Presence,
-        quit_view: {Kantele.Character.QuitView, "disconnected"}
-      ]
+      foreman: foreman_options
     ]
 
     children = [
@@ -67,8 +63,8 @@ defmodule Kantele.Application do
       {Kantele.Character.Presence, []},
       {Kantele.Character.Emotes, [name: Kantele.Character.Emotes]},
       {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
-      listener(listener_config),
-      {Kalevala.Websocket.Listener, websocket_config},
+      telnet_listener(telnet_config),
+      websocket_listener(websocket_config),
       {Kantele.Telemetry, []}
     ]
 
@@ -83,12 +79,24 @@ defmodule Kantele.Application do
     Supervisor.start_link(children, opts)
   end
 
-  def listener(listener_config) do
+  def telnet_listener(telnet_config) do
     config = Application.get_env(:kantele, :listener, [])
 
     case Keyword.get(config, :start, true) do
       true ->
-        {Kalevala.Telnet.Listener, listener_config}
+        {Kalevala.Telnet.Listener, telnet_config}
+
+      false ->
+        nil
+    end
+  end
+
+  def websocket_listener(websocket_config) do
+    config = Application.get_env(:kantele, :listener, [])
+
+    case Keyword.get(config, :start, true) do
+      true ->
+        {Kalevala.Websocket.Listener, websocket_config}
 
       false ->
         nil
