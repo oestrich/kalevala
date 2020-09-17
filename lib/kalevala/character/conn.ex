@@ -167,7 +167,11 @@ defmodule Kalevala.Character.Conn do
 
   If the character has been updated, this character will be returned
   """
-  def character(conn), do: Private.character(conn)
+  def character(conn, opts \\ [])
+
+  def character(conn, trim: true), do: Private.character(conn)
+
+  def character(conn, _), do: conn.private.update_character || conn.character
 
   @doc """
   Render text to the conn

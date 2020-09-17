@@ -5,6 +5,14 @@ zones "kissa-jarvi" {
 rooms "gates" {
   name = "The Gates to Sammatti"
   description = "You are in front of the gates to Sammatti."
+
+  features = [
+    {
+      keyword = "lake edge"
+      short = "The lake edge creeps close to the entrance."
+      long = "The lake edge creeps close to the entrance."
+    }
+  ]
 }
 
 room_exits "gates" {

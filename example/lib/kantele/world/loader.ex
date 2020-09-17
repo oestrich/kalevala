@@ -274,6 +274,19 @@ defmodule Kantele.World.Loader do
     }
   end
 
+  defp parse_node(%{type: "conditions/meta-match", data: data}, _brains) do
+    data = %{
+      key: String.to_atom(data.key),
+      match: data.match,
+      value: data.value
+    }
+
+    %Kalevala.Character.Brain.Condition{
+      type: Kalevala.Character.Conditions.MetaMatch,
+      data: data
+    }
+  end
+
   defp parse_node(%{type: "conditions/room-enter", data: data}, _brains) do
     %Kalevala.Character.Brain.Condition{
       type: Kalevala.Character.Conditions.EventMatch,
@@ -295,6 +308,12 @@ defmodule Kantele.World.Loader do
         topic: data.topic,
         data: Map.get(data, :data, %{})
       }
+    }
+  end
+
+  defp parse_node(%{type: "actions/meta-set", data: data}, _brains) do
+    %Kalevala.Character.Brain.MetaSet{
+      data: data
     }
   end
 

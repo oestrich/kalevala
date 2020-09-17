@@ -373,7 +373,7 @@ defmodule Kalevala.Character.Foreman.Player do
 
   @impl true
   def track_presence(state, conn) do
-    state.private.presence_module.track(Conn.character(conn))
+    state.private.presence_module.track(Conn.character(conn, trim: true))
   end
 end
 

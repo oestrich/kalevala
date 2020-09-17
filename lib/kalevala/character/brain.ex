@@ -223,6 +223,59 @@ defmodule Kalevala.Character.Brain.Action do
   end
 end
 
+defmodule Kalevala.Character.Brain.MetaSet do
+  @moduledoc """
+  Node to set meta values on a character
+  """
+
+  defstruct [:data]
+
+  defimpl Kalevala.Character.Brain.Node do
+    alias Kalevala.Character.Conn
+    alias Kalevala.Meta
+
+    def run(node, conn, _event) do
+      character = Conn.character(conn)
+
+      character =
+        Enum.reduce(node.data, character, fn {key, value}, character ->
+          meta = Meta.put(character.meta, key, value)
+          %{character | meta: meta}
+        end)
+
+      Conn.put_character(conn, character)
+    end
+  end
+end
+
+defmodule Kalevala.Character.Conditions.EventMatch do
+  @moduledoc """
+  Condition check for the event being a message and the regex matches
+  """
+
+  @behaviour Kalevala.Character.Brain.Condition
+
+  @impl true
+  def match?(event, conn, data) do
+    self_check(event, conn, data) && data.topic == event.topic &&
+      Enum.all?(data.data, fn {key, value} ->
+        Map.get(event.data, key) == value
+      end)
+  end
+
+  def self_check(event, conn, %{self_trigger: self_trigger}) do
+    acting_character = Map.get(event, :acting_character) || %{}
+
+    case Map.get(acting_character, :id) == conn.character.id do
+      true ->
+        self_trigger
+
+      false ->
+        true
+    end
+  end
+end
+
 defmodule Kalevala.Character.Conditions.MessageMatch do
   @moduledoc """
   Condition check for the event being a message and the regex matches
@@ -252,30 +305,26 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
   end
 end
 
-defmodule Kalevala.Character.Conditions.EventMatch do
+defmodule Kalevala.Character.Conditions.MetaMatch do
   @moduledoc """
-  Condition check for the event being a message and the regex matches
+  Match values in the meta map
   """
+
+  alias Kalevala.Character.Conn
+  alias Kalevala.Meta
 
   @behaviour Kalevala.Character.Brain.Condition
 
   @impl true
-  def match?(event, conn, data) do
-    self_check(event, conn, data) && data.topic == event.topic &&
-      Enum.all?(data.data, fn {key, value} ->
-        Map.get(event.data, key) == value
-      end)
-  end
+  def match?(_event, conn, %{key: key, match: match, value: value}) do
+    character = Conn.character(conn)
 
-  def self_check(event, conn, %{self_trigger: self_trigger}) do
-    acting_character = Map.get(event, :acting_character) || %{}
+    case match do
+      "equality" ->
+        Meta.get(character.meta, key) == value
 
-    case Map.get(acting_character, :id) == conn.character.id do
-      true ->
-        self_trigger
-
-      false ->
-        true
+      "inequality" ->
+        Meta.get(character.meta, key) != value
     end
   end
 end
