@@ -144,59 +144,155 @@ defmodule Kalevala.Character.Brain.Condition do
   end
 end
 
-defmodule Kalevala.Character.Brain.Action do
+defmodule Kalevala.Character.Brain.Variable do
   @moduledoc """
-  Node to trigger an action
+  Handle variable data in brain nodes
+
+  Replaces variables in the format of `${variable_name}`. Works with
+  a dot notation for nested variables.
+
+  Example:
+
+  The starting data
+
+       %{
+         channel_name: "rooms:${room_id}",
+         delay: 500,
+         text: "Welcome, ${character.name}!"
+       }
+
+  With the event data
+
+      %{
+        room_id: "room-id",
+        character: %{
+          name: "Elias"
+        }
+      }
+
+  Will replace to the following
+
+       %{
+         channel_name: "rooms:room-id",
+         delay: 500,
+         text: "Welcome, Elias!"
+       }
   """
 
-  defstruct [:data, :type, delay: 0]
+  defstruct [:path, :original, :reference, :value]
 
   @doc """
   Replace action data variables with event data
   """
   def replace(data, event_data) do
-    Enum.into(data, %{}, fn {key, value} ->
-      replace_value(key, value, event_data)
-    end)
-  end
-
-  defp replace_value(key, value, event_data) when is_binary(value) do
-    value = replace_variables(value, event_data)
-    {to_string(key), value}
-  end
-
-  defp replace_value(key, value, event_data) when is_map(value) do
-    {to_string(key), replace(value, event_data)}
-  end
-
-  defp replace_value(key, value, _event_data) do
-    {to_string(key), value}
+    data
+    |> detect_variables()
+    |> dereference_variables(event_data)
+    |> replace_variables(data)
   end
 
   @doc """
-  Replace variables in a string value with a given map of data
+  Detect variables inside of the data
   """
-  def replace_variables(value, data) do
-    variables = Regex.scan(~r/\$\{(?<variable>[\w\.]+)\}/, value)
-
-    Enum.reduce(variables, value, fn [string, variable], value ->
-      variable_path = String.split(variable, ".")
-      variable_value = dereference(data, variable_path)
-      String.replace(value, string, variable_value)
+  def detect_variables(data, path \\ []) do
+    data
+    |> Enum.map(fn {key, value} ->
+      find_variables({key, value}, path)
     end)
+    |> Enum.reject(&is_nil/1)
+    |> List.flatten()
+  end
+
+  defp find_variables({key, value}, path) when is_binary(value) do
+    variables(value, path ++ [key])
+  end
+
+  defp find_variables({key, value}, path) when is_map(value) do
+    detect_variables(value, path ++ [key])
+  end
+
+  defp find_variables(_, _), do: nil
+
+  @doc """
+  Scan the value for a variable, returning `Variable` structs
+  """
+  def variables(value, path) do
+    Enum.map(Regex.scan(~r/\$\{(?<variable>[\w\.]+)\}/, value), fn [string, variable] ->
+      %Kalevala.Character.Brain.Variable{
+        path: path,
+        original: string,
+        reference: variable
+      }
+    end)
+  end
+
+  def dereference_variables(variables, event_data) do
+    Enum.map(variables, fn variable ->
+      dereference_variable(variable, event_data)
+    end)
+  end
+
+  defp dereference_variable(variables, event_data) when is_list(variables) do
+    Enum.map(variables, fn variable ->
+      dereference_variable(variable, event_data)
+    end)
+  end
+
+  defp dereference_variable(variable, event_data) do
+    variable_reference = String.split(variable.reference, ".")
+    variable_value = dereference(event_data, variable_reference)
+    %{variable | value: variable_value}
+  end
+
+  @doc """
+  Replace detected and dereferenced variables in the data
+
+  Fails if any variables still contain an `:error` value, they were
+  not able to be dereferenced.
+  """
+  def replace_variables(variables, data) do
+    failed_replace? =
+      Enum.any?(variables, fn variable ->
+        variable.value == :error
+      end)
+
+    case failed_replace? do
+      true ->
+        :error
+
+      false ->
+        {:ok, Enum.reduce(variables, data, &replace_variable/2)}
+    end
+  end
+
+  defp replace_variable(variables, data) when is_list(variables) do
+    Enum.reduce(variables, data, &replace_variable/2)
+  end
+
+  defp replace_variable(variable, data) do
+    string = get_in(data, variable.path)
+    string = String.replace(string, variable.original, variable.value)
+    put_in(data, variable.path, string)
   end
 
   @doc """
   Dereference a variable path from a map of data
   """
   def dereference(data, variable_path) do
-    Enum.reduce(variable_path, data, fn path, data ->
-      data =
-        Enum.into(maybe_destruct(data), %{}, fn {key, value} ->
-          {to_string(key), value}
-        end)
+    Enum.reduce(variable_path, data, fn
+      _path, nil ->
+        :error
 
-      Map.get(data, path)
+      _path, :error ->
+        :error
+
+      path, data ->
+        data =
+          Enum.into(maybe_destruct(data), %{}, fn {key, value} ->
+            {to_string(key), value}
+          end)
+
+        Map.get(data, path)
     end)
   end
 
@@ -206,19 +302,112 @@ defmodule Kalevala.Character.Brain.Action do
 
   defp maybe_destruct(data), do: data
 
+  @doc """
+  Walk the resulting data map to convert keys from atoms to strings
+
+  This is useful when sending the resulting data struct to action params
+  """
+  def stringify_keys(nil), do: nil
+
+  def stringify_keys(map) when is_map(map) do
+    Enum.into(map, %{}, fn {k, v} ->
+      {to_string(k), stringify_keys(v)}
+    end)
+  end
+
+  def stringify_keys([head | rest]) do
+    [stringify_keys(head) | stringify_keys(rest)]
+  end
+
+  def stringify_keys(value), do: value
+end
+
+defmodule Kalevala.Character.Brain.Action do
+  @moduledoc """
+  Node to trigger an action
+  """
+
+  defstruct [:data, :type, delay: 0]
+
   defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Action
+    alias Kalevala.Character.Brain.Variable
     alias Kalevala.Character.Conn
 
     def run(node, conn, event) do
-      data = Map.merge(Map.from_struct(conn.character), event.data)
-      data = Action.replace(node.data, data)
+      character = Conn.character(conn, trim: true)
+      event_data = Map.merge(Map.from_struct(character), event.data)
 
-      Conn.put_action(conn, %Kalevala.Character.Action{
-        type: node.type,
-        params: data,
-        delay: node.delay
-      })
+      case Variable.replace(node.data, event_data) do
+        {:ok, data} ->
+          data = Variable.stringify_keys(data)
+
+          Conn.put_action(conn, %Kalevala.Character.Action{
+            type: node.type,
+            params: data,
+            delay: node.delay
+          })
+
+        :error ->
+          conn
+      end
+    end
+  end
+end
+
+defmodule Kalevala.Character.Brain.MetaSet do
+  @moduledoc """
+  Node to set meta values on a character
+  """
+
+  defstruct [:data]
+
+  defimpl Kalevala.Character.Brain.Node do
+    alias Kalevala.Character.Brain.Variable
+    alias Kalevala.Character.Conn
+    alias Kalevala.Meta
+
+    def run(node, conn, event) do
+      character = Conn.character(conn)
+
+      event_data = Map.merge(Map.from_struct(character), event.data)
+
+      case Variable.replace(node.data, event_data) do
+        {:ok, data} ->
+          meta = Meta.put(character.meta, data.key, data.value)
+          character = %{character | meta: meta}
+          Conn.put_character(conn, character)
+
+        :error ->
+          conn
+      end
+    end
+  end
+end
+
+defmodule Kalevala.Character.Conditions.EventMatch do
+  @moduledoc """
+  Condition check for the event being a message and the regex matches
+  """
+
+  @behaviour Kalevala.Character.Brain.Condition
+
+  @impl true
+  def match?(event, conn, data) do
+    self_check(event, conn, data) && data.topic == event.topic &&
+      Enum.all?(data.data, fn {key, value} ->
+        Map.get(event.data, key) == value
+      end)
+  end
+
+  def self_check(event, conn, %{self_trigger: self_trigger}) do
+    acting_character = Map.get(event, :acting_character) || %{}
+
+    case Map.get(acting_character, :id) == conn.character.id do
+      true ->
+        self_trigger
+
+      false ->
+        true
     end
   end
 end
@@ -252,30 +441,34 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
   end
 end
 
-defmodule Kalevala.Character.Conditions.EventMatch do
+defmodule Kalevala.Character.Conditions.MetaMatch do
   @moduledoc """
-  Condition check for the event being a message and the regex matches
+  Match values in the meta map
   """
+
+  alias Kalevala.Character.Brain.Variable
+  alias Kalevala.Character.Conn
+  alias Kalevala.Meta
 
   @behaviour Kalevala.Character.Brain.Condition
 
   @impl true
-  def match?(event, conn, data) do
-    self_check(event, conn, data) && data.topic == event.topic &&
-      Enum.all?(data.data, fn {key, value} ->
-        Map.get(event.data, key) == value
-      end)
-  end
+  def match?(event, conn, data = %{match: match}) do
+    character = Conn.character(conn)
+    event_data = Map.merge(Map.from_struct(character), event.data)
 
-  def self_check(event, conn, %{self_trigger: self_trigger}) do
-    acting_character = Map.get(event, :acting_character) || %{}
+    case Variable.replace(data, event_data) do
+      {:ok, data} ->
+        case match do
+          "equality" ->
+            Meta.get(character.meta, data.key) == data.value
 
-    case Map.get(acting_character, :id) == conn.character.id do
-      true ->
-        self_trigger
+          "inequality" ->
+            Meta.get(character.meta, data.key) != data.value
+        end
 
-      false ->
-        true
+      :error ->
+        false
     end
   end
 end

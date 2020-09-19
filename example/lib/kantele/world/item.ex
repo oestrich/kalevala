@@ -22,4 +22,10 @@ defmodule Kantele.World.Item.Meta do
   defimpl Kalevala.Meta.Trim do
     def trim(_meta), do: %{}
   end
+
+  defimpl Kalevala.Meta.Access do
+    def get(meta, key), do: Map.get(meta, key)
+
+    def put(meta, key, value), do: Map.put(meta, key, value)
+  end
 end

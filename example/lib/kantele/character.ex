@@ -16,6 +16,12 @@ defmodule Kantele.Character.PlayerMeta do
       Map.take(meta, [:vitals])
     end
   end
+
+  defimpl Kalevala.Meta.Access do
+    def get(meta, key), do: Map.get(meta, key)
+
+    def put(meta, key, value), do: Map.put(meta, key, value)
+  end
 end
 
 defmodule Kantele.Character.NonPlayerMeta do
@@ -29,6 +35,12 @@ defmodule Kantele.Character.NonPlayerMeta do
     def trim(meta) do
       Map.take(meta, [:vitals])
     end
+  end
+
+  defimpl Kalevala.Meta.Access do
+    def get(meta, key), do: Map.get(meta, key)
+
+    def put(meta, key, value), do: Map.put(meta, key, value)
   end
 end
 

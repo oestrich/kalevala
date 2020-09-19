@@ -66,6 +66,41 @@ brains "town_crier" {
       type = "conditional"
       nodes = [
         {
+          type = "conditions/meta-match"
+          data = {
+            match = "equality"
+            key = "condition-${character.id}"
+            value = "cowering"
+          }
+        },
+        {
+          type = "conditions/message-match"
+          data = {
+            self_trigger = false
+            text = "\bboo\b"
+          }
+        },
+        {
+          type = "actions/emote"
+          data = {
+            channel_name = "${channel_name}"
+            text = "*again*"
+          }
+        }
+      ]
+    },
+    {
+      type = "conditional"
+      nodes = [
+        {
+          type = "conditions/meta-match"
+          data = {
+            match = "inequality"
+            key = "condition-${character.id}"
+            value = "cowering"
+          }
+        },
+        {
           type = "conditions/message-match"
           data = {
             self_trigger = false
@@ -80,7 +115,11 @@ brains "town_crier" {
           }
         },
         {
-          type = "actions/flee"
+          type = "actions/meta-set"
+          data = {
+            key = "condition-${character.id}"
+            value = "cowering"
+          }
         }
       ]
     },

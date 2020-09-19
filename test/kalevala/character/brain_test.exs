@@ -1,7 +1,7 @@
-defmodule Kalevala.Character.Brain.ActionTest do
+defmodule Kalevala.Character.Brain.VariableTest do
   use ExUnit.Case
 
-  alias Kalevala.Character.Brain.Action
+  alias Kalevala.Character.Brain.Variable
 
   describe "replacing action data with event data" do
     test "simple string replacement" do
@@ -15,9 +15,9 @@ defmodule Kalevala.Character.Brain.ActionTest do
         text: "How are you?"
       }
 
-      data = Action.replace(data, event_data)
+      {:ok, data} = Variable.replace(data, event_data)
 
-      assert data["channel_name"] == "general"
+      assert data[:channel_name] == "general"
     end
 
     test "multiple variables" do
@@ -30,9 +30,9 @@ defmodule Kalevala.Character.Brain.ActionTest do
         text: "[${channel_name}] ${text}"
       }
 
-      data = Action.replace(data, event_data)
+      {:ok, data} = Variable.replace(data, event_data)
 
-      assert data["text"] == "[general] Hello!"
+      assert data[:text] == "[general] Hello!"
     end
 
     test "nested values" do
@@ -49,9 +49,66 @@ defmodule Kalevala.Character.Brain.ActionTest do
         text: "How are you, ${character.name}? Welcome to ${channel_name}"
       }
 
-      data = Action.replace(data, event_data)
+      {:ok, data} = Variable.replace(data, event_data)
 
-      assert data["text"] == "How are you, Elias? Welcome to general"
+      assert data[:text] == "How are you, Elias? Welcome to general"
+    end
+
+    test "nested data" do
+      event_data = %{
+        channel_name: "general",
+        character: %{
+          name: "Elias"
+        },
+        text: "Hello!"
+      }
+
+      data = %{
+        channel: %{
+          name: "${channel_name}"
+        },
+        text: "How are you, ${character.name}? Welcome to ${channel_name}"
+      }
+
+      {:ok, data} = Variable.replace(data, event_data)
+
+      assert data[:text] == "How are you, Elias? Welcome to general"
+    end
+
+    test "values that aren't strings" do
+      event_data = %{
+        channel_name: "general",
+        character: %{
+          name: "Elias"
+        },
+        text: "Hello!"
+      }
+
+      data = %{
+        text: "How are you, ${character.name}? Welcome to ${channel_name}",
+        other: 10
+      }
+
+      {:ok, data} = Variable.replace(data, event_data)
+
+      assert data[:text] == "How are you, Elias? Welcome to general"
+    end
+
+    test "missing values" do
+      event_data = %{
+        character: %{
+          status: "a person"
+        }
+      }
+
+      data = %{
+        channel: %{
+          name: "${channel.name}"
+        },
+        text: "How are you, ${character.name}? Welcome to ${channel_name}"
+      }
+
+      :error = Variable.replace(data, event_data)
     end
   end
 end
