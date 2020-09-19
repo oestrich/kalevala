@@ -1,8 +1,8 @@
-alias Kalevala.Character.Brain.FirstSelector
-alias Kalevala.Character.Brain.Sequence
-alias Kalevala.Character.Brain.ConditionalSelector
-alias Kalevala.Character.Brain.Condition
-alias Kalevala.Character.Brain.Node
+alias Kalevala.Brain.FirstSelector
+alias Kalevala.Brain.Sequence
+alias Kalevala.Brain.ConditionalSelector
+alias Kalevala.Brain.Condition
+alias Kalevala.Brain.Node
 alias Kalevala.Character
 alias Kalevala.Character.Conn
 
@@ -13,15 +13,16 @@ brain = %Sequence{
         %ConditionalSelector{
           nodes: [
             %Condition{
-              type: Kalevala.Character.Conditions.MessageMatch,
+              type: Kalevala.Brain.Conditions.MessageMatch,
               data: %{
                 self_trigger: false,
+                interested?: fn _ -> true end,
                 text: ~r/\bhi\b/i
               }
             },
             %Sequence{
               nodes: [
-                %Kalevala.Character.Brain.Action{
+                %Kalevala.Brain.Action{
                   type: Kantele.Character.SayAction,
                   data: %{
                     channel_name: "${channel_name}",
@@ -29,7 +30,7 @@ brain = %Sequence{
                   },
                   delay: 500
                 },
-                %Kalevala.Character.Brain.Action{
+                %Kalevala.Brain.Action{
                   type: Kantele.Character.SayAction,
                   data: %{
                     channel_name: "${channel_name}",
@@ -44,13 +45,14 @@ brain = %Sequence{
         %ConditionalSelector{
           nodes: [
             %Condition{
-              type: Kalevala.Character.Conditions.MessageMatch,
+              type: Kalevala.Brain.Conditions.MessageMatch,
               data: %{
                 self_trigger: false,
+                interested?: fn _ -> true end,
                 text: ~r/\bgoblin\b/i
               }
             },
-            %Kalevala.Character.Brain.Action{
+            %Kalevala.Brain.Action{
               type: Kantele.Character.SayAction,
               data: %{
                 channel_name: "${channel_name}",
@@ -64,20 +66,21 @@ brain = %Sequence{
     %ConditionalSelector{
       nodes: [
         %Condition{
-          type: Kalevala.Character.Conditions.MessageMatch,
+          type: Kalevala.Brain.Conditions.MessageMatch,
           data: %{
             self_trigger: false,
+            interested?: fn _ -> true end,
             text: ~r/\bboo\b/i
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.EmoteAction,
           data: %{
             channel_name: "${channel_name}",
             text: "hides behind a desk"
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.FleeAction,
           data: %{},
           delay: 0
@@ -86,8 +89,8 @@ brain = %Sequence{
     },
     %ConditionalSelector{
       nodes: [
-        %Kalevala.Character.Brain.Condition{
-          type: Kalevala.Character.Conditions.EventMatch,
+        %Kalevala.Brain.Condition{
+          type: Kalevala.Brain.Conditions.EventMatch,
           data: %{
             self_trigger: false,
             topic: Kalevala.Event.Movement.Notice,
@@ -96,7 +99,7 @@ brain = %Sequence{
             }
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.SayAction,
           data: %{
             channel_name: "rooms:${room_id}",
@@ -107,8 +110,8 @@ brain = %Sequence{
     },
     %ConditionalSelector{
       nodes: [
-        %Kalevala.Character.Brain.Condition{
-          type: Kalevala.Character.Conditions.EventMatch,
+        %Kalevala.Brain.Condition{
+          type: Kalevala.Brain.Conditions.EventMatch,
           data: %{
             self_trigger: false,
             topic: "characters/emote",
@@ -117,14 +120,14 @@ brain = %Sequence{
             }
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.EmoteAction,
           data: %{
             channel_name: "${channel_name}",
             text: "${message}"
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.DelayEventAction,
           data: %{
             minimum_delay: 30000,
@@ -140,8 +143,8 @@ brain = %Sequence{
     },
     %ConditionalSelector{
       nodes: [
-        %Kalevala.Character.Brain.Condition{
-          type: Kalevala.Character.Conditions.EventMatch,
+        %Kalevala.Brain.Condition{
+          type: Kalevala.Brain.Conditions.EventMatch,
           data: %{
             self_trigger: false,
             topic: "characters/move",
@@ -150,19 +153,19 @@ brain = %Sequence{
             }
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.EmoteAction,
           data: %{
             channel_name: "${channel_name}",
             text: "${message}"
           }
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.FleeAction,
           data: %{},
           delay: 0
         },
-        %Kalevala.Character.Brain.Action{
+        %Kalevala.Brain.Action{
           type: Kantele.Character.DelayEventAction,
           data: %{
             minimum_delay: 30000,

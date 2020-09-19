@@ -1,7 +1,7 @@
 defmodule Kantele.Character.SpawnController do
   use Kalevala.Character.Controller
 
-  alias Kalevala.Character.Brain.Node
+  alias Kalevala.Brain.Node
   alias Kantele.Character.MoveEvent
   alias Kantele.Character.NonPlayerEvents
   alias Kantele.Character.SpawnView

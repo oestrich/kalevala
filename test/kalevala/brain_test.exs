@@ -1,7 +1,7 @@
-defmodule Kalevala.Character.Brain.VariableTest do
+defmodule Kalevala.Brain.VariableTest do
   use ExUnit.Case
 
-  alias Kalevala.Character.Brain.Variable
+  alias Kalevala.Brain.Variable
 
   describe "replacing action data with event data" do
     test "simple string replacement" do
