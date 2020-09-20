@@ -473,6 +473,9 @@ defmodule Kalevala.Brain.Conditions.StateMatch do
 
           "inequality" ->
             Brain.get(character.brain, data.key) != data.value
+
+          "nil" ->
+            is_nil(Brain.get(character.brain, data.key))
         end
 
       :error ->

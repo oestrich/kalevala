@@ -32,11 +32,114 @@ brains "generic_hello" {
   ]
 }
 
+brains "town_crier_conversation" {
+  type = "conditional"
+  nodes = [
+    {
+      type = "conditions/tell-match"
+      data = {
+        self_trigger = false
+        text = ".*"
+      }
+    },
+    {
+      type = "first"
+      nodes = [
+        {
+          type = "conditional"
+          nodes = [
+            {
+              type = "conditions/state-match"
+              data = {
+                match = "nil"
+                key = "conversation-${character.id}"
+              }
+            },
+            {
+              type = "actions/say"
+              data = {
+                channel_name = "characters:${character.id}"
+                text = "Hello, are you here to find out about our bandit problem?"
+              }
+            },
+            {
+              type = "actions/state-set"
+              data = {
+                key = "conversation-${character.id}"
+                value = "started"
+                ttl = 60
+              }
+            }
+          ]
+        },
+        {
+          type = "conditional"
+          nodes = [
+            {
+              type = "conditions/state-match"
+              data = {
+                match = "equality"
+                key = "conversation-${character.id}"
+                value = "started"
+              }
+            },
+            {
+              type = "conditions/tell-match"
+              data = {
+                self_trigger = false
+                text = "\b(yes|bandit)\b"
+              }
+            },
+            {
+              type = "actions/say"
+              data = {
+                channel_name = "characters:${character.id}"
+                text = "Great. Before you head off and face the bandits. I would like you to prove your worth as an adventurer."
+              }
+            },
+            {
+              type = "actions/state-set"
+              data = {
+                key = "conversation-${character.id}"
+                value = "given"
+                ttl = 60
+              }
+            }
+          ]
+        },
+        {
+          type = "conditional"
+          nodes = [
+            {
+              type = "conditions/state-match"
+              data = {
+                match = "equality"
+                key = "conversation-${character.id}"
+                value = "started"
+              }
+            },
+            {
+              type = "actions/say"
+              data = {
+                channel_name = "characters:${character.id}"
+                text = "I don't know about that, but I can help you with bandits"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
 brains "town_crier" {
   type = "sequence"
   nodes = [
     {
       ref = brains.generic_hello
+    },
+    {
+      ref = brains.town_crier_conversation
     },
     {
       type = "first"

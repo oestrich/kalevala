@@ -280,6 +280,19 @@ defmodule Kantele.World.Loader do
     }
   end
 
+  defp parse_node(%{type: "conditions/tell-match", data: data}, _brains) do
+    {:ok, regex} = Regex.compile(data.text, "i")
+
+    %Kalevala.Brain.Condition{
+      type: Kalevala.Brain.Conditions.MessageMatch,
+      data: %{
+        interested?: &Kantele.Character.TellEvent.interested?/1,
+        self_trigger: data.self_trigger == "true",
+        text: regex
+      }
+    }
+  end
+
   defp parse_node(%{type: "conditions/state-match", data: data}, _brains) do
     %Kalevala.Brain.Condition{
       type: Kalevala.Brain.Conditions.StateMatch,
