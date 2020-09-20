@@ -35,7 +35,7 @@ defmodule Kalevala.Character.Conn.Private do
 
       false ->
         meta = Kalevala.Meta.trim(character.meta)
-        %{character | inventory: :trimmed, meta: meta}
+        %{character | brain: :trimmed, inventory: :trimmed, meta: meta}
     end
   end
 

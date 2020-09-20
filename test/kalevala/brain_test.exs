@@ -1,7 +1,7 @@
-defmodule Kalevala.Character.Brain.VariableTest do
+defmodule Kalevala.Brain.VariableTest do
   use ExUnit.Case
 
-  alias Kalevala.Character.Brain.Variable
+  alias Kalevala.Brain.Variable
 
   describe "replacing action data with event data" do
     test "simple string replacement" do
@@ -109,6 +109,69 @@ defmodule Kalevala.Character.Brain.VariableTest do
       }
 
       :error = Variable.replace(data, event_data)
+    end
+  end
+end
+
+defmodule Kalevala.Brain.StateTest do
+  use ExUnit.Case
+
+  alias Kalevala.Brain.State
+  alias Kalevala.Brain.StateValue
+
+  describe "putting values" do
+    test "simple" do
+      state = %State{}
+
+      state = State.put(state, :key, :value, nil)
+
+      assert state.values == [
+               %StateValue{
+                 key: :key,
+                 value: :value
+               }
+             ]
+    end
+
+    test "expires" do
+      state = %State{}
+      expires_at = Time.add(Time.utc_now(), 10, :second)
+
+      state = State.put(state, :key, :value, expires_at)
+
+      assert state.values == [
+               %StateValue{
+                 expires_at: expires_at,
+                 key: :key,
+                 value: :value
+               }
+             ]
+    end
+  end
+
+  describe "getting values" do
+    test "simple" do
+      state = %State{}
+      state = State.put(state, :key, :value, nil)
+
+      assert State.get(state, :key, Time.utc_now()) == :value
+    end
+
+    test "expiration - not expired" do
+      state = %State{}
+      expires_at = Time.add(Time.utc_now(), 10, :second)
+      state = State.put(state, :key, :value, expires_at)
+
+      assert State.get(state, :key, Time.utc_now()) == :value
+    end
+
+    test "expiration - expired" do
+      state = %State{}
+      expires_at = Time.add(Time.utc_now(), 10, :second)
+      state = State.put(state, :key, :value, expires_at)
+
+      then = Time.add(expires_at, 20, :second)
+      assert is_nil(State.get(state, :key, then))
     end
   end
 end

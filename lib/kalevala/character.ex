@@ -6,6 +6,7 @@ defmodule Kalevala.Character do
   """
 
   defstruct [
+    :brain,
     :description,
     :id,
     :name,

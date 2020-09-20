@@ -29,7 +29,7 @@ defmodule Kantele.Character.NonPlayerMeta do
   Specific metadata for a world character in Kantele
   """
 
-  defstruct [:brain, :initial_events, :vitals, :zone_id]
+  defstruct [:initial_events, :vitals, :zone_id]
 
   defimpl Kalevala.Meta.Trim do
     def trim(meta) do

@@ -1,4 +1,4 @@
-defprotocol Kalevala.Character.Brain.Node do
+defprotocol Kalevala.Brain.Node do
   @moduledoc """
   Process a node in the behavior tree
   """
@@ -6,27 +6,27 @@ defprotocol Kalevala.Character.Brain.Node do
   def run(node, conn, event)
 end
 
-defmodule Kalevala.Character.Brain.NullNode do
+defmodule Kalevala.Brain.NullNode do
   @moduledoc """
   A no-op node
   """
 
   defstruct []
 
-  defimpl Kalevala.Character.Brain.Node do
+  defimpl Kalevala.Brain.Node do
     def run(_node, conn, _event), do: conn
   end
 end
 
-defmodule Kalevala.Character.Brain.FirstSelector do
+defmodule Kalevala.Brain.FirstSelector do
   @moduledoc """
   Processes each node one at a time and stops processing when the first one succeeds
   """
 
   defstruct [:nodes]
 
-  defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Node
+  defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain.Node
 
     def run(node, conn, event) do
       result =
@@ -51,15 +51,15 @@ defmodule Kalevala.Character.Brain.FirstSelector do
   end
 end
 
-defmodule Kalevala.Character.Brain.ConditionalSelector do
+defmodule Kalevala.Brain.ConditionalSelector do
   @moduledoc """
   Processes each node one at a time and stops processing when the first one fails
   """
 
   defstruct [:nodes]
 
-  defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Node
+  defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain.Node
 
     def run(node, conn, event) do
       Enum.reduce_while(node.nodes, conn, fn node, conn ->
@@ -75,15 +75,15 @@ defmodule Kalevala.Character.Brain.ConditionalSelector do
   end
 end
 
-defmodule Kalevala.Character.Brain.RandomSelector do
+defmodule Kalevala.Brain.RandomSelector do
   @moduledoc """
   Processes a random node
   """
 
   defstruct [:nodes]
 
-  defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Node
+  defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain.Node
 
     def run(node, conn, event) do
       node =
@@ -96,15 +96,15 @@ defmodule Kalevala.Character.Brain.RandomSelector do
   end
 end
 
-defmodule Kalevala.Character.Brain.Sequence do
+defmodule Kalevala.Brain.Sequence do
   @moduledoc """
   Process each node one at a time
   """
 
   defstruct [:nodes]
 
-  defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Node
+  defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain.Node
 
     def run(node, conn, event) do
       Enum.reduce(node.nodes, conn, fn node, conn ->
@@ -120,7 +120,7 @@ defmodule Kalevala.Character.Brain.Sequence do
   end
 end
 
-defmodule Kalevala.Character.Brain.Condition do
+defmodule Kalevala.Brain.Condition do
   @moduledoc """
   Check if a condition is valid
 
@@ -131,7 +131,7 @@ defmodule Kalevala.Character.Brain.Condition do
 
   @callback match?(Event.t(), Conn.t(), map()) :: boolean()
 
-  defimpl Kalevala.Character.Brain.Node do
+  defimpl Kalevala.Brain.Node do
     def run(node, conn, event) do
       case node.type.match?(event, conn, node.data) do
         true ->
@@ -144,7 +144,7 @@ defmodule Kalevala.Character.Brain.Condition do
   end
 end
 
-defmodule Kalevala.Character.Brain.Variable do
+defmodule Kalevala.Brain.Variable do
   @moduledoc """
   Handle variable data in brain nodes
 
@@ -218,7 +218,7 @@ defmodule Kalevala.Character.Brain.Variable do
   """
   def variables(value, path) do
     Enum.map(Regex.scan(~r/\$\{(?<variable>[\w\.]+)\}/, value), fn [string, variable] ->
-      %Kalevala.Character.Brain.Variable{
+      %Kalevala.Brain.Variable{
         path: path,
         original: string,
         reference: variable
@@ -322,15 +322,15 @@ defmodule Kalevala.Character.Brain.Variable do
   def stringify_keys(value), do: value
 end
 
-defmodule Kalevala.Character.Brain.Action do
+defmodule Kalevala.Brain.Action do
   @moduledoc """
   Node to trigger an action
   """
 
   defstruct [:data, :type, delay: 0]
 
-  defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Variable
+  defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain.Variable
     alias Kalevala.Character.Conn
 
     def run(node, conn, event) do
@@ -354,17 +354,17 @@ defmodule Kalevala.Character.Brain.Action do
   end
 end
 
-defmodule Kalevala.Character.Brain.MetaSet do
+defmodule Kalevala.Brain.StateSet do
   @moduledoc """
   Node to set meta values on a character
   """
 
   defstruct [:data]
 
-  defimpl Kalevala.Character.Brain.Node do
-    alias Kalevala.Character.Brain.Variable
+  defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain
+    alias Kalevala.Brain.Variable
     alias Kalevala.Character.Conn
-    alias Kalevala.Meta
 
     def run(node, conn, event) do
       character = Conn.character(conn)
@@ -373,23 +373,31 @@ defmodule Kalevala.Character.Brain.MetaSet do
 
       case Variable.replace(node.data, event_data) do
         {:ok, data} ->
-          meta = Meta.put(character.meta, data.key, data.value)
-          character = %{character | meta: meta}
+          expires_at = expiration(data)
+
+          brain = Brain.put(character.brain, data.key, data.value, expires_at)
+          character = %{character | brain: brain}
           Conn.put_character(conn, character)
 
         :error ->
           conn
       end
     end
+
+    defp expiration(%{ttl: ttl}) when is_integer(ttl) do
+      Time.add(Time.utc_now(), ttl, :second)
+    end
+
+    defp expiration(_), do: nil
   end
 end
 
-defmodule Kalevala.Character.Conditions.EventMatch do
+defmodule Kalevala.Brain.Conditions.EventMatch do
   @moduledoc """
   Condition check for the event being a message and the regex matches
   """
 
-  @behaviour Kalevala.Character.Brain.Condition
+  @behaviour Kalevala.Brain.Condition
 
   @impl true
   def match?(event, conn, data) do
@@ -412,12 +420,12 @@ defmodule Kalevala.Character.Conditions.EventMatch do
   end
 end
 
-defmodule Kalevala.Character.Conditions.MessageMatch do
+defmodule Kalevala.Brain.Conditions.MessageMatch do
   @moduledoc """
   Condition check for the event being a message and the regex matches
   """
 
-  @behaviour Kalevala.Character.Brain.Condition
+  @behaviour Kalevala.Brain.Condition
 
   alias Kalevala.Event.Message
 
@@ -441,16 +449,16 @@ defmodule Kalevala.Character.Conditions.MessageMatch do
   end
 end
 
-defmodule Kalevala.Character.Conditions.MetaMatch do
+defmodule Kalevala.Brain.Conditions.StateMatch do
   @moduledoc """
   Match values in the meta map
   """
 
-  alias Kalevala.Character.Brain.Variable
+  alias Kalevala.Brain
+  alias Kalevala.Brain.Variable
   alias Kalevala.Character.Conn
-  alias Kalevala.Meta
 
-  @behaviour Kalevala.Character.Brain.Condition
+  @behaviour Kalevala.Brain.Condition
 
   @impl true
   def match?(event, conn, data = %{match: match}) do
@@ -461,14 +469,135 @@ defmodule Kalevala.Character.Conditions.MetaMatch do
       {:ok, data} ->
         case match do
           "equality" ->
-            Meta.get(character.meta, data.key) == data.value
+            Brain.get(character.brain, data.key) == data.value
 
           "inequality" ->
-            Meta.get(character.meta, data.key) != data.value
+            Brain.get(character.brain, data.key) != data.value
         end
 
       :error ->
         false
     end
+  end
+end
+
+defmodule Kalevala.Brain.StateValue do
+  @moduledoc false
+
+  defstruct [:key, :expires_at, :value]
+end
+
+defmodule Kalevala.Brain.State do
+  @moduledoc """
+  Keep state around a character's brain
+
+  A key/value store that allows for expiring keys
+  """
+
+  alias Kalevala.Brain.StateValue
+
+  defstruct values: []
+
+  @doc """
+  Get a key from the store
+  """
+  def get(state, key, compare_time) do
+    value =
+      Enum.find(state.values, fn value ->
+        value.key == key
+      end)
+
+    case expired?(value, compare_time) do
+      true ->
+        nil
+
+      false ->
+        value.value
+    end
+  end
+
+  defp expired?(nil, _compare_time), do: true
+
+  defp expired?(%{expires_at: expires_at}, compare_time) when expires_at != nil do
+    case Time.compare(expires_at, compare_time) do
+      :gt ->
+        false
+
+      _ ->
+        true
+    end
+  end
+
+  defp expired?(_value, _compare_time), do: false
+
+  @doc """
+  Put a key in the store, with an optional expiration time
+  """
+  def put(state, key, value, expires_at) do
+    values =
+      Enum.reject(state.values, fn value ->
+        value.key == key
+      end)
+
+    value = %StateValue{
+      expires_at: expires_at,
+      key: key,
+      value: value
+    }
+
+    %{state | values: [value | values]}
+  end
+
+  def clean(state, compare_time \\ Time.utc_now()) do
+    values =
+      Enum.reject(state.values, fn value ->
+        expired?(value, compare_time)
+      end)
+
+    %{state | values: values}
+  end
+end
+
+defmodule Kalevala.Brain do
+  @moduledoc """
+  A struct for holding a character's brain and state
+  """
+
+  alias Kalevala.Brain.Node
+  alias Kalevala.Brain.State
+  alias Kalevala.Character.Conn
+
+  defstruct [:root, state: %Kalevala.Brain.State{}]
+
+  @doc """
+  Get a value from the brain's state
+  """
+  def get(brain, key, compare_time \\ Time.utc_now()) do
+    State.get(brain.state, key, compare_time)
+  end
+
+  @doc """
+  Put a value in the brain's state
+  """
+  def put(brain, key, value, expires_at \\ nil) do
+    state = State.put(brain.state, key, value, expires_at)
+    %{brain | state: state}
+  end
+
+  @doc """
+  Process a new event based on the character's brain data
+  """
+  def run(brain, conn, event) do
+    brain.root
+    |> Node.run(conn, event)
+    |> clean_state()
+  end
+
+  defp clean_state(conn) do
+    character = Conn.character(conn)
+    state = State.clean(character.brain.state)
+    brain = %{character.brain | state: state}
+    character = %{character | brain: brain}
+    Conn.put_character(conn, character)
   end
 end
