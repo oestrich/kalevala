@@ -1,7 +1,7 @@
 defmodule Kantele.Character.SpawnController do
   use Kalevala.Character.Controller
 
-  alias Kalevala.Brain.Node
+  alias Kalevala.Brain
   alias Kantele.Character.MoveEvent
   alias Kantele.Character.NonPlayerEvents
   alias Kantele.Character.SpawnView
@@ -27,8 +27,8 @@ defmodule Kantele.Character.SpawnController do
 
   @impl true
   def event(conn, event) do
-    conn.character.meta.brain
-    |> Node.run(conn, event)
+    conn.character.brain
+    |> Brain.run(conn, event)
     |> NonPlayerEvents.call(event)
   end
 

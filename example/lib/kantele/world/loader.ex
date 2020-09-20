@@ -199,9 +199,9 @@ defmodule Kantele.World.Loader do
       id: "#{zone.id}:#{key}",
       name: character_data.name,
       description: character_data.description,
+      brain: parse_brain(character_data, brains),
       meta: %Kantele.Character.NonPlayerMeta{
         zone_id: zone.id,
-        brain: parse_brain(character_data, brains),
         initial_events: parse_initial_events(character_data),
         vitals: %Kantele.Character.Vitals{
           health_points: 25,
@@ -230,10 +230,16 @@ defmodule Kantele.World.Loader do
   defp parse_initial_events(_), do: []
 
   defp parse_brain(%{brain: brain}, brains) do
-    parse_node(brain, brains)
+    %Kalevala.Brain{
+      root: parse_node(brain, brains)
+    }
   end
 
-  defp parse_brain(_, _brains), do: %Kalevala.Brain.NullNode{}
+  defp parse_brain(_, _brains) do
+    %Kalevala.Brain{
+      root: %Kalevala.Brain.NullNode{}
+    }
+  end
 
   defp parse_node("brains." <> key_path, brains) do
     parse_node(brains[key_path], brains)
@@ -274,9 +280,9 @@ defmodule Kantele.World.Loader do
     }
   end
 
-  defp parse_node(%{type: "conditions/meta-match", data: data}, _brains) do
+  defp parse_node(%{type: "conditions/state-match", data: data}, _brains) do
     %Kalevala.Brain.Condition{
-      type: Kalevala.Brain.Conditions.MetaMatch,
+      type: Kalevala.Brain.Conditions.StateMatch,
       data: data
     }
   end
@@ -305,8 +311,8 @@ defmodule Kantele.World.Loader do
     }
   end
 
-  defp parse_node(%{type: "actions/meta-set", data: data}, _brains) do
-    %Kalevala.Brain.MetaSet{
+  defp parse_node(%{type: "actions/state-set", data: data}, _brains) do
+    %Kalevala.Brain.StateSet{
       data: data
     }
   end

@@ -354,7 +354,7 @@ defmodule Kalevala.Brain.Action do
   end
 end
 
-defmodule Kalevala.Brain.MetaSet do
+defmodule Kalevala.Brain.StateSet do
   @moduledoc """
   Node to set meta values on a character
   """
@@ -362,9 +362,9 @@ defmodule Kalevala.Brain.MetaSet do
   defstruct [:data]
 
   defimpl Kalevala.Brain.Node do
+    alias Kalevala.Brain
     alias Kalevala.Brain.Variable
     alias Kalevala.Character.Conn
-    alias Kalevala.Meta
 
     def run(node, conn, event) do
       character = Conn.character(conn)
@@ -373,14 +373,22 @@ defmodule Kalevala.Brain.MetaSet do
 
       case Variable.replace(node.data, event_data) do
         {:ok, data} ->
-          meta = Meta.put(character.meta, data.key, data.value)
-          character = %{character | meta: meta}
+          expires_at = expiration(data)
+
+          brain = Brain.put(character.brain, data.key, data.value, expires_at)
+          character = %{character | brain: brain}
           Conn.put_character(conn, character)
 
         :error ->
           conn
       end
     end
+
+    defp expiration(%{ttl: ttl}) when is_integer(ttl) do
+      Time.add(Time.utc_now(), ttl, :second)
+    end
+
+    defp expiration(_), do: nil
   end
 end
 
@@ -441,14 +449,14 @@ defmodule Kalevala.Brain.Conditions.MessageMatch do
   end
 end
 
-defmodule Kalevala.Brain.Conditions.MetaMatch do
+defmodule Kalevala.Brain.Conditions.StateMatch do
   @moduledoc """
   Match values in the meta map
   """
 
+  alias Kalevala.Brain
   alias Kalevala.Brain.Variable
   alias Kalevala.Character.Conn
-  alias Kalevala.Meta
 
   @behaviour Kalevala.Brain.Condition
 
@@ -461,14 +469,135 @@ defmodule Kalevala.Brain.Conditions.MetaMatch do
       {:ok, data} ->
         case match do
           "equality" ->
-            Meta.get(character.meta, data.key) == data.value
+            Brain.get(character.brain, data.key) == data.value
 
           "inequality" ->
-            Meta.get(character.meta, data.key) != data.value
+            Brain.get(character.brain, data.key) != data.value
         end
 
       :error ->
         false
     end
+  end
+end
+
+defmodule Kalevala.Brain.StateValue do
+  @moduledoc false
+
+  defstruct [:key, :expires_at, :value]
+end
+
+defmodule Kalevala.Brain.State do
+  @moduledoc """
+  Keep state around a character's brain
+
+  A key/value store that allows for expiring keys
+  """
+
+  alias Kalevala.Brain.StateValue
+
+  defstruct values: []
+
+  @doc """
+  Get a key from the store
+  """
+  def get(state, key, compare_time) do
+    value =
+      Enum.find(state.values, fn value ->
+        value.key == key
+      end)
+
+    case expired?(value, compare_time) do
+      true ->
+        nil
+
+      false ->
+        value.value
+    end
+  end
+
+  defp expired?(nil, _compare_time), do: true
+
+  defp expired?(%{expires_at: expires_at}, compare_time) when expires_at != nil do
+    case Time.compare(expires_at, compare_time) do
+      :gt ->
+        false
+
+      _ ->
+        true
+    end
+  end
+
+  defp expired?(_value, _compare_time), do: false
+
+  @doc """
+  Put a key in the store, with an optional expiration time
+  """
+  def put(state, key, value, expires_at) do
+    values =
+      Enum.reject(state.values, fn value ->
+        value.key == key
+      end)
+
+    value = %StateValue{
+      expires_at: expires_at,
+      key: key,
+      value: value
+    }
+
+    %{state | values: [value | values]}
+  end
+
+  def clean(state, compare_time \\ Time.utc_now()) do
+    values =
+      Enum.reject(state.values, fn value ->
+        expired?(value, compare_time)
+      end)
+
+    %{state | values: values}
+  end
+end
+
+defmodule Kalevala.Brain do
+  @moduledoc """
+  A struct for holding a character's brain and state
+  """
+
+  alias Kalevala.Brain.Node
+  alias Kalevala.Brain.State
+  alias Kalevala.Character.Conn
+
+  defstruct [:root, state: %Kalevala.Brain.State{}]
+
+  @doc """
+  Get a value from the brain's state
+  """
+  def get(brain, key, compare_time \\ Time.utc_now()) do
+    State.get(brain.state, key, compare_time)
+  end
+
+  @doc """
+  Put a value in the brain's state
+  """
+  def put(brain, key, value, expires_at \\ nil) do
+    state = State.put(brain.state, key, value, expires_at)
+    %{brain | state: state}
+  end
+
+  @doc """
+  Process a new event based on the character's brain data
+  """
+  def run(brain, conn, event) do
+    brain.root
+    |> Node.run(conn, event)
+    |> clean_state()
+  end
+
+  defp clean_state(conn) do
+    character = Conn.character(conn)
+    state = State.clean(character.brain.state)
+    brain = %{character.brain | state: state}
+    character = %{character | brain: brain}
+    Conn.put_character(conn, character)
   end
 end
