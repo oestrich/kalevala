@@ -59,7 +59,7 @@ brains "town_crier_conversation" {
               type = "actions/say"
               data = {
                 channel_name = "characters:${character.id}"
-                text = "Hello, are you here to find out about our bandit problem?"
+                text = "Hello, are you here to find out about our {color foreground=\"white\"}bandit{/color} problem?"
               }
             },
             {
