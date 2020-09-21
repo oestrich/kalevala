@@ -9,7 +9,7 @@ defmodule Kantele.Character.PlayerMeta do
   Specific metadata for a character in Kantele
   """
 
-  defstruct [:vitals]
+  defstruct [:reply_to, :vitals]
 
   defimpl Kalevala.Meta.Trim do
     def trim(meta) do

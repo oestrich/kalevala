@@ -112,6 +112,7 @@ defmodule Kalevala.Character.Conn do
   @type t() :: %__MODULE__{}
 
   alias Kalevala.Character.Conn.Private
+  alias Kalevala.Meta
 
   defstruct [
     :character,
@@ -416,6 +417,16 @@ defmodule Kalevala.Character.Conn do
   def put_action(conn, action = %Kalevala.Character.Action{}) do
     action = %{action | request_id: conn.private.request_id}
     put_private(conn, :actions, conn.private.actions ++ [action])
+  end
+
+  @doc """
+  Update a key in a character's meta map
+  """
+  def put_meta(conn, key, value) do
+    character = character(conn)
+    meta = Meta.put(character.meta, key, value)
+    character = %{character | meta: meta}
+    put_character(conn, character)
   end
 
   defp put_private(conn, key, value) do

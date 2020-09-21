@@ -12,6 +12,7 @@ defmodule Kantele.Character.TellEvent do
 
   def broadcast(conn, %{data: %{character: character, text: text}}) when character != nil do
     conn
+    |> put_meta(:reply_to, character.id)
     |> assign(:character, character)
     |> assign(:text, text)
     |> render(TellView, "echo")

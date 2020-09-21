@@ -73,6 +73,12 @@ defmodule Kantele.Character.Commands do
     parse("reload", :reload)
   end
 
+  module(ReplyCommand) do
+    parse("reply", :run, fn command ->
+      command |> spaces() |> text(:text)
+    end)
+  end
+
   module(SayCommand) do
     parse("say", :run, fn command ->
       command
