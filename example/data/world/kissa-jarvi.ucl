@@ -6,6 +6,10 @@ rooms "gates" {
   name = "The Gates to Sammatti"
   description = "You are in front of the gates to Sammatti."
 
+  x = 1
+  y = 3
+  z = 0
+
   features = [
     {
       keyword = "lake edge"
@@ -26,6 +30,10 @@ rooms "path-1" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
 
+  x = 1
+  y = 2
+  z = 0
+
   features = [
     {
       ref = features.stones
@@ -44,6 +52,10 @@ room_exits "path-1" {
 rooms "path-2" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
+
+  x = 1
+  y = 1
+  z = 0
 
   features = [
     {
@@ -75,6 +87,10 @@ rooms "path-3" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
 
+  x = 2
+  y = 1
+  z = 0
+
   features = [
     {
       ref = features.stones
@@ -104,6 +120,10 @@ rooms "path-4" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
 
+  x = 3
+  y = 1
+  z = 0
+
   features = [
     {
       ref = features.stones
@@ -122,6 +142,10 @@ rooms "lake-1" {
   name = "Kissa Järvi"
   description = "A long shallow lake."
 
+  x = 0
+  y = 2
+  z = 0
+
   features = [
     {
       ref = features.water
@@ -139,6 +163,10 @@ room_exits "lake-1" {
 rooms "lake-2" {
   name = "Kissa Järvi"
   description = "A long shallow lake."
+
+  x = 0
+  y = 1
+  z = 0
 
   features = [
     {
@@ -159,6 +187,10 @@ rooms "lake-3" {
   name = "Kissa Järvi"
   description = "A long shallow lake."
 
+  x = 0
+  y = 0
+  z = 0
+
   features = [
     {
       ref = features.water
@@ -176,6 +208,10 @@ room_exits "lake-3" {
 rooms "lake-4" {
   name = "Kissa Järvi"
   description = "A long shallow lake."
+
+  x = 1
+  y = 0
+  z = 0
 
   features = [
     {
@@ -196,6 +232,10 @@ rooms "lake-5" {
   name = "Kissa Järvi"
   description = "A long shallow lake."
 
+  x = 2
+  y = 0
+  z = 0
+
   features = [
     {
       ref = features.water
@@ -208,11 +248,16 @@ room_exits "lake-5" {
 
   north = rooms.path-3.id
   west = rooms.lake-4.id
+  east = rooms.lake-6.id
 }
 
 rooms "lake-6" {
   name = "Kissa Järvi"
   description = "A long shallow lake."
+
+  x = 3
+  y = 0
+  z = 0
 
   features = [
     {

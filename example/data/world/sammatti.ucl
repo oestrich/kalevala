@@ -6,6 +6,10 @@ rooms "town_square" {
   name = "Town Square"
   description = "You are in the town square."
 
+  x = 0
+  y = 0
+  z = 0
+
   features = [
     {
       keyword = "Lohikäärme"
@@ -59,6 +63,10 @@ room_items "town_square" {
 rooms "marketplace" {
   name = "Marketplace"
   description = "There are sellers hawking their wares all around you."
+
+  x = 0
+  y = 1
+  z = 0
 }
 
 room_exits "marketplace" {
@@ -72,6 +80,10 @@ room_exits "marketplace" {
 rooms "inn" {
   name = "Lohikäärme"
   description = "The interior of the small inn. There are several chairs sitting around a table. A small staircase leads upstairs."
+
+  x = 1
+  y = 0
+  z = 0
 }
 
 room_exits "inn" {
@@ -95,6 +107,10 @@ room_characters "inn" {
 rooms "inn_upstairs" {
   name = "Lohikäärme Upstairs"
   description = "The upstairs of the small inn. A small staircase leads downstairs."
+
+  x = 1
+  y = 0
+  z = 1
 }
 
 room_exits "inn_upstairs" {
@@ -106,6 +122,10 @@ room_exits "inn_upstairs" {
 rooms "well" {
   name = "Town Well"
   description = ""
+
+  x = 0
+  y = 2
+  z = 0
 
   features = [
     {
@@ -125,6 +145,10 @@ room_exits "well" {
 rooms "guild_hall" {
   name = "Trader's Guild Hall"
   description = "The local trader guild's guildhall."
+
+  x = 1
+  y = 1
+  z = 0
 }
 
 room_exits "guild_hall" {
@@ -136,6 +160,10 @@ room_exits "guild_hall" {
 rooms "blacksmith" {
   name = "Seppä"
   description = "The local blacksmith."
+
+  x = -1
+  y = 0
+  z = 0
 }
 
 room_exits "blacksmith" {

@@ -161,6 +161,9 @@ defmodule Kantele.World.Loader do
       zone_id: zone.id,
       name: room_data.name,
       description: room_data.description,
+      x: room_data.x,
+      y: room_data.y,
+      z: room_data.z,
       features: parse_features(room_data, zone_data)
     }
 

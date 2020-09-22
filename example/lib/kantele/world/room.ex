@@ -16,6 +16,9 @@ defmodule Kantele.World.Room do
     :zone_id,
     :name,
     :description,
+    :x,
+    :y,
+    :z,
     exits: [],
     features: []
   ]

@@ -13,7 +13,10 @@ defmodule Kantele.Character.LookView do
         description: render("_description", %{room: room}),
         exits: Enum.map(room.exits, fn room_exit -> room_exit.exit_name end),
         item_instances: item_instances,
-        name: room.name
+        name: room.name,
+        x: room.x,
+        y: room.y,
+        z: room.z
       },
       text:
         render("look.text", %{
@@ -26,7 +29,7 @@ defmodule Kantele.Character.LookView do
 
   def render("look.text", %{room: room, characters: characters, item_instances: item_instances}) do
     ~E"""
-    {room-title id="<%= room.id %>"}<%= room.name %>{/room-title}
+    {room-title id="<%= room.id %>" x="<%= to_string(room.x) %>" y="<%= to_string(room.y) %>" z="<%= to_string(room.z) %>"}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
     <%= render("_items", %{item_instances: item_instances}) %>
     <%= render("_exits", %{room: room}) %>

@@ -156,7 +156,7 @@ defmodule Kantele.Output.AdminTags do
   end)
 
   metadata("room-title", "95,95,95", fn attributes ->
-    ~i( #{attributes["id"]})
+    ~i( #{attributes["id"]} [#{attributes["x"]},#{attributes["y"]},#{attributes["z"]}])
   end)
 
   @impl true
