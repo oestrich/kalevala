@@ -23,7 +23,7 @@ defmodule Kantele.World.Loader do
     paths = Map.merge(@paths, paths)
 
     world_data = load_folder(paths.world_path, ".ucl", &merge_world_data/1)
-    brain_data = load_folder(paths.brains_path, ".ucl", &merge_brain_data/1)
+    brain_data = Kantele.Brain.load_all(paths.brains_path)
 
     verbs = parse_verbs(Elias.parse(File.read!(paths.verbs_path)))
 
@@ -54,12 +54,6 @@ defmodule Kantele.World.Loader do
     |> Enum.map(&Elias.parse/1)
     |> Enum.flat_map(merge_fun)
     |> Enum.into(%{})
-  end
-
-  defp merge_brain_data(brain_data) do
-    Enum.map(brain_data.brains, fn {key, value} ->
-      {to_string(key), value}
-    end)
   end
 
   defp merge_world_data(zone_data) do
@@ -202,7 +196,7 @@ defmodule Kantele.World.Loader do
       id: "#{zone.id}:#{key}",
       name: character_data.name,
       description: character_data.description,
-      brain: parse_brain(character_data, brains),
+      brain: Kantele.Brain.process(Map.get(character_data, :brain), brains),
       meta: %Kantele.Character.NonPlayerMeta{
         zone_id: zone.id,
         initial_events: parse_initial_events(character_data),
@@ -231,147 +225,6 @@ defmodule Kantele.World.Loader do
   end
 
   defp parse_initial_events(_), do: []
-
-  defp parse_brain(%{brain: brain}, brains) do
-    %Kalevala.Brain{
-      root: parse_node(brain, brains)
-    }
-  end
-
-  defp parse_brain(_, _brains) do
-    %Kalevala.Brain{
-      root: %Kalevala.Brain.NullNode{}
-    }
-  end
-
-  defp parse_node("brains." <> key_path, brains) do
-    parse_node(brains[key_path], brains)
-  end
-
-  defp parse_node(%{ref: "brains." <> key_path}, brains) do
-    parse_node(brains[key_path], brains)
-  end
-
-  defp parse_node(%{type: "sequence", nodes: nodes}, brains) do
-    %Kalevala.Brain.Sequence{
-      nodes: Enum.map(nodes, &parse_node(&1, brains))
-    }
-  end
-
-  defp parse_node(%{type: "first", nodes: nodes}, brains) do
-    %Kalevala.Brain.FirstSelector{
-      nodes: Enum.map(nodes, &parse_node(&1, brains))
-    }
-  end
-
-  defp parse_node(%{type: "conditional", nodes: nodes}, brains) do
-    %Kalevala.Brain.ConditionalSelector{
-      nodes: Enum.map(nodes, &parse_node(&1, brains))
-    }
-  end
-
-  defp parse_node(%{type: "conditions/message-match", data: data}, _brains) do
-    {:ok, regex} = Regex.compile(data.text, "i")
-
-    %Kalevala.Brain.Condition{
-      type: Kalevala.Brain.Conditions.MessageMatch,
-      data: %{
-        interested?: &Kantele.Character.SayEvent.interested?/1,
-        self_trigger: data.self_trigger == "true",
-        text: regex
-      }
-    }
-  end
-
-  defp parse_node(%{type: "conditions/tell-match", data: data}, _brains) do
-    {:ok, regex} = Regex.compile(data.text, "i")
-
-    %Kalevala.Brain.Condition{
-      type: Kalevala.Brain.Conditions.MessageMatch,
-      data: %{
-        interested?: &Kantele.Character.TellEvent.interested?/1,
-        self_trigger: data.self_trigger == "true",
-        text: regex
-      }
-    }
-  end
-
-  defp parse_node(%{type: "conditions/state-match", data: data}, _brains) do
-    %Kalevala.Brain.Condition{
-      type: Kalevala.Brain.Conditions.StateMatch,
-      data: data
-    }
-  end
-
-  defp parse_node(%{type: "conditions/room-enter", data: data}, _brains) do
-    %Kalevala.Brain.Condition{
-      type: Kalevala.Brain.Conditions.EventMatch,
-      data: %{
-        self_trigger: data.self_trigger == "true",
-        topic: Kalevala.Event.Movement.Notice,
-        data: %{
-          direction: :to
-        }
-      }
-    }
-  end
-
-  defp parse_node(%{type: "conditions/event-match", data: data}, _brains) do
-    %Kalevala.Brain.Condition{
-      type: Kalevala.Brain.Conditions.EventMatch,
-      data: %{
-        self_trigger: Map.get(data, :self_trigger, "false") == "true",
-        topic: data.topic,
-        data: Map.get(data, :data, %{})
-      }
-    }
-  end
-
-  defp parse_node(%{type: "actions/state-set", data: data}, _brains) do
-    %Kalevala.Brain.StateSet{
-      data: data
-    }
-  end
-
-  defp parse_node(action = %{type: "actions/say", data: data}, _brains) do
-    %Kalevala.Brain.Action{
-      type: Kantele.Character.SayAction,
-      data: data,
-      delay: Map.get(action, :delay, 0)
-    }
-  end
-
-  defp parse_node(action = %{type: "actions/emote", data: data}, _brains) do
-    %Kalevala.Brain.Action{
-      type: Kantele.Character.EmoteAction,
-      data: data,
-      delay: Map.get(action, :delay, 0)
-    }
-  end
-
-  defp parse_node(action = %{type: "actions/flee"}, _brains) do
-    %Kalevala.Brain.Action{
-      type: Kantele.Character.FleeAction,
-      data: %{},
-      delay: Map.get(action, :delay, 0)
-    }
-  end
-
-  defp parse_node(action = %{type: "actions/wander"}, _brains) do
-    %Kalevala.Brain.Action{
-      type: Kantele.Character.WanderAction,
-      data: %{},
-      delay: Map.get(action, :delay, 0)
-    }
-  end
-
-  defp parse_node(action = %{type: "actions/delay-event", data: data}, _brains) do
-    %Kalevala.Brain.Action{
-      type: Kantele.Character.DelayEventAction,
-      data: data,
-      delay: Map.get(action, :delay, 0)
-    }
-  end
 
   @doc """
   Parse item data
