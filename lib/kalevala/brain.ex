@@ -397,6 +397,8 @@ defmodule Kalevala.Brain.Conditions.EventMatch do
   Condition check for the event being a message and the regex matches
   """
 
+  alias Kalevala.Character.Conn
+
   @behaviour Kalevala.Brain.Condition
 
   @impl true
@@ -409,8 +411,9 @@ defmodule Kalevala.Brain.Conditions.EventMatch do
 
   def self_check(event, conn, %{self_trigger: self_trigger}) do
     acting_character = Map.get(event, :acting_character) || %{}
+    character = Conn.character(conn)
 
-    case Map.get(acting_character, :id) == conn.character.id do
+    case Map.get(acting_character, :id) == character.id do
       true ->
         self_trigger
 

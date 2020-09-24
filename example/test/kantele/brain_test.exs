@@ -30,6 +30,8 @@ defmodule Kantele.BrainTestHelpers do
 
   defmacro assert_actions(actual_actions, expected_actions) do
     quote do
+      assert length(unquote(actual_actions)) == length(unquote(expected_actions))
+
       unquote(expected_actions)
       |> Enum.with_index()
       |> Enum.map(fn {expected_action, index} ->
@@ -217,6 +219,41 @@ defmodule Kantele.BrainTest do
             "delay" => 500
           },
           type: Kantele.Character.SayAction
+        }
+      ])
+    end
+
+    test "ticking emote", %{brain: brain} do
+      character = generate_character("nonplayer", brain)
+
+      event =
+        event(character, "characters/emote", %{
+          id: "looking",
+          message: "looks around for someone to talk to."
+        })
+
+      conn = new_conn(character)
+
+      conn = Kalevala.Brain.run(brain, conn, event)
+
+      assert_actions(conn.private.actions, [
+        %Kalevala.Character.Action{
+          delay: 0,
+          params: %{
+            "channel_name" => "rooms:room-id",
+            "text" => "looks around for someone to talk to."
+          },
+          type: Kantele.Character.EmoteAction
+        },
+        %Kalevala.Character.Action{
+          delay: 0,
+          params: %{
+            "data" => %{"id" => "looking", "message" => "looks around for someone to talk to."},
+            "minimum_delay" => 90_000,
+            "random_delay" => 180_000,
+            "topic" => "characters/emote"
+          },
+          type: Kantele.Character.DelayEventAction
         }
       ])
     end

@@ -253,6 +253,7 @@ brains "town_crier" {
           type = "conditions/event-match"
           data = {
             topic = "characters/emote"
+            self_trigger = true
             data = {
               id = "looking"
             }
