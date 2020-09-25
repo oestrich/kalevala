@@ -27,3 +27,31 @@ jobs:
         mix test
       env:
         MIX_ENV: test
+  example:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-elixir@v1.0.0
+      with:
+        otp-version: 22.x
+        elixir-version: 1.10.1
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git build-essential
+    - name: Setup elixir
+      run: |
+        cd example/
+        mix deps.get
+        mix compile
+      env:
+        MIX_ENV: test
+    - name: Verify application
+      run: |
+        cd example/
+        mix format --check-formatted
+        mix compile --force --warnings-as-errors
+        mix credo
+        mix test
+      env:
+        MIX_ENV: test
