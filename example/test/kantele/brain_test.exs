@@ -1,58 +1,8 @@
-defmodule Kantele.BrainTestHelpers do
-  def new_conn(character) do
-    %Kalevala.Character.Conn{
-      character: character,
-      session: %{},
-      private: %Kalevala.Character.Conn.Private{
-        request_id: Kalevala.Character.Conn.Private.generate_request_id()
-      }
-    }
-  end
-
-  def generate_character(name, brain \\ nil) do
-    %Kalevala.Character{
-      id: Kalevala.Character.generate_id(),
-      name: name,
-      pid: self(),
-      brain: brain,
-      room_id: "room-id"
-    }
-  end
-
-  def event(character, topic, data) do
-    %Kalevala.Event{
-      acting_character: character,
-      from_pid: self(),
-      topic: topic,
-      data: data
-    }
-  end
-
-  defmacro assert_actions(actual_actions, expected_actions) do
-    quote do
-      assert length(unquote(actual_actions)) == length(unquote(expected_actions))
-
-      unquote(expected_actions)
-      |> Enum.with_index()
-      |> Enum.map(fn {expected_action, index} ->
-        attributes = [:delay, :params, :type]
-        actual_action = Enum.at(unquote(actual_actions), index)
-        assert Map.take(actual_action, attributes) == Map.take(expected_action, attributes)
-      end)
-    end
-  end
-
-  defmacro assert_brain_value(brain, key, value) do
-    quote do
-      assert Kalevala.Brain.get(unquote(brain), unquote(key)) == unquote(value)
-    end
-  end
-end
-
 defmodule Kantele.BrainTest do
-  use ExUnit.Case, async: true
+  use Kantele.ConnCase, async: true
 
-  import Kantele.BrainTestHelpers
+  import Kalevala.BrainTest
+  import Kantele.TestHelpers
 
   alias Kalevala.Character.Conn
   alias Kantele.Brain
@@ -75,7 +25,7 @@ defmodule Kantele.BrainTest do
         })
 
       conn =
-        new_conn(%Kalevala.Character{
+        build_conn(%Kalevala.Character{
           id: Kalevala.Character.generate_id(),
           pid: self(),
           name: "nonplayer",
@@ -111,7 +61,7 @@ defmodule Kantele.BrainTest do
           type: "speech"
         })
 
-      conn = new_conn(generate_character("nonplayer", brain))
+      conn = build_conn(generate_character("nonplayer", brain))
 
       conn = Kalevala.Brain.run(brain, conn, event)
 
@@ -136,7 +86,7 @@ defmodule Kantele.BrainTest do
           type: "speech"
         })
 
-      conn = new_conn(generate_character("nonplayer", brain))
+      conn = build_conn(generate_character("nonplayer", brain))
 
       conn = Kalevala.Brain.run(brain, conn, event)
 
@@ -162,7 +112,7 @@ defmodule Kantele.BrainTest do
           type: "speech"
         })
 
-      conn = new_conn(generate_character("nonplayer", Conn.character(conn).brain))
+      conn = build_conn(generate_character("nonplayer", Conn.character(conn).brain))
 
       conn = Kalevala.Brain.run(brain, conn, event)
 
@@ -183,7 +133,7 @@ defmodule Kantele.BrainTest do
           type: "speech"
         })
 
-      conn = new_conn(generate_character("nonplayer", Conn.character(conn).brain))
+      conn = build_conn(generate_character("nonplayer", Conn.character(conn).brain))
 
       conn = Kalevala.Brain.run(brain, conn, event)
 
@@ -206,7 +156,7 @@ defmodule Kantele.BrainTest do
           reason: "Player enters"
         })
 
-      conn = new_conn(generate_character("nonplayer", brain))
+      conn = build_conn(generate_character("nonplayer", brain))
 
       conn = Kalevala.Brain.run(brain, conn, event)
 
@@ -232,7 +182,7 @@ defmodule Kantele.BrainTest do
           message: "looks around for someone to talk to."
         })
 
-      conn = new_conn(character)
+      conn = build_conn(character)
 
       conn = Kalevala.Brain.run(brain, conn, event)
 
