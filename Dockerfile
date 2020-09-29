@@ -1,4 +1,4 @@
-FROM hexpm/elixir:1.10.2-erlang-22.2.8-alpine-3.11.3 as builder
+FROM hexpm/elixir:1.10.4-erlang-23.1-alpine-3.12.0 as builder
 WORKDIR /app/example
 ENV MIX_ENV=prod
 RUN apk add --no-cache gcc git make musl-dev
@@ -22,7 +22,7 @@ COPY --from=frontend /priv/static /app/example/priv/static
 COPY . /app/
 RUN mix release
 
-FROM alpine:3.11
+FROM alpine:3.12.0
 ENV LANG=C.UTF-8
 RUN apk add -U bash openssl
 WORKDIR /app
