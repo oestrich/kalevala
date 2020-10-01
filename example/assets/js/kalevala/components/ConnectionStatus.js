@@ -36,4 +36,4 @@ let mapStateToProps = (state) => {
   return { connected };
 };
 
-export default ConnectionStatus = connect(mapStateToProps)(ConnectionStatus);
+export default connect(mapStateToProps)(ConnectionStatus);

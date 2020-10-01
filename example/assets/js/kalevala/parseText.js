@@ -74,7 +74,7 @@ const parseTag = (tag) => {
       // LineBreak
       return strings;
     });
-  };
+  }
 
   if (tag instanceof Array) {
     return tag.map(parseTag).flat();

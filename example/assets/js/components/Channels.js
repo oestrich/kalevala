@@ -59,7 +59,7 @@ class Channels extends React.Component {
       </div>
     );
   }
-};
+}
 
 let mapStateToProps = (state) => {
   const messages = getChannelMessages(state);

@@ -7,11 +7,11 @@ const INITIAL_STATE = {
   loggedIn: false,
 };
 
-const loginActive = (state, action) => {
+const loginActive = (state) => {
   return {...state, active: true};
 };
 
-const loggedIn = (state, action) => {
+const loggedIn = (state) => {
   return {...state, loggedIn: true};
 };
 

@@ -8,7 +8,7 @@ const INITIAL_STATE = {
   displayText: "",
 }
 
-export const promptClear = (state, action) => {
+export const promptClear = (state) => {
   return {...state, index: -1, currentText: "", displayText: ""};
 };
 
@@ -17,7 +17,7 @@ export const promptSetCurrentText = (state, action) => {
   return {...state, index: -1, currentText: text, displayText: text};
 }
 
-export const promptHistoryAdd = (state, action) => {
+export const promptHistoryAdd = (state) => {
   if (state.history[0] == state.displayText) {
     return {...state, index: -1};
   } else {
@@ -27,7 +27,7 @@ export const promptHistoryAdd = (state, action) => {
   }
 }
 
-export const promptHistoryScrollBackward = (state, action) => {
+export const promptHistoryScrollBackward = (state) => {
   let index = state.index + 1;
 
   if (state.history[index] != undefined) {
@@ -37,7 +37,7 @@ export const promptHistoryScrollBackward = (state, action) => {
   return state;
 }
 
-export const promptHistoryScrollForward = (state, action) => {
+export const promptHistoryScrollForward = (state) => {
   let index = state.index - 1;
 
   if (index == -1) {

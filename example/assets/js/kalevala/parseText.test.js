@@ -1,4 +1,4 @@
-import parseText, { Children, Line, LineBreak, NewLine, parseTag } from "./parseText";
+import parseText, { Line, LineBreak, NewLine, parseTag } from "./parseText";
 
 describe("breaking apart a single tag", () => {
   test("has no line breaks", () => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const isFunction = (obj) => {
   return !!(obj && obj.constructor && obj.call && obj.apply);
@@ -24,5 +25,11 @@ const Tooltip = ({ children, className, tip }) => {
     </span>
   );
 };
+
+Tooltip.propTypes = {
+  children: PropTypes.element.isRequired,
+  className: PropTypes.string.isRequired,
+  tip: PropTypes.func.optional,
+}
 
 export default Tooltip;

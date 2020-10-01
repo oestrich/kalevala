@@ -26,7 +26,7 @@ class CharacterSelect extends React.Component {
       if (e.key === "Enter") {
         e.preventDefault();
         submitCharacter();
-      };
+      }
     };
 
     return (

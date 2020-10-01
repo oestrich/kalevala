@@ -3,7 +3,7 @@ export default class Keys {
     this.keysDown = [];
     this.listeners = {};
 
-    window.addEventListener("blur", e => {
+    window.addEventListener("blur", () => {
       this.keysDown = [];
     });
 

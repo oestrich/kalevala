@@ -16,7 +16,7 @@ export const socketConnected = (state, action) => {
   return {...state, socket: socket, connected: true};
 };
 
-export const socketDisconnected = (state, action) => {
+export const socketDisconnected = (state) => {
   if (!state.connected) {
     return state;
   }
@@ -28,7 +28,7 @@ export const socketReceivedEvent = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
-    case "system/display":
+    case "system/display": {
       let lines = parseText(event.data);
       lines = state.lines.concat(lines);
 
@@ -52,12 +52,15 @@ export const socketReceivedEvent = (state, action) => {
       }
 
       return {...state, lines: context.lines};
+    }
 
-    case "system/pong":
+    case "system/pong": {
       return state;
+    }
 
-    default:
+    default: {
       return state;
+    }
   }
 };
 
@@ -65,7 +68,7 @@ export const socketSendEvent = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
-    case "system/send":
+    case "system/send": {
       const { text } = event.data;
 
       const tag = {
@@ -76,10 +79,12 @@ export const socketSendEvent = (state, action) => {
       let lines = parseText(tag);
 
       return {...state, lines: state.lines.concat(lines)};
+    }
 
-    default:
+    default: {
       return state;
-  };
+    }
+  }
 };
 
 export const HANDLERS = {

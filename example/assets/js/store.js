@@ -47,7 +47,7 @@ const eventTextHandlers = {
   "Inventory.All": dispatchEventText,
   "Inventory.DropItem": dispatchEventText,
   "Inventory.PickupItem": dispatchEventText,
-  "Login.Welcome": (dispatch, getState, event, { history }) => {
+  "Login.Welcome": (dispatch) => {
     dispatch(Creators.loginActive());
   },
   "Login.PromptCharacter": (dispatch, getState, event, { history }) => {
@@ -83,7 +83,7 @@ const eventTextHandlers = {
 
 const systemEventHandlers = {
   "system/event-text": (dispatch, getState, event, args) => {
-    const { topic, data, text } = event.data;
+    const { topic, data } = event.data;
 
     let handler = eventTextHandlers[topic];
 

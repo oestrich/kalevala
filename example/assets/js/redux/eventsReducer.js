@@ -37,32 +37,39 @@ const eventReceived = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
-    case "Character.Vitals":
+    case "Character.Vitals": {
       return {...state, vitals: event.data};
+    }
 
-    case "Context.Verbs":
+    case "Context.Verbs": {
       const { contexts } = state;
       const { verbs, context, type, id } = event.data;
 
       contexts[`${context}:${type}:${id}`] = verbs;
 
       return {...state, contexts: contexts};
+    }
 
-    case "Inventory.All":
+    case "Inventory.All": {
       const { item_instances } = event.data;
       return {...state, inventory: item_instances};
+    }
 
-    case "Inventory.DropItem":
+    case "Inventory.DropItem": {
       return dropItem(state, event);
+    }
 
-    case "Inventory.PickupItem":
+    case "Inventory.PickupItem": {
       return pickupItem(state, event);
+    }
 
-    case "Room.Info":
+    case "Room.Info": {
       return {...state, room: event.data};
+    }
 
-    default:
+    default: {
       return state;
+    }
   }
 };
 

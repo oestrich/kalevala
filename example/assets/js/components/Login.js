@@ -27,7 +27,7 @@ class Login extends React.Component {
       if (e.key === "Enter") {
         e.preventDefault();
         submitLogin();
-      };
+      }
     };
 
     return (

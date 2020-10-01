@@ -13,7 +13,7 @@ const borderColor = (side) => {
 
     case "top":
       return "border-b-2";
-  };
+  }
 };
 
 const Sidebar = ({ children, side, width }) => {
