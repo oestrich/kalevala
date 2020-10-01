@@ -1,12 +1,13 @@
+import PropTypes from "prop-types";
 import React from "react";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
 import { Creators } from "../kalevala";
 
 import { ContextMenu } from "./ContextMenu";
 import { getEventsContextVerbs } from "../redux";
 
-export class ItemContext extends React.Component {
+let ItemContext = class ItemContext extends React.Component {
   componentDidMount() {
     const { context, id } = this.props;
 
@@ -20,11 +21,16 @@ export class ItemContext extends React.Component {
       return null;
     }
 
-    return (
-      <ContextMenu verbs={verbs} dispatch={dispatch} />
-    );
+    return <ContextMenu verbs={verbs} dispatch={dispatch} />;
   }
-}
+};
+
+ItemContext.propTypes = {
+  context: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  verbs: PropTypes.array,
+};
 
 const mapStateToProps = (state, ownProps) => {
   const verbs = getEventsContextVerbs(state, ownProps.context, "item", ownProps.id);
@@ -50,18 +56,18 @@ export default class ItemWrapper extends React.Component {
     clearTimeout(this.timer);
 
     if (!this.state.showTooltip) {
-      this.setState({showTooltip: true});
+      this.setState({ showTooltip: true });
     }
   }
 
   startHoverTimeout() {
     this.timer = setTimeout(() => {
-      this.setState({showTooltip: false});
+      this.setState({ showTooltip: false });
     }, 500);
   }
 
   render() {
-    const { attributes, children } = this.props;
+    const { attributes } = this.props;
     const { showTooltip } = this.state;
 
     let tooltip = null;
@@ -78,11 +84,17 @@ export default class ItemWrapper extends React.Component {
 
     return (
       <div className="tooltip-hover inline-block" onMouseEnter={this.showTooltip} onMouseLeave={this.startHoverTimeout}>
-        <span className="cursor-pointer">
-          {this.props.children}
-        </span>
+        <span className="cursor-pointer">{this.props.children}</span>
         {tooltip}
       </div>
     );
   }
 }
+
+ItemWrapper.propTypes = {
+  attributes: PropTypes.shape({
+    description: PropTypes.string,
+    name: PropTypes.string,
+  }),
+  children: PropTypes.node,
+};

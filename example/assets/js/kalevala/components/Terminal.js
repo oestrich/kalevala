@@ -1,5 +1,6 @@
+import PropTypes from "prop-types";
 import React from "react";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
 import { parse256Color } from "./colors";
 import { getSocketLines } from "../redux";
@@ -9,9 +10,9 @@ import Tooltip from "./Tooltip";
 const CustomTagsContext = React.createContext({});
 
 const tooltipTags = {
-  "ep": "Endurance Points",
-  "hp": "Health Points",
-  "sp": "Skill Points",
+  ep: "Endurance Points",
+  hp: "Health Points",
+  sp: "Skill Points",
 };
 
 const theme = {
@@ -42,9 +43,7 @@ export const renderTags = (children) => {
   return (
     <>
       {children.map((child) => {
-        return (
-          <Tag key={child.id} tag={child} />
-        );
+        return <Tag key={child.id} tag={child} />;
       })}
     </>
   );
@@ -54,7 +53,7 @@ export class ColorTag extends React.Component {
   /**
    * This is static, no need to ever re-render
    */
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate() {
     return false;
   }
 
@@ -99,38 +98,43 @@ export class ColorTag extends React.Component {
   }
 
   render() {
-    return (
-      <span style={this.styleAttributes()}>
-        {renderTags(this.props.children)}
-      </span>
-    );
+    return <span style={this.styleAttributes()}>{renderTags(this.props.children)}</span>;
   }
 }
+
+ColorTag.propTypes = {
+  attributes: PropTypes.shape({
+    background: PropTypes.string,
+    foreground: PropTypes.string,
+    underline: PropTypes.string,
+  }).isRequired,
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+};
 
 export class SentText extends React.Component {
   /**
    * This is static, no need to ever re-render
    */
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate() {
     return false;
   }
 
   render() {
     const color = theme.colors["white"];
 
-    return (
-      <span style={{ color: color }}>
-        {renderTags(this.props.children)}
-      </span>
-    );
+    return <span style={{ color: color }}>{renderTags(this.props.children)}</span>;
   }
 }
+
+SentText.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+};
 
 class Tag extends React.Component {
   render() {
     const customTags = this.context;
 
-    const { dispatch, tag } = this.props;
+    const { tag } = this.props;
 
     if (tag.name === "string") {
       return tag.text;
@@ -143,30 +147,18 @@ class Tag extends React.Component {
     }
 
     if (tooltipTags[tag.name]) {
-      return (
-        <Tooltip tip={tooltipTags[tag.name]}>
-          {renderTags(tag.children)}
-        </Tooltip>
-      );
+      return <Tooltip tip={tooltipTags[tag.name]}>{renderTags(tag.children)}</Tooltip>;
     }
 
     switch (tag.name) {
       case "color":
-        return (
-          <ColorTag children={tag.children} attributes={tag.attributes} />
-        );
+        return <ColorTag attributes={tag.attributes}>{tag.children}</ColorTag>;
 
       case "tooltip":
-        return (
-          <Tooltip tip={tag.attributes.text} >
-            {renderTags(this.props.children)}
-          </Tooltip>
-        );
+        return <Tooltip tip={tag.attributes.text}>{renderTags(this.props.children)}</Tooltip>;
 
       case "sent-text":
-        return (
-          <SentText children={tag.children} />
-        );
+        return <SentText>{tag.children}</SentText>;
 
       default:
         return renderTags(tag.children);
@@ -174,33 +166,34 @@ class Tag extends React.Component {
   }
 }
 
+Tag.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+  tag: PropTypes.object.isRequired,
+};
+
 Tag.contextType = CustomTagsContext;
 
 export { Tag };
 
 class Lines extends React.Component {
   render() {
-    let { children } = this.props;
+    let { lines } = this.props;
 
     let renderLine = (line) => {
       if (line instanceof NewLine) {
-        return (<br key={line.id} />);
+        return <br key={line.id} />;
       }
 
-      return (
-        <span key={line.id}>
-          {renderTags(line.children)}
-        </span>
-      );
+      return <span key={line.id}>{renderTags(line.children)}</span>;
     };
 
-    return (
-      <React.Fragment>
-        {children.map(renderLine)}
-      </React.Fragment>
-    );
+    return <React.Fragment>{lines.map(renderLine)}</React.Fragment>;
   }
 }
+
+Lines.propTypes = {
+  lines: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
 
 class Terminal extends React.Component {
   constructor(props) {
@@ -244,14 +237,30 @@ class Terminal extends React.Component {
     };
 
     return (
-      <div ref={el => { this.terminal = el; }} style={style}
-        className="relative text-gray-500 overflow-y-scroll flex-grow w-full p-4 whitespace-pre-wrap z-10 bg-gray-900">
-        <Lines children={lines} />
-        <div ref={el => { this.el = el; }} />
+      <div
+        ref={(el) => {
+          this.terminal = el;
+        }}
+        style={style}
+        className="relative text-gray-500 overflow-y-scroll flex-grow w-full p-4 whitespace-pre-wrap z-10 bg-gray-900"
+      >
+        <Lines lines={lines} />
+        <div
+          ref={(el) => {
+            this.el = el;
+          }}
+        />
       </div>
     );
   }
 }
+
+Terminal.propTypes = {
+  font: PropTypes.string.isRequired,
+  fontSize: PropTypes.number.isRequired,
+  lineHeight: PropTypes.number.isRequired,
+  lines: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
 
 let mapStateToProps = (state) => {
   const lines = getSocketLines(state);
@@ -259,6 +268,6 @@ let mapStateToProps = (state) => {
   return { font: "Monaco", fontSize: 16, lineHeight: 1.5, lines };
 };
 
-export default Terminal = connect(mapStateToProps)(Terminal);
+export default connect(mapStateToProps)(Terminal);
 
 export { CustomTagsContext };

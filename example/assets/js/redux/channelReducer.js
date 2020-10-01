@@ -13,13 +13,13 @@ const channelBroadcast = (state, action) => {
     channelName,
     character: {
       id: character.id,
-      name: character.name
+      name: character.name,
     },
     id,
-    text
+    text,
   };
 
-  return {...state, messages: [...state.messages, message]};
+  return { ...state, messages: [...state.messages, message] };
 };
 
 const HANDLERS = {

@@ -1,5 +1,5 @@
-import { applyMiddleware, combineReducers } from 'redux';
-import thunk from 'redux-thunk';
+import { applyMiddleware, combineReducers } from "redux";
+import thunk from "redux-thunk";
 
 import { Types, Creators } from "./actions";
 import { createReducer } from "./createReducer";
@@ -37,10 +37,4 @@ export const kalevalaReducers = combineReducers({
   socket: socketReducer,
 });
 
-export {
-  createReducer,
-  Creators,
-  promptReducer,
-  socketReducer,
-  Types
-};
+export { createReducer, Creators, promptReducer, socketReducer, Types };

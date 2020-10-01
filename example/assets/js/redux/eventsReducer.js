@@ -38,7 +38,7 @@ const eventReceived = (state, action) => {
 
   switch (event.topic) {
     case "Character.Vitals": {
-      return {...state, vitals: event.data};
+      return { ...state, vitals: event.data };
     }
 
     case "Context.Verbs": {
@@ -47,12 +47,12 @@ const eventReceived = (state, action) => {
 
       contexts[`${context}:${type}:${id}`] = verbs;
 
-      return {...state, contexts: contexts};
+      return { ...state, contexts: contexts };
     }
 
     case "Inventory.All": {
       const { item_instances } = event.data;
-      return {...state, inventory: item_instances};
+      return { ...state, inventory: item_instances };
     }
 
     case "Inventory.DropItem": {
@@ -64,7 +64,7 @@ const eventReceived = (state, action) => {
     }
 
     case "Room.Info": {
-      return {...state, room: event.data};
+      return { ...state, room: event.data };
     }
 
     default: {
@@ -76,13 +76,13 @@ const eventReceived = (state, action) => {
 const dropItem = (state, event) => {
   const { item_instance } = event.data;
   let { inventory } = state;
-  inventory = inventory.filter(instance => instance.id != item_instance.id);
-  return {...state, inventory: inventory};
+  inventory = inventory.filter((instance) => instance.id != item_instance.id);
+  return { ...state, inventory: inventory };
 };
 
 const pickupItem = (state, event) => {
   const { item_instance } = event.data;
-  return {...state, inventory: [item_instance, ...state.inventory]};
+  return { ...state, inventory: [item_instance, ...state.inventory] };
 };
 
 const eventClearVerbs = (state, event) => {
@@ -91,7 +91,7 @@ const eventClearVerbs = (state, event) => {
 
   delete contexts[`${context}:${type}:${id}`];
 
-  return {...state, contexts: contexts};
+  return { ...state, contexts: contexts };
 };
 
 const HANDLERS = {

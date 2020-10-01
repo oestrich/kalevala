@@ -1,5 +1,6 @@
+import PropTypes from "prop-types";
 import React from "react";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 import { Tooltip } from "../kalevala";
 
 import { Creators, getEventsRoom } from "../redux";
@@ -10,66 +11,57 @@ const exitTooltip = ({ active, direction }) => {
   } else {
     return null;
   }
-}
+};
 
 const Exit = ({ active, className, direction, move }) => {
-  const activeClassName = active ? "bg-teal-600 cursor-pointer" : "bg-gray-700 border border-teal-800 cursor-not-allowed";
+  const activeClassName = active
+    ? "bg-teal-600 cursor-pointer"
+    : "bg-gray-700 border border-teal-800 cursor-not-allowed";
   const fullClassName = `${className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
 
   return (
-    <Tooltip tip={exitTooltip({ active, direction })} className={fullClassName}>
-      <div onClick={move}>
-        {direction}
-      </div>
-    </Tooltip>
+    <div onClick={move} className={fullClassName}>
+      <Tooltip tip={exitTooltip({ active, direction })}>{direction}</Tooltip>
+    </div>
   );
 };
 
-class Exits extends React.Component {
-  render() {
-    const { exits } = this.props;
+Exit.propTypes = {
+  active: PropTypes.bool.isRequired,
+  className: PropTypes.string,
+  direction: PropTypes.string.isRequired,
+  move: PropTypes.func.isRequired,
+};
 
-    return (
-      <div className="grid grid-cols-3 gap-1 text-sm w-64 h-32 items-center">
-        <Exit
-          className="col-start-1"
-          direction="up"
-          move={this.props.moveUp}
-          active={exits.includes("up")} />
+let Exits = (props) => {
+  const { exits } = props;
 
-        <Exit
-          className="col-start-2"
-          direction="north"
-          move={this.props.moveNorth}
-          active={exits.includes("north")} />
+  return (
+    <div className="grid grid-cols-3 gap-1 text-sm w-64 h-32 items-center">
+      <Exit className="col-start-1" direction="up" move={props.moveUp} active={exits.includes("up")} />
 
-        <Exit
-          className="col-start-1"
-          direction="west"
-          move={this.props.moveWest}
-          active={exits.includes("west")} />
+      <Exit className="col-start-2" direction="north" move={props.moveNorth} active={exits.includes("north")} />
 
-        <Exit
-          className="col-start-3"
-          direction="east"
-          move={this.props.moveEast}
-          active={exits.includes("east")} />
+      <Exit className="col-start-1" direction="west" move={props.moveWest} active={exits.includes("west")} />
 
-        <Exit
-          className="col-start-1"
-          direction="down"
-          move={this.props.moveDown}
-          active={exits.includes("down")} />
+      <Exit className="col-start-3" direction="east" move={props.moveEast} active={exits.includes("east")} />
 
-        <Exit
-          className="col-start-2"
-          direction="south"
-          move={this.props.moveSouth}
-          active={exits.includes("south")} />
-      </div>
-    );
-  }
-}
+      <Exit className="col-start-1" direction="down" move={props.moveDown} active={exits.includes("down")} />
+
+      <Exit className="col-start-2" direction="south" move={props.moveSouth} active={exits.includes("south")} />
+    </div>
+  );
+};
+
+Exits.propTypes = {
+  exits: PropTypes.array.isRequired,
+  moveNorth: PropTypes.func.isRequired,
+  moveSouth: PropTypes.func.isRequired,
+  moveWest: PropTypes.func.isRequired,
+  moveEast: PropTypes.func.isRequired,
+  moveUp: PropTypes.func.isRequired,
+  moveDown: PropTypes.func.isRequired,
+};
 
 Exits = connect(null, {
   moveNorth: Creators.moveNorth,
@@ -82,25 +74,36 @@ Exits = connect(null, {
 
 const Character = ({ description, name }) => {
   return (
-    <div className="mr-2 bg-gray-800 border border-teal-800 rounded p-2" style={{color: "#cfad00"}}>
-      <Tooltip tip={description}>
-        {name}
-      </Tooltip>
+    <div className="mr-2 bg-gray-800 border border-teal-800 rounded p-2" style={{ color: "#cfad00" }}>
+      <Tooltip tip={description}>{name}</Tooltip>
     </div>
   );
+};
+
+Character.propTypes = {
+  description: PropTypes.string,
+  name: PropTypes.string.isRequired,
 };
 
 const Characters = ({ characters }) => {
   return (
     <div className="flex">
       {characters.map((character) => {
-        return (
-          <Character key={character.id} description={character.description} name={character.name} />
-        );
+        return <Character key={character.id} description={character.description} name={character.name} />;
       })}
     </div>
   );
-}
+};
+
+Characters.propTypes = {
+  characters: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      name: PropTypes.string.isRequired,
+    }),
+  ),
+};
 
 let trimTags = (line) => {
   if (line instanceof Array) {
@@ -133,7 +136,16 @@ let Room = ({ room }) => {
       <Exits exits={exits} />
     </div>
   );
-}
+};
+
+Room.propTypes = {
+  room: PropTypes.shape({
+    characters: PropTypes.array,
+    description: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
+    exits: PropTypes.array,
+    name: PropTypes.string.isRequired,
+  }),
+};
 
 let mapStateToProps = (state) => {
   const room = getEventsRoom(state);
@@ -141,4 +153,4 @@ let mapStateToProps = (state) => {
   return { room };
 };
 
-export default Room = connect(mapStateToProps)(Room);
+export default connect(mapStateToProps)(Room);

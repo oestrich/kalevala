@@ -11,7 +11,7 @@ export const parse256Color = (color) => {
 
   switch (true) {
     case color < 8:
-      return  basicColorCodes[color];
+      return basicColorCodes[color];
 
     case color < 16:
       return basicColorCodes[color - 8];

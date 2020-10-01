@@ -6,7 +6,9 @@ module.exports = {
     },
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:prettier/recommended",
+        "prettier/react",
     ],
     "parserOptions": {
         "ecmaFeatures": {
@@ -15,7 +17,9 @@ module.exports = {
         "ecmaVersion": 12,
         "sourceType": "module"
     },
-    "plugins": ["react"],
+    "plugins": [
+      "react"
+    ],
     "rules": {
         "accessor-pairs": "error",
         "array-bracket-newline": "error",
@@ -69,11 +73,10 @@ module.exports = {
         ],
         "consistent-return": "off",
         "consistent-this": "error",
-        "curly": "off",
+        "curly": ["error", "all"],
         "default-case": "off",
         "default-case-last": "error",
         "default-param-last": "error",
-        "dot-location": "error",
         "dot-notation": "off",
         "eol-last": "error",
         "eqeqeq": "off",
@@ -84,7 +87,6 @@ module.exports = {
             "error",
             "expression"
         ],
-        "function-paren-newline": "error",
         "generator-star-spacing": "error",
         "global-require": "error",
         "grouped-accessor-pairs": "error",
@@ -260,10 +262,6 @@ module.exports = {
             "error",
             "always"
         ],
-        "operator-linebreak": [
-            "error",
-            "after"
-        ],
         "padded-blocks": "off",
         "padding-line-between-statements": "error",
         "prefer-arrow-callback": "error",
@@ -338,10 +336,14 @@ module.exports = {
         "vars-on-top": "error",
         "wrap-iife": "error",
         "wrap-regex": "error",
-        "yield-star-spacing": "error",
         "yoda": [
             "error",
             "never"
         ]
-    }
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
 };

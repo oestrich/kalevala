@@ -5,32 +5,38 @@ import {
   Types as KalevalaTypes,
   kalevalaMiddleware,
   promptReducer,
-  socketReducer
+  socketReducer,
 } from "./kalevala";
 
-import {
-  Creators,
-  channelReducer,
-  eventsReducer,
-  loginReducer
-} from "./redux";
+import { Creators, channelReducer, eventsReducer, loginReducer } from "./redux";
 
 const composeEnhancers =
-  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
-  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
+  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+    : compose;
 
 const dispatchEventText = (dispatch, getState, event, { history }) => {
   const { data, text, topic } = event;
 
-  dispatch(KalevalaCreators.socketReceivedEvent({
-    topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
-    data: { event: { topic, data } },
-  }, { history }));
+  dispatch(
+    KalevalaCreators.socketReceivedEvent(
+      {
+        topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
+        data: { event: { topic, data } },
+      },
+      { history },
+    ),
+  );
 
-  dispatch(KalevalaCreators.socketReceivedEvent({
-    topic: "system/display",
-    data: text
-  }, { history }));
+  dispatch(
+    KalevalaCreators.socketReceivedEvent(
+      {
+        topic: "system/display",
+        data: text,
+      },
+      { history },
+    ),
+  );
 };
 
 const eventTextHandlers = {
@@ -107,4 +113,4 @@ const reducers = combineReducers({
 
 export const makeStore = () => {
   return createStore(reducers, middleware);
-}
+};

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 const borderColor = (side) => {
@@ -22,6 +23,12 @@ const Sidebar = ({ children, side, width }) => {
       {children}
     </div>
   );
+};
+
+Sidebar.propTypes = {
+  children: PropTypes.node,
+  side: PropTypes.string.isRequired,
+  width: PropTypes.string,
 };
 
 const SidebarSplit = () => {

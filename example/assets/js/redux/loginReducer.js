@@ -8,11 +8,11 @@ const INITIAL_STATE = {
 };
 
 const loginActive = (state) => {
-  return {...state, active: true};
+  return { ...state, active: true };
 };
 
 const loggedIn = (state) => {
-  return {...state, loggedIn: true};
+  return { ...state, loggedIn: true };
 };
 
 const HANDLERS = {

@@ -16,7 +16,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "Login",
-        data: { username, password }
+        data: { username, password },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -32,7 +32,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "system/send",
-        data: { text: "north" }
+        data: { text: "north" },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -42,7 +42,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "system/send",
-        data: { text: "south" }
+        data: { text: "south" },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -52,7 +52,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "system/send",
-        data: { text: "west" }
+        data: { text: "west" },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -62,7 +62,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "system/send",
-        data: { text: "east" }
+        data: { text: "east" },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -72,7 +72,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "system/send",
-        data: { text: "up" }
+        data: { text: "up" },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -82,7 +82,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "system/send",
-        data: { text: "down" }
+        data: { text: "down" },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));
@@ -98,7 +98,7 @@ export const Creators = {
     return (dispatch) => {
       const event = {
         topic: "Login.Character",
-        data: { character }
+        data: { character },
       };
 
       dispatch(KalevalaCreators.socketSendEvent(event));

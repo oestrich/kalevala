@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
-import { connect } from 'react-redux';
-import { Creators, Tooltip } from "../kalevala";
+import PropTypes from "prop-types";
+import React from "react";
+import { connect } from "react-redux";
 
-import { getEventsContextVerbs, getEventsInventory } from "../redux";
+import { getEventsInventory } from "../redux";
 
-import { ContextMenu } from "./ContextMenu";
 import ItemWrapper from "./ItemWrapper";
 
-const Item = ({ itemInstance, verbs }) => {
+const Item = ({ itemInstance }) => {
   const attributes = {
     context: "inventory",
     description: itemInstance.item.description,
@@ -24,19 +23,36 @@ const Item = ({ itemInstance, verbs }) => {
   );
 };
 
+Item.propTypes = {
+  itemInstance: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    item: PropTypes.shape({
+      description: PropTypes.string,
+      name: PropTypes.string,
+    }),
+  }),
+};
+
 let Inventory = ({ dispatch, inventory }) => {
   return (
     <div className="flex flex-col h-full">
       <h3 className="text-xl text-gray-200 px-4 pt-4">Inventory</h3>
       <div className="flex-grow overflow-y-scroll">
         {inventory.map((itemInstance) => {
-          return (
-            <Item key={itemInstance.id} dispatch={dispatch} itemInstance={itemInstance} />
-          );
+          return <Item key={itemInstance.id} dispatch={dispatch} itemInstance={itemInstance} />;
         })}
       </div>
     </div>
   );
+};
+
+Inventory.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  inventory: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }),
+  ),
 };
 
 let mapStateToProps = (state) => {

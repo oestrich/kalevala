@@ -17,5 +17,5 @@ export {
   Socket,
   Terminal,
   Tooltip,
-  Types
+  Types,
 };

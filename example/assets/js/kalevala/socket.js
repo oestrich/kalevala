@@ -44,7 +44,7 @@ export class Socket {
     };
 
     this.pingTimeout = setInterval(() => {
-      this.send({topic: "system/ping"});
+      this.send({ topic: "system/ping" });
     }, 5000);
   }
 
@@ -86,7 +86,7 @@ export const makeReduxSocket = (path, store, eventHandlerArguments = {}) => {
     },
     receivedEvent: (event) => {
       store.dispatch(Creators.socketReceivedEvent(event, eventHandlerArguments));
-    }
+    },
   });
 };
 
