@@ -55,3 +55,24 @@ jobs:
         mix test
       env:
         MIX_ENV: test
+  example-js:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git build-essential
+    - name: Setup node
+      run: |
+        npm install -g yarn
+        cd example/assets
+        yarn install
+    - name: Verify application
+      run: |
+        cd example/assets
+        yarn lint-ci
+        yarn jest

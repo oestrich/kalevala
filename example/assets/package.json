@@ -5,6 +5,7 @@
     "build": "webpack --mode development",
     "deploy": "webpack --mode production",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "lint-ci": "eslint '*/**/*.{js,ts,tsx}'",
     "test": "jest",
     "watch": "webpack --mode development --watch"
   },
