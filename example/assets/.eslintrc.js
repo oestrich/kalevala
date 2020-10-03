@@ -22,13 +22,7 @@ module.exports = {
     ],
     "rules": {
         "accessor-pairs": "error",
-        "array-bracket-newline": "error",
-        "array-bracket-spacing": [
-            "error",
-            "never"
-        ],
         "array-callback-return": "off",
-        "array-element-newline": "off",
         "arrow-body-style": "off",
         "arrow-parens": "off",
         "arrow-spacing": [
@@ -39,38 +33,9 @@ module.exports = {
             }
         ],
         "block-scoped-var": "error",
-        "block-spacing": [
-            "error",
-            "always"
-        ],
-        "brace-style": [
-            "error",
-            "1tbs",
-            {
-                "allowSingleLine": true
-            }
-        ],
         "callback-return": "error",
-        "camelcase": "off",
-        "capitalized-comments": "off",
         "class-methods-use-this": "off",
-        "comma-dangle": "off",
-        "comma-spacing": [
-            "error",
-            {
-                "after": true,
-                "before": false
-            }
-        ],
-        "comma-style": [
-            "error",
-            "last"
-        ],
         "complexity": "error",
-        "computed-property-spacing": [
-            "error",
-            "never"
-        ],
         "consistent-return": "off",
         "consistent-this": "error",
         "curly": ["error", "all"],
@@ -80,9 +45,6 @@ module.exports = {
         "dot-notation": "off",
         "eol-last": "error",
         "eqeqeq": "off",
-        "func-call-spacing": "error",
-        "func-name-matching": "error",
-        "func-names": "error",
         "func-style": [
             "error",
             "expression"
@@ -92,53 +54,11 @@ module.exports = {
         "grouped-accessor-pairs": "error",
         "guard-for-in": "error",
         "handle-callback-err": "error",
-        "id-blacklist": "error",
-        "id-denylist": "error",
-        "id-length": "off",
-        "id-match": "error",
         "implicit-arrow-linebreak": [
             "error",
             "beside"
         ],
-        "indent": "off",
-        "indent-legacy": "off",
-        "init-declarations": "off",
-        "jsx-quotes": [
-            "error",
-            "prefer-double"
-        ],
-        "key-spacing": "off",
-        "keyword-spacing": "off",
-        "line-comment-position": "off",
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "lines-around-comment": "off",
         "lines-around-directive": "error",
-        "lines-between-class-members": [
-            "error",
-            "always"
-        ],
-        "max-classes-per-file": "off",
-        "max-depth": "error",
-        "max-len": "off",
-        "max-lines": "off",
-        "max-lines-per-function": "off",
-        "max-nested-callbacks": "error",
-        "max-params": "off",
-        "max-statements": "off",
-        "max-statements-per-line": "error",
-        "multiline-comment-style": [
-            "error",
-            "separate-lines"
-        ],
-        "multiline-ternary": "off",
-        "new-cap": "error",
-        "new-parens": "error",
-        "newline-after-var": "off",
-        "newline-before-return": "off",
-        "newline-per-chained-call": "off",
         "no-alert": "error",
         "no-array-constructor": "error",
         "no-await-in-loop": "error",
@@ -278,7 +198,6 @@ module.exports = {
         "prefer-spread": "error",
         "prefer-template": "off",
         "quote-props": "off",
-        "quotes": "off",
         "radix": "error",
         "require-atomic-updates": "error",
         "require-await": "error",
