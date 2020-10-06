@@ -1,16 +1,19 @@
+import PropTypes from "prop-types";
 import React from "react";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
 import { Creators, Tooltip } from "../kalevala";
 
 let CommandWrapper = ({ children, dispatch, send }) => {
-  const onClick = (e) => {
-    dispatch(Creators.socketSendEvent({
-      topic: "system/send",
-      data: {
-        text: send
-      }
-    }));
+  const onClick = () => {
+    dispatch(
+      Creators.socketSendEvent({
+        topic: "system/send",
+        data: {
+          text: send,
+        },
+      }),
+    );
   };
 
   return (
@@ -20,6 +23,12 @@ let CommandWrapper = ({ children, dispatch, send }) => {
       </span>
     </Tooltip>
   );
+};
+
+CommandWrapper.propTypes = {
+  children: PropTypes.node,
+  dispatch: PropTypes.func.isRequired,
+  send: PropTypes.string.isRequired,
 };
 
 CommandWrapper = connect()(CommandWrapper);

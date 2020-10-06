@@ -8,27 +8,27 @@ const INITIAL_STATE = {
   socket: null,
   connected: false,
   lines: [],
-}
+};
 
 export const socketConnected = (state, action) => {
   const { socket } = action.data;
 
-  return {...state, socket: socket, connected: true};
+  return { ...state, socket: socket, connected: true };
 };
 
-export const socketDisconnected = (state, action) => {
+export const socketDisconnected = (state) => {
   if (!state.connected) {
     return state;
   }
 
-  return {...state, socket: null, connected: false};
+  return { ...state, socket: null, connected: false };
 };
 
 export const socketReceivedEvent = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
-    case "system/display":
+    case "system/display": {
       let lines = parseText(event.data);
       lines = state.lines.concat(lines);
 
@@ -45,19 +45,22 @@ export const socketReceivedEvent = (state, action) => {
         }
 
         if (line instanceof NewLine) {
-          context = {lines: [line, ...context.lines], newLines: context.newLines + 1};
+          context = { lines: [line, ...context.lines], newLines: context.newLines + 1 };
         } else {
-          context = {...context, lines: [line, ...context.lines]};
+          context = { ...context, lines: [line, ...context.lines] };
         }
       }
 
-      return {...state, lines: context.lines};
+      return { ...state, lines: context.lines };
+    }
 
-    case "system/pong":
+    case "system/pong": {
       return state;
+    }
 
-    default:
+    default: {
       return state;
+    }
   }
 };
 
@@ -65,7 +68,7 @@ export const socketSendEvent = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
-    case "system/send":
+    case "system/send": {
       const { text } = event.data;
 
       const tag = {
@@ -75,11 +78,13 @@ export const socketSendEvent = (state, action) => {
 
       let lines = parseText(tag);
 
-      return {...state, lines: state.lines.concat(lines)};
+      return { ...state, lines: state.lines.concat(lines) };
+    }
 
-    default:
+    default: {
       return state;
-  };
+    }
+  }
 };
 
 export const HANDLERS = {
@@ -87,6 +92,6 @@ export const HANDLERS = {
   [Types.SOCKET_DISCONNECTED]: socketDisconnected,
   [Types.SOCKET_RECEIVED_EVENT]: socketReceivedEvent,
   [Types.SOCKET_SEND_EVENT]: socketSendEvent,
-}
+};
 
 export const socketReducer = createReducer(INITIAL_STATE, HANDLERS);

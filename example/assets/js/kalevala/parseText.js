@@ -1,5 +1,5 @@
 const arrayWrap = (data) => {
-  if(!(data instanceof Array)){
+  if (!(data instanceof Array)) {
     data = [data];
   }
 
@@ -26,7 +26,11 @@ export class NewLine {
 const LineBreak = new NewLine();
 
 const splitString = (string) => {
-  let strings = string.split("\n").map(s => [LineBreak, s]).flat().slice(1);
+  let strings = string
+    .split("\n")
+    .map((s) => [LineBreak, s])
+    .flat()
+    .slice(1);
 
   let reducer = (context, string) => {
     if (string === LineBreak) {
@@ -39,10 +43,10 @@ const splitString = (string) => {
     return context;
   };
 
-  let context = strings.reduce(reducer, {strings: [], current: []});
+  let context = strings.reduce(reducer, { strings: [], current: [] });
 
   return context.strings.concat([context.current]);
-}
+};
 
 const flattenChildren = (children) => {
   let reducer = (context, child) => {
@@ -56,7 +60,7 @@ const flattenChildren = (children) => {
     return context;
   };
 
-  let context = children.reduce(reducer, {children: [], current: []});
+  let context = children.reduce(reducer, { children: [], current: [] });
   return context.children.concat([context.current]);
 };
 
@@ -64,9 +68,9 @@ const parseTag = (tag) => {
   let children;
 
   if (typeof tag === "string") {
-    return splitString(tag).map(strings => {
+    return splitString(tag).map((strings) => {
       if (strings instanceof Array) {
-        return strings.map(string => {
+        return strings.map((string) => {
           return { id: generateTagId(), name: "string", text: string };
         });
       }
@@ -74,7 +78,7 @@ const parseTag = (tag) => {
       // LineBreak
       return strings;
     });
-  };
+  }
 
   if (tag instanceof Array) {
     return tag.map(parseTag).flat();
@@ -93,15 +97,17 @@ const parseTag = (tag) => {
 const parseText = (input) => {
   let children = arrayWrap(input).map(parseTag).flat();
 
-  return flattenChildren(children).filter((tag) => {
-    return !(tag.length == 1 && tag[0].name == "string" && tag[0].text == "");
-  }).map((tag) => {
-    if (tag == LineBreak) {
-      return new NewLine();
-    } else {
-      return new Line(tag);
-    }
-  });
+  return flattenChildren(children)
+    .filter((tag) => {
+      return !(tag.length == 1 && tag[0].name == "string" && tag[0].text == "");
+    })
+    .map((tag) => {
+      if (tag == LineBreak) {
+        return new NewLine();
+      } else {
+        return new Line(tag);
+      }
+    });
 };
 
 export default parseText;

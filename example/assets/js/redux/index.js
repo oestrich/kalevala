@@ -47,9 +47,4 @@ export const getLoginStatus = (state) => {
   return getLogin(state).loggedIn;
 };
 
-export {
-  Creators,
-  channelReducer,
-  eventsReducer,
-  loginReducer
-};
+export { Creators, channelReducer, eventsReducer, loginReducer };

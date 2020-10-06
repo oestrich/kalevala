@@ -3,7 +3,7 @@ import { Creators } from "./actions";
 
 describe("socket reducer", () => {
   test("socket connected", () => {
-    let state = {lines: [], connected: false};
+    let state = { lines: [], connected: false };
 
     state = socketReducer(state, Creators.socketConnected());
 
@@ -11,7 +11,7 @@ describe("socket reducer", () => {
   });
 
   test("socket disconnected", () => {
-    let state = {lines: [], connected: true};
+    let state = { lines: [], connected: true };
 
     state = socketReducer(state, Creators.socketDisconnected());
 

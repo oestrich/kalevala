@@ -1,39 +1,18 @@
+import PropTypes from "prop-types";
 import React, { Fragment } from "react";
 import { connect, Provider } from "react-redux";
-import {
-  BrowserRouter as Router,
-  Route,
-  Redirect,
-  Switch,
-  withRouter
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch, withRouter } from "react-router-dom";
 
-import {
-  CustomTagsContext,
-  Keys,
-  makeReduxSocket,
-  Prompt,
-  Terminal
-} from "./kalevala";
+import { CustomTagsContext, Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
 
-import {
-  Channels,
-  CharacterSelect,
-  Home,
-  Inventory,
-  Login,
-  Room,
-  Sidebar,
-  SidebarSplit,
-  Vitals,
-} from "./components";
+import { Channels, CharacterSelect, Home, Inventory, Login, Room, Sidebar, SidebarSplit, Vitals } from "./components";
 import { customTags } from "./customTags";
 import { Creators, getLoginStatus } from "./redux";
 import { makeStore } from "./store";
 
 const keys = new Keys();
 
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", () => {
   if (!keys.isModifierKeyPressed()) {
     let textPrompt = document.getElementById("prompt");
 
@@ -42,8 +21,6 @@ document.addEventListener("keydown", e => {
     }
   }
 });
-
-let body = document.getElementById("body");
 
 let store = makeStore();
 
@@ -67,7 +44,7 @@ keys.on(["Alt", "ArrowRight"], (e) => {
   store.dispatch(Creators.moveEast());
 });
 
-class SocketProvider extends React.Component {
+let SocketProvider = class SocketProvider extends React.Component {
   constructor(props) {
     super(props);
 
@@ -78,25 +55,30 @@ class SocketProvider extends React.Component {
   }
 
   render() {
-    return (
-      <Fragment>{this.props.children}</Fragment>
-    );
+    return <Fragment>{this.props.children}</Fragment>;
   }
-}
+};
+
+SocketProvider.propTypes = {
+  children: PropTypes.node,
+  history: PropTypes.object.isRequired,
+};
 
 SocketProvider = withRouter(SocketProvider);
 
-class ValidateLoggedIn extends React.Component {
+let ValidateLoggedIn = class ValidateLoggedIn extends React.Component {
   render() {
     if (this.props.loggedIn) {
       return null;
     } else {
-      return (
-        <Redirect to="/" />
-      );
+      return <Redirect to="/" />;
     }
   }
-}
+};
+
+ValidateLoggedIn.propTypes = {
+  loggedIn: PropTypes.bool.isRequired,
+};
 
 const mapStateToProps = (state) => {
   const loggedIn = getLoginStatus(state);

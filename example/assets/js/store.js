@@ -5,32 +5,38 @@ import {
   Types as KalevalaTypes,
   kalevalaMiddleware,
   promptReducer,
-  socketReducer
+  socketReducer,
 } from "./kalevala";
 
-import {
-  Creators,
-  channelReducer,
-  eventsReducer,
-  loginReducer
-} from "./redux";
+import { Creators, channelReducer, eventsReducer, loginReducer } from "./redux";
 
 const composeEnhancers =
-  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
-  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({}) : compose;
+  typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+    : compose;
 
 const dispatchEventText = (dispatch, getState, event, { history }) => {
   const { data, text, topic } = event;
 
-  dispatch(KalevalaCreators.socketReceivedEvent({
-    topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
-    data: { event: { topic, data } },
-  }, { history }));
+  dispatch(
+    KalevalaCreators.socketReceivedEvent(
+      {
+        topic: KalevalaTypes.SOCKET_RECEIVED_EVENT,
+        data: { event: { topic, data } },
+      },
+      { history },
+    ),
+  );
 
-  dispatch(KalevalaCreators.socketReceivedEvent({
-    topic: "system/display",
-    data: text
-  }, { history }));
+  dispatch(
+    KalevalaCreators.socketReceivedEvent(
+      {
+        topic: "system/display",
+        data: text,
+      },
+      { history },
+    ),
+  );
 };
 
 const eventTextHandlers = {
@@ -47,7 +53,7 @@ const eventTextHandlers = {
   "Inventory.All": dispatchEventText,
   "Inventory.DropItem": dispatchEventText,
   "Inventory.PickupItem": dispatchEventText,
-  "Login.Welcome": (dispatch, getState, event, { history }) => {
+  "Login.Welcome": (dispatch) => {
     dispatch(Creators.loginActive());
   },
   "Login.PromptCharacter": (dispatch, getState, event, { history }) => {
@@ -83,7 +89,7 @@ const eventTextHandlers = {
 
 const systemEventHandlers = {
   "system/event-text": (dispatch, getState, event, args) => {
-    const { topic, data, text } = event.data;
+    const { topic, data } = event.data;
 
     let handler = eventTextHandlers[topic];
 
@@ -107,4 +113,4 @@ const reducers = combineReducers({
 
 export const makeStore = () => {
   return createStore(reducers, middleware);
-}
+};

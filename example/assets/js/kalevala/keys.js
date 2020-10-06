@@ -3,15 +3,15 @@ export default class Keys {
     this.keysDown = [];
     this.listeners = {};
 
-    window.addEventListener("blur", e => {
+    window.addEventListener("blur", () => {
       this.keysDown = [];
     });
 
-    document.addEventListener("keydown", e => {
+    document.addEventListener("keydown", (e) => {
       this.keyDown(e);
     });
 
-    document.addEventListener("keyup", e => {
+    document.addEventListener("keyup", (e) => {
       this.keyUp(e.key);
     });
   }
@@ -24,14 +24,14 @@ export default class Keys {
     this.keysDown.push(event.key);
 
     if (this.listeners[this.keysDown] != undefined) {
-      this.listeners[this.keysDown].map(callback => {
+      this.listeners[this.keysDown].map((callback) => {
         callback(event);
       });
     }
   }
 
   keyUp(keyDown) {
-    this.keysDown = this.keysDown.filter(key => {
+    this.keysDown = this.keysDown.filter((key) => {
       return key != keyDown;
     });
   }

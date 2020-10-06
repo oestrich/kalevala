@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 
@@ -26,7 +27,7 @@ class CharacterSelect extends React.Component {
       if (e.key === "Enter") {
         e.preventDefault();
         submitCharacter();
-      };
+      }
     };
 
     return (
@@ -35,7 +36,9 @@ class CharacterSelect extends React.Component {
           <h1 className="text-6xl text-center">Kantele</h1>
 
           <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <p className="text-center mb-4">Enter in a character name to play as. This is how characters will refer to you.</p>
+            <p className="text-center mb-4">
+              Enter in a character name to play as. This is how characters will refer to you.
+            </p>
 
             <p className="mb-4 text-sm text-center italic">Note: At the moment any character name will work.</p>
 
@@ -48,10 +51,15 @@ class CharacterSelect extends React.Component {
                 placeholder="Character Name"
                 value={this.state.character}
                 onKeyDown={onKeyDown}
-                onChange={(e) => { this.setState({ character: e.target.value }) }}/>
+                onChange={(e) => {
+                  this.setState({ character: e.target.value });
+                }}
+              />
             </div>
 
-            <button className="btn-primary w-full" onClick={selectClick}>Select</button>
+            <button className="btn-primary w-full" onClick={selectClick}>
+              Select
+            </button>
           </div>
         </div>
       </div>
@@ -59,6 +67,10 @@ class CharacterSelect extends React.Component {
   }
 }
 
-export default CharacterSelect = connect(null, {
-  selectCharacter: Creators.selectCharacter
+CharacterSelect.propTypes = {
+  selectCharacter: PropTypes.func.isRequired,
+};
+
+export default connect(null, {
+  selectCharacter: Creators.selectCharacter,
 })(CharacterSelect);

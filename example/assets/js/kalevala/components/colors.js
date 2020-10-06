@@ -11,13 +11,13 @@ export const parse256Color = (color) => {
 
   switch (true) {
     case color < 8:
-      return  basicColorCodes[color];
+      return basicColorCodes[color];
 
     case color < 16:
       return basicColorCodes[color - 8];
 
     default:
-      return colorizer256Colors[color];
+      return window.colorizer256Colors[color];
   }
 };
 
@@ -45,7 +45,6 @@ const memoize256Colors = () => {
   // Index 16..231 : RGB 6x6x6
   // https://gist.github.com/jasonm23/2868981#file-xterm-256color-yaml
   let levels = [0, 95, 135, 175, 215, 255];
-  let r, g, b;
   for (let r = 0; r < 6; ++r) {
     for (let g = 0; g < 6; ++g) {
       for (let b = 0; b < 6; ++b) {

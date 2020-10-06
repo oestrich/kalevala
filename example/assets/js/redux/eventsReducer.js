@@ -37,45 +37,52 @@ const eventReceived = (state, action) => {
   const { event } = action.data;
 
   switch (event.topic) {
-    case "Character.Vitals":
-      return {...state, vitals: event.data};
+    case "Character.Vitals": {
+      return { ...state, vitals: event.data };
+    }
 
-    case "Context.Verbs":
+    case "Context.Verbs": {
       const { contexts } = state;
       const { verbs, context, type, id } = event.data;
 
       contexts[`${context}:${type}:${id}`] = verbs;
 
-      return {...state, contexts: contexts};
+      return { ...state, contexts: contexts };
+    }
 
-    case "Inventory.All":
+    case "Inventory.All": {
       const { item_instances } = event.data;
-      return {...state, inventory: item_instances};
+      return { ...state, inventory: item_instances };
+    }
 
-    case "Inventory.DropItem":
+    case "Inventory.DropItem": {
       return dropItem(state, event);
+    }
 
-    case "Inventory.PickupItem":
+    case "Inventory.PickupItem": {
       return pickupItem(state, event);
+    }
 
-    case "Room.Info":
-      return {...state, room: event.data};
+    case "Room.Info": {
+      return { ...state, room: event.data };
+    }
 
-    default:
+    default: {
       return state;
+    }
   }
 };
 
 const dropItem = (state, event) => {
   const { item_instance } = event.data;
   let { inventory } = state;
-  inventory = inventory.filter(instance => instance.id != item_instance.id);
-  return {...state, inventory: inventory};
+  inventory = inventory.filter((instance) => instance.id != item_instance.id);
+  return { ...state, inventory: inventory };
 };
 
 const pickupItem = (state, event) => {
   const { item_instance } = event.data;
-  return {...state, inventory: [item_instance, ...state.inventory]};
+  return { ...state, inventory: [item_instance, ...state.inventory] };
 };
 
 const eventClearVerbs = (state, event) => {
@@ -84,7 +91,7 @@ const eventClearVerbs = (state, event) => {
 
   delete contexts[`${context}:${type}:${id}`];
 
-  return {...state, contexts: contexts};
+  return { ...state, contexts: contexts };
 };
 
 const HANDLERS = {

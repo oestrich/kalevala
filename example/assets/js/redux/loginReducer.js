@@ -7,12 +7,12 @@ const INITIAL_STATE = {
   loggedIn: false,
 };
 
-const loginActive = (state, action) => {
-  return {...state, active: true};
+const loginActive = (state) => {
+  return { ...state, active: true };
 };
 
-const loggedIn = (state, action) => {
-  return {...state, loggedIn: true};
+const loggedIn = (state) => {
+  return { ...state, loggedIn: true };
 };
 
 const HANDLERS = {

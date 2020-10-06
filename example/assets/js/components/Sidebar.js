@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 const borderColor = (side) => {
@@ -13,7 +14,7 @@ const borderColor = (side) => {
 
     case "top":
       return "border-b-2";
-  };
+  }
 };
 
 const Sidebar = ({ children, side, width }) => {
@@ -22,6 +23,12 @@ const Sidebar = ({ children, side, width }) => {
       {children}
     </div>
   );
+};
+
+Sidebar.propTypes = {
+  children: PropTypes.node,
+  side: PropTypes.string.isRequired,
+  width: PropTypes.string,
 };
 
 const SidebarSplit = () => {

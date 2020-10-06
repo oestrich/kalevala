@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 
@@ -9,7 +10,7 @@ class Login extends React.Component {
 
     this.state = {
       username: "",
-      password: ""
+      password: "",
     };
   }
 
@@ -27,7 +28,7 @@ class Login extends React.Component {
       if (e.key === "Enter") {
         e.preventDefault();
         submitLogin();
-      };
+      }
     };
 
     return (
@@ -49,7 +50,10 @@ class Login extends React.Component {
                 placeholder="Username"
                 value={this.state.username}
                 onKeyDown={onKeyDown}
-                onChange={(e) => { this.setState({ username: e.target.value }) }}/>
+                onChange={(e) => {
+                  this.setState({ username: e.target.value });
+                }}
+              />
             </div>
 
             <div className="mb-4">
@@ -60,10 +64,15 @@ class Login extends React.Component {
                 placeholder="Password"
                 value={this.state.password}
                 onKeyDown={onKeyDown}
-                onChange={(e) => { this.setState({password: e.target.value}); }}/>
+                onChange={(e) => {
+                  this.setState({ password: e.target.value });
+                }}
+              />
             </div>
 
-            <button className="btn-primary w-full" onClick={loginClick}>Login</button>
+            <button className="btn-primary w-full" onClick={loginClick}>
+              Login
+            </button>
           </form>
         </div>
       </div>
@@ -71,6 +80,10 @@ class Login extends React.Component {
   }
 }
 
-export default Login = connect(null, {
-  login: Creators.login
+Login.propTypes = {
+  login: PropTypes.func.isRequired,
+};
+
+export default connect(null, {
+  login: Creators.login,
 })(Login);

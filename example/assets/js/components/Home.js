@@ -1,15 +1,27 @@
+import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { getLoginActive } from "../redux";
 
-class Home extends React.Component {
+let Home = class Home extends React.Component {
   renderLogin() {
     if (this.props.loginActive) {
-      return (<Link className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white" to="/login">Login</Link>);
+      return (
+        <Link
+          className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white"
+          to="/login"
+        >
+          Login
+        </Link>
+      );
     } else {
-      return (<a className="inline-block text-sm px-4 py-2 leading-none border rounded text-gray-200 border-gray-200 hover:border-transparent hover:text-gray-500 hover:bg-white">Login</a>);
+      return (
+        <a className="inline-block text-sm px-4 py-2 leading-none border rounded text-gray-200 border-gray-200 hover:border-transparent hover:text-gray-500 hover:bg-white">
+          Login
+        </a>
+      );
     }
   }
 
@@ -24,22 +36,35 @@ class Home extends React.Component {
               </Link>
             </div>
 
-            <div className="flex items-center content-center w-1/2 justify-end">
-              {this.renderLogin()}
-            </div>
+            <div className="flex items-center content-center w-1/2 justify-end">{this.renderLogin()}</div>
           </div>
         </nav>
 
         <div className="container mx-auto mt-4 px-4 sm:px-0 h-screen">
           <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
             <p className="text-xl sm:text-4xl">Kantele is a multiplayer text adventure.</p>
-            <p>This is the sample game for <a className="underline text-gray-700" href="https://github.com/oestrich/kalevala" target="_blank">Kalevala</a>, a world building toolkit written in Elixir.</p>
+            <p>
+              This is the sample game for{" "}
+              <a
+                className="underline text-gray-700"
+                href="https://github.com/oestrich/kalevala"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Kalevala
+              </a>
+              , a world building toolkit written in Elixir.
+            </p>
           </div>
         </div>
       </div>
     );
   }
-}
+};
+
+Home.propTypes = {
+  loginActive: PropTypes.bool,
+};
 
 const mapStateToProps = (state) => {
   const loginActive = getLoginActive(state);

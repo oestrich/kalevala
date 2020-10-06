@@ -1,13 +1,10 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import PropTypes from "prop-types";
+import React from "react";
+import { connect } from "react-redux";
 
 import ConnectionStatus from "./ConnectionStatus";
 
-import {
-  Creators,
-  getSocketPromptType,
-  getPromptDisplayText,
-} from "../redux";
+import { Creators, getPromptDisplayText } from "../redux";
 
 class Prompt extends React.Component {
   constructor(props) {
@@ -32,14 +29,16 @@ class Prompt extends React.Component {
         break;
       }
 
-      case 38: { // up
+      case 38: {
+        // up
         e.preventDefault();
         this.props.promptHistoryScrollBackward();
         this.shouldSelect = true;
         break;
       }
 
-      case 40: { // down
+      case 40: {
+        // down
         e.preventDefault();
         this.props.promptHistoryScrollForward();
         this.shouldSelect = true;
@@ -55,8 +54,8 @@ class Prompt extends React.Component {
     this.props.socketSendEvent({
       topic: "system/send",
       data: {
-        text: this.props.displayText
-      }
+        text: this.props.displayText,
+      },
     });
   }
 
@@ -72,13 +71,15 @@ class Prompt extends React.Component {
   }
 
   render() {
-    const promptClasses = "mr-4 ml-4 shadow appearance-none border focus:border-0 border-teal-800 rounded w-full py-2 px-3 bg-gray-800 text-gray-200 leading-tight focus:outline-none focus:shadow-outline";
+    const promptClasses =
+      "mr-4 ml-4 shadow appearance-none border focus:border-0 border-teal-800 rounded w-full py-2 px-3 bg-gray-800 text-gray-200 leading-tight focus:outline-none focus:shadow-outline";
 
     return (
       <div className="flex p-4 bg-gray-900 border-t-2 border-teal-800">
         <ConnectionStatus />
 
-        <input id="prompt"
+        <input
+          id="prompt"
           value={this.props.displayText}
           onChange={this.onTextChange}
           type="text"
@@ -89,20 +90,35 @@ class Prompt extends React.Component {
           autoCapitalize="off"
           autoComplete="off"
           spellCheck="false"
-          ref={el => { this.prompt = el; }} />
+          ref={(el) => {
+            this.prompt = el;
+          }}
+        />
 
-        <button id="send" className="btn-primary" onClick={this.buttonSendMessage}>Send</button>
+        <button id="send" className="btn-primary" onClick={this.buttonSendMessage}>
+          Send
+        </button>
       </div>
     );
   }
 }
+
+Prompt.propTypes = {
+  displayText: PropTypes.string,
+  promptClear: PropTypes.func.isRequired,
+  promptHistoryAdd: PropTypes.func.isRequired,
+  promptHistoryScrollBackward: PropTypes.func.isRequired,
+  promptHistoryScrollForward: PropTypes.func.isRequired,
+  promptSetCurrentText: PropTypes.func.isRequired,
+  socketSendEvent: PropTypes.func.isRequired,
+};
 
 let mapStateToProps = (state) => {
   let displayText = getPromptDisplayText(state);
   return { displayText };
 };
 
-export default Prompt = connect(mapStateToProps, {
+export default connect(mapStateToProps, {
   promptClear: Creators.promptClear,
   promptHistoryAdd: Creators.promptHistoryAdd,
   promptHistoryScrollBackward: Creators.promptHistoryScrollBackward,

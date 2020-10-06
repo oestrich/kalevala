@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 const Icon = ({ alt, className, icon }) => {
@@ -6,6 +7,12 @@ const Icon = ({ alt, className, icon }) => {
       <img src={`/images/${icon}`} alt={alt} />
     </div>
   );
+};
+
+Icon.propTypes = {
+  alt: PropTypes.string,
+  className: PropTypes.string,
+  icon: PropTypes.string.isRequired,
 };
 
 export default Icon;

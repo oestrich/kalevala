@@ -47,7 +47,7 @@ export const Creators = {
         topic: `Context.Lookup`,
         data: { context, type, id },
       });
-    }
+    };
   },
   socketReceivedEvent: (event, eventHandlerArguments) => {
     return (dispatch, getState, { eventHandlers }) => {

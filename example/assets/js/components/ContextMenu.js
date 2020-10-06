@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 import { Creators } from "../kalevala";
@@ -9,14 +10,19 @@ const verbIcons = {
   grab: () => <Icon icon="card-play.svg" />,
 };
 
+verbIcons.drop.displayName = "Drop";
+verbIcons.grab.displayName = "Grab";
+
 export const Verb = ({ verb, dispatch }) => {
-  const onClick = (e) => {
-    dispatch(Creators.socketSendEvent({
-      topic: "system/send",
-      data: {
-        text: verb.send
-      }
-    }));
+  const onClick = () => {
+    dispatch(
+      Creators.socketSendEvent({
+        topic: "system/send",
+        data: {
+          text: verb.send,
+        },
+      }),
+    );
   };
 
   const verbIcon = verbIcons[verb.icon];
@@ -28,14 +34,30 @@ export const Verb = ({ verb, dispatch }) => {
   );
 };
 
+Verb.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  verb: PropTypes.shape({
+    icon: PropTypes.string,
+    send: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
+  }),
+};
+
 export const ContextMenu = ({ verbs, dispatch }) => {
   return (
     <>
-      {verbs.map(verb => {
-        return (
-          <Verb key={verb.send} verb={verb} dispatch={dispatch} />
-        );
+      {verbs.map((verb) => {
+        return <Verb key={verb.send} verb={verb} dispatch={dispatch} />;
       })}
     </>
   );
-}
+};
+
+ContextMenu.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  verbs: PropTypes.arrayOf(
+    PropTypes.shape({
+      send: PropTypes.string.isRequired,
+    }),
+  ),
+};
