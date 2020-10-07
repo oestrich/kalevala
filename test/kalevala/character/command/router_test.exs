@@ -30,6 +30,10 @@ defmodule Kalevala.Character.Command.RouterTest do
         |> text(:message)
       end)
     end
+
+    module(MoveCommand) do
+      parse("north", :north, aliases: ["n"])
+    end
   end
 
   describe "parsing commands" do
@@ -97,6 +101,17 @@ defmodule Kalevala.Character.Command.RouterTest do
                "command" => "tell",
                "name" => "town crier",
                "message" => "hello"
+             }
+    end
+
+    test "a command with an alias" do
+      {:ok, parsed_command} = Router.parse("n")
+
+      assert parsed_command.module == TestGame.MoveCommand
+      assert parsed_command.function == :north
+
+      assert parsed_command.params == %{
+               "command" => "north"
              }
     end
   end

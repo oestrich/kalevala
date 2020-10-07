@@ -12,11 +12,11 @@ defmodule Kantele.Character.HelpView do
       ~i(Topic: {color foreground="white"}#{help_topic.title}{/color}\n),
       render("_keywords", %{keywords: help_topic.keywords}),
       render("_see_also", %{see_also: help_topic.see_also}),
-      ~i(\n#{help_topic.content}\n)
+      ~i(#{help_topic.content}\n)
     ]
   end
 
-  def render("_keywords", %{keywords: []}), do: []
+  def render("_keywords", %{keywords: []}), do: ""
 
   def render("_keywords", %{keywords: keywords}) do
     keywords =

@@ -77,11 +77,11 @@ defmodule Kalevala.Character.Command.Router do
     parsed_command =
       Enum.find_value(parse_functions, fn command ->
         case apply(module, command, [text]) do
-          {:ok, {module, function}, params} ->
+          {:ok, {module, function}, command, params} ->
             %Kalevala.Character.Command.ParsedCommand{
               module: module,
               function: function,
-              params: process_params(params)
+              params: process_params(params, command)
             }
 
           {:error, _error} ->
@@ -98,12 +98,13 @@ defmodule Kalevala.Character.Command.Router do
     end
   end
 
-  defp process_params(params) do
+  defp process_params(params, command) do
     params
     |> Enum.map(fn {key, value} ->
       {to_string(key), value}
     end)
     |> Enum.into(%{})
+    |> Map.put("command", command)
   end
 end
 
@@ -127,16 +128,24 @@ defmodule Kalevala.Character.Command.RouterMacros do
 
   `command` starts out the parse and any whitespace afterwards will be ignored
   """
-  defmacro parse(command, fun, parse_fun \\ nil) do
-    internal_function_name = :"parsep_#{command}_#{fun}"
-    function_name = :"parse_#{command}_#{fun}"
-
+  defmacro parse(command, fun, opts \\ [], parse_fun \\ nil) do
+    {opts, parse_fun} = opts_vs_parse(opts, parse_fun)
+    aliases = Keyword.get(opts, :aliases, [])
     parse_fun = parse_fun || (&__MODULE__.default_parse_function/1)
+
+    Enum.map([command | aliases], fn command_alias ->
+      generate_parse_function(command, command_alias, fun, parse_fun)
+    end)
+  end
+
+  defp generate_parse_function(command, command_alias, fun, parse_fun) do
+    internal_function_name = :"parsep_#{command_alias}_#{fun}"
+    function_name = :"parse_#{command_alias}_#{fun}"
 
     quote do
       defparsecp(
         unquote(internal_function_name),
-        unquote(parse_fun).(command(unquote(command)))
+        unquote(parse_fun).(command(unquote(command_alias)))
       )
 
       @parse_functions unquote(function_name)
@@ -148,17 +157,24 @@ defmodule Kalevala.Character.Command.RouterMacros do
         unquote(__MODULE__).parse_text(
           module,
           unquote(fun),
+          unquote(command),
           unquote(internal_function_name)(text)
         )
       end
     end
   end
 
-  def parse_text(module, fun, {:ok, parsed, _leftover, _unknown1, _unknown2, _unknown3}) do
-    {:ok, {module, fun}, parsed}
+  defp opts_vs_parse(opts = {:fn, _, _}, _parse_fun) do
+    {[], opts}
   end
 
-  def parse_text(_module, _fun, {:error, error, _leftover, _unknown1, _unknown2, _unknown3}) do
+  defp opts_vs_parse(opts, parse_fun), do: {opts, parse_fun}
+
+  def parse_text(module, fun, command, {:ok, parsed, _leftover, _unknown1, _unknown2, _unknown3}) do
+    {:ok, {module, fun}, command, parsed}
+  end
+
+  def parse_text(_module, _fun, _command, {:error, error, _leftover, _u1, _u2, _u3}) do
     {:error, error}
   end
 
