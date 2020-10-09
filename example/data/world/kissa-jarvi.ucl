@@ -226,6 +226,7 @@ room_exits "lake-4" {
   north = rooms.path-2.id
   east = rooms.lake-5.id
   west = rooms.lake-3.id
+  south = lepakko-luola.rooms.cave-outside.id
 }
 
 rooms "lake-5" {
