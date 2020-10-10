@@ -3,6 +3,8 @@ defmodule Kantele.World.Zone do
   Callbacks for a Kalevala zone
   """
 
+  defstruct [:id, :name, characters: [], rooms: [], items: []]
+
   @behaviour Kalevala.World.Zone
 
   @impl true

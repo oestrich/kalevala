@@ -10,9 +10,7 @@ defmodule Kalevala.World.Zone do
   alias Kalevala.Event
   alias Kalevala.World.Zone.Movement
 
-  defstruct [:id, :name, characters: [], rooms: [], items: []]
-
-  @type t() :: %__MODULE__{}
+  @type t() :: map()
 
   @doc """
   Called when the zone is initializing
@@ -27,7 +25,7 @@ defmodule Kalevala.World.Zone do
   end
 
   @doc false
-  def global_name(zone = %__MODULE__{}), do: global_name(zone.id)
+  def global_name(%{id: zone_id}), do: global_name(zone_id)
 
   def global_name(zone_id), do: {:global, {__MODULE__, zone_id}}
 
@@ -69,6 +67,17 @@ defmodule Kalevala.World.Zone do
   end
 end
 
+defmodule Kalevala.World.BasicZone do
+  @moduledoc """
+  A basic Zone
+
+  These are the minimum fields a zone should have. You likely want more, so
+  you can create your own local struct with these and more fields.
+  """
+
+  defstruct [:id]
+end
+
 defmodule Kalevala.World.Zone.Movement do
   @moduledoc """
   Zone movement functions
@@ -98,11 +107,4 @@ defmodule Kalevala.World.Zone.Movement do
 
     send(character.pid, Voting.commit(event))
   end
-end
-
-defprotocol Kalevala.World.Zone.Child do
-  @doc """
-  Load the a Zone's ID out of the struct
-  """
-  def zone_id(struct)
 end

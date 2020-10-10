@@ -5,6 +5,8 @@ defmodule Kantele.World.Kickoff do
 
   use GenServer
 
+  alias Kalevala.World.CharacterSupervisor
+  alias Kalevala.World.RoomSupervisor
   alias Kantele.World.Cache
   alias Kantele.World.Loader
 
@@ -76,7 +78,7 @@ defmodule Kantele.World.Kickoff do
 
   defp start_room(room) do
     config = %{
-      supervisor_name: Kalevala.World.RoomSupervisor.global_name(room),
+      supervisor_name: RoomSupervisor.global_name(room.zone_id),
       callback_module: Kantele.World.Room
     }
 
@@ -95,7 +97,7 @@ defmodule Kantele.World.Kickoff do
 
   defp start_character(character) do
     config = [
-      supervisor_name: Kalevala.World.CharacterSupervisor.global_name(character.meta.zone_id),
+      supervisor_name: CharacterSupervisor.global_name(character.meta.zone_id),
       communication_module: Kantele.Communication,
       initial_controller: Kantele.Character.SpawnController,
       quit_view: {Kantele.Character.QuitView, "disconnected"}
@@ -116,7 +118,7 @@ defmodule Kantele.World.Kickoff do
   end
 
   defp character_pids(zone_id) do
-    case GenServer.whereis(Kalevala.World.CharacterSupervisor.global_name(zone_id)) do
+    case GenServer.whereis(CharacterSupervisor.global_name(zone_id)) do
       nil ->
         []
 

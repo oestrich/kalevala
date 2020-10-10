@@ -8,7 +8,7 @@ defmodule Kantele.World do
   alias Kantele.World.Cache
   alias Kantele.World.Loader
 
-  defstruct zones: [], rooms: [], characters: [], items: []
+  defstruct characters: [], items: [], rooms: [], zones: []
 
   @doc """
   Dereference a world variable reference

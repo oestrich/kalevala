@@ -6,8 +6,8 @@ defmodule Kantele.World.Loader do
   alias Kalevala.Character
   alias Kalevala.World.Item
   alias Kalevala.World.Room.Feature
-  alias Kalevala.World.Zone
   alias Kantele.World.Room
+  alias Kantele.World.Zone
 
   @paths %{
     brains_path: "data/brains",

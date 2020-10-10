@@ -87,10 +87,6 @@ defmodule Kantele.World.Room do
     end
   end
 
-  defimpl Kalevala.World.Zone.Child do
-    def zone_id(room), do: room.zone_id
-  end
-
   defimpl Kalevala.World.Room.Callbacks do
     require Logger
 
