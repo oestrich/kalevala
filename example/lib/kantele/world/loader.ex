@@ -40,6 +40,7 @@ defmodule Kantele.World.Loader do
     |> Enum.map(&parse_items(&1, world_data, zones))
     |> Enum.map(&zone_items_to_list/1)
     |> Enum.map(&zone_rooms_to_list/1)
+    |> Enum.map(&generate_minimap/1)
     |> parse_world()
   end
 
@@ -478,6 +479,51 @@ defmodule Kantele.World.Loader do
     Enum.reduce(world.zones, world, fn zone, world ->
       Map.put(world, :items, zone.items ++ world.items)
     end)
+  end
+
+  def generate_minimap(zone) do
+    mini_map = %Kantele.MiniMap{id: zone.id}
+
+    cells =
+      Enum.map(zone.rooms, fn room ->
+        %Kantele.MiniMap.Cell{
+          id: room.id,
+          x: room.x,
+          y: room.y,
+          z: room.z,
+          connections: %Kantele.MiniMap.Connections{
+            north: exit_id(room.exits, :north),
+            south: exit_id(room.exits, :south),
+            east: exit_id(room.exits, :east),
+            west: exit_id(room.exits, :west),
+            up: exit_id(room.exits, :up),
+            down: exit_id(room.exits, :down)
+          }
+        }
+      end)
+
+    mini_map =
+      Enum.reduce(cells, mini_map, fn cell, mini_map ->
+        cells = Map.put(mini_map.cells, {cell.x, cell.y, cell.z}, cell)
+        %{mini_map | cells: cells}
+      end)
+
+    %{zone | mini_map: mini_map}
+  end
+
+  defp exit_id(exits, direction) do
+    room_exit =
+      Enum.find(exits, fn room_exit ->
+        room_exit.exit_name == to_string(direction)
+      end)
+
+    case room_exit != nil do
+      true ->
+        room_exit.end_room_id
+
+      false ->
+        nil
+    end
   end
 
   @doc """
