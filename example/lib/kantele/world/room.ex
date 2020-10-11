@@ -16,6 +16,7 @@ defmodule Kantele.World.Room do
     :zone_id,
     :name,
     :description,
+    :map_color,
     :x,
     :y,
     :z,
@@ -147,6 +148,10 @@ defmodule Kantele.World.Room.Events do
       event("room/look", :call)
     end
 
+    module(MapEvent) do
+      event("zone-map/look", :call)
+    end
+
     module(RandomExitEvent) do
       event("room/flee", :call)
       event("room/wander", :call)
@@ -192,8 +197,15 @@ defmodule Kantele.World.Room.LookEvent do
 
   alias Kantele.Character.LookView
   alias Kantele.World.Items
+  alias Kantele.World.ZoneCache
 
   def call(context, event) do
+    x = context.data.x
+    y = context.data.y
+    z = context.data.z
+
+    {:ok, mini_map} = ZoneCache.mini_map(context.data.zone_id, {x, y, z})
+
     characters =
       Enum.reject(context.characters, fn character ->
         character.id == event.acting_character.id
@@ -208,7 +220,28 @@ defmodule Kantele.World.Room.LookEvent do
     |> assign(:room, context.data)
     |> assign(:characters, characters)
     |> assign(:item_instances, item_instances)
+    |> assign(:mini_map, mini_map)
     |> render(event.from_pid, LookView, "look", %{})
+  end
+end
+
+defmodule Kantele.World.Room.MapEvent do
+  import Kalevala.World.Room.Context
+
+  alias Kantele.Character.MapView
+  alias Kantele.World.ZoneCache
+
+  def call(context, event) do
+    x = context.data.x
+    y = context.data.y
+    z = context.data.z
+
+    {:ok, mini_map} = ZoneCache.mini_map(context.data.zone_id, {x, y, z})
+
+    context
+    |> assign(:room, context.data)
+    |> assign(:mini_map, mini_map)
+    |> render(event.from_pid, MapView, "look", %{})
   end
 end
 

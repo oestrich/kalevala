@@ -7,8 +7,8 @@ defmodule Kantele.World.Kickoff do
 
   alias Kalevala.World.CharacterSupervisor
   alias Kalevala.World.RoomSupervisor
-  alias Kantele.World.Cache
   alias Kantele.World.Loader
+  alias Kantele.World.ZoneCache
 
   @doc false
   def start_link(opts) do
@@ -45,7 +45,7 @@ defmodule Kantele.World.Kickoff do
 
     Enum.each(world.zones, fn zone ->
       zone
-      |> Cache.cache_zone()
+      |> ZoneCache.cache()
       |> Loader.strip_zone()
       |> start_zone()
     end)

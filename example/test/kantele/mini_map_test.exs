@@ -42,22 +42,28 @@ defmodule Kantele.MiniMapTest do
         |> MiniMap.expand_character_map()
         |> MiniMap.fill_in(mini_map)
 
-      assert Map.get(expanded_map, {-1, 0, 0}) == "["
+      assert Map.get(expanded_map, {-1, 0, 0}) == "{color foreground=\"white\"}["
       assert Map.get(expanded_map, {0, 0, 0}) == " "
-      assert Map.get(expanded_map, {1, 0, 0}) == "]"
+      assert Map.get(expanded_map, {1, 0, 0}) == "]{/color}"
     end
 
     test "fully displays the map" do
-      mini_map = MiniMap.display(generate_mini_map())
+      mini_map = MiniMap.display(generate_mini_map(), {0, 0, 0})
 
-      assert to_string(mini_map) ==
+      mini_map =
+        mini_map
+        |> to_string()
+        |> String.replace(~r/\{color foreground="white"\}/, "")
+        |> String.replace(~r/\{\/color\}/, "")
+
+      assert mini_map ==
                to_string([
                  "                     \n",
                  "     [ ]             \n",
                  "      |              \n",
                  " [ ]-[ ]-[ ]-[ ]     \n",
                  "              |      \n",
-                 "             [ ]-[ ] \n",
+                 "             [X]-[ ] \n",
                  "                     "
                ])
     end

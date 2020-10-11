@@ -55,6 +55,10 @@ defmodule Kantele.Character.Commands do
     parse("look", :run)
   end
 
+  module(MapCommand) do
+    parse("map", :run)
+  end
+
   module(MoveCommand) do
     parse("north", :north, aliases: ["n"])
     parse("south", :south, aliases: ["s"])

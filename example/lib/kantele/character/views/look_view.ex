@@ -5,7 +5,12 @@ defmodule Kantele.Character.LookView do
   alias Kantele.Character.CharacterView
   alias Kantele.Character.ItemView
 
-  def render("look", %{room: room, characters: characters, item_instances: item_instances}) do
+  def render("look", %{
+        room: room,
+        characters: characters,
+        item_instances: item_instances,
+        mini_map: mini_map
+      }) do
     %EventText{
       topic: "Room.Info",
       data: %{
@@ -22,15 +27,22 @@ defmodule Kantele.Character.LookView do
         render("look.text", %{
           room: room,
           characters: characters,
-          item_instances: item_instances
+          item_instances: item_instances,
+          mini_map: mini_map
         })
     }
   end
 
-  def render("look.text", %{room: room, characters: characters, item_instances: item_instances}) do
+  def render("look.text", %{
+        room: room,
+        characters: characters,
+        item_instances: item_instances,
+        mini_map: mini_map
+      }) do
     ~E"""
     {room-title id="<%= room.id %>" x="<%= to_string(room.x) %>" y="<%= to_string(room.y) %>" z="<%= to_string(room.z) %>"}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
+    <%= mini_map %>
     <%= render("_items", %{item_instances: item_instances}) %>
     <%= render("_exits", %{room: room}) %>
     <%= render("_characters", %{characters: characters}) %>

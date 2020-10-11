@@ -16,7 +16,7 @@ defmodule Kantele.MiniMap.Cell do
 
   @derive Jason.Encoder
   @derive {Inspect, only: [:x, :y, :z]}
-  defstruct [:id, :x, :y, :z, connections: %Kantele.MiniMap.Connections{}]
+  defstruct [:id, :map_color, :x, :y, :z, connections: %Kantele.MiniMap.Connections{}]
 end
 
 defmodule Kantele.MiniMap do
@@ -38,12 +38,21 @@ defmodule Kantele.MiniMap do
   @doc """
   Turns a MiniMap struct into an ASCII map
   """
-  def display(mini_map, display_z \\ 0) do
+  def display(mini_map, {current_x, current_y, current_z}) do
+    expanded_current_x = current_x * 4
+    expanded_current_y = current_y * 2
+
     mini_map
     |> size_of_map()
     |> expand_character_map()
     |> fill_in(mini_map)
-    |> Enum.filter(fn {{_x, _y, z}, _character} -> z == display_z end)
+    |> Map.put({expanded_current_x, expanded_current_y, current_z}, "X")
+    |> Enum.filter(fn {{_x, _y, z}, _character} -> z == current_z end)
+    |> to_io()
+  end
+
+  defp to_io(expanded_map) do
+    expanded_map
     |> Enum.map(fn {{x, y, _z}, character} -> {{x, y}, character} end)
     |> Enum.group_by(fn {{_x, y}, _character} -> y end)
     |> Enum.sort_by(fn {y, _row} -> -1 * y end)
@@ -100,10 +109,12 @@ defmodule Kantele.MiniMap do
       y = cell.y * 2
       z = cell.z
 
+      map_color = cell.map_color || "white"
+
       expanded_map
-      |> Map.put({x - 1, y, z}, "[")
+      |> Map.put({x - 1, y, z}, ~s({color foreground="#{map_color}"}[))
       |> Map.put({x, y, z}, " ")
-      |> Map.put({x + 1, y, z}, "]")
+      |> Map.put({x + 1, y, z}, ~s(]{/color}))
       |> fill_in_direction(:north, {x, y, z}, cell.connections)
       |> fill_in_direction(:south, {x, y, z}, cell.connections)
       |> fill_in_direction(:east, {x, y, z}, cell.connections)

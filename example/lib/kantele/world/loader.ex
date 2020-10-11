@@ -156,6 +156,7 @@ defmodule Kantele.World.Loader do
       zone_id: zone.id,
       name: room_data.name,
       description: room_data.description,
+      map_color: Map.get(room_data, :map_color),
       x: room_data.x,
       y: room_data.y,
       z: room_data.z,
@@ -488,6 +489,7 @@ defmodule Kantele.World.Loader do
       Enum.map(zone.rooms, fn room ->
         %Kantele.MiniMap.Cell{
           id: room.id,
+          map_color: room.map_color,
           x: room.x,
           y: room.y,
           z: room.z,

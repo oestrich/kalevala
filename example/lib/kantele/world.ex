@@ -5,8 +5,8 @@ defmodule Kantele.World do
 
   use Supervisor
 
-  alias Kantele.World.Cache
   alias Kantele.World.Loader
+  alias Kantele.World.ZoneCache
 
   defstruct characters: [], items: [], rooms: [], zones: []
 
@@ -18,8 +18,8 @@ defmodule Kantele.World do
   end
 
   def dereference([zone_id | reference]) do
-    case :ets.lookup(Cache.ets_key(), zone_id) do
-      [{^zone_id, zone}] ->
+    case ZoneCache.get(zone_id) do
+      {:ok, zone} ->
         Loader.dereference(zone, reference)
 
       _ ->
@@ -38,8 +38,8 @@ defmodule Kantele.World do
     kickoff = Keyword.get(config, :kickoff, true)
 
     children = [
-      {Kantele.World.Cache, [name: Kantele.World.Cache]},
-      {Kantele.World.Items, [name: Kantele.World.Items]},
+      {ZoneCache, [id: ZoneCache, name: ZoneCache]},
+      {Kantele.World.Items, [id: Kantele.World.Items, name: Kantele.World.Items]},
       {Kalevala.World, [name: Kantele.World]},
       {Kantele.World.Kickoff, [name: Kantele.World.Kickoff, start: kickoff]}
     ]
