@@ -60,12 +60,12 @@ defmodule Kantele.Character.Commands do
   end
 
   module(MoveCommand) do
-    parse("north", :north, aliases: ["n"])
-    parse("south", :south, aliases: ["s"])
-    parse("east", :east, aliases: ["e"])
-    parse("west", :west, aliases: ["w"])
-    parse("up", :up, aliases: ["u"])
-    parse("down", :down, aliases: ["d"])
+    parse("north", :north)
+    parse("south", :south)
+    parse("east", :east)
+    parse("west", :west)
+    parse("up", :up)
+    parse("down", :down)
   end
 
   module(QuitCommand) do
