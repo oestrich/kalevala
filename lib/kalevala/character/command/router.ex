@@ -50,7 +50,13 @@ defmodule Kalevala.Character.Command.Router do
       env.module
       |> Module.get_attribute(:aliases)
       |> Enum.map(fn {module, command, command_alias, fun, parse_fun} ->
-        Kalevala.Character.Command.RouterMacros.generate_parse_function(command, command_alias, fun, parse_fun, module)
+        Kalevala.Character.Command.RouterMacros.generate_parse_function(
+          command,
+          command_alias,
+          fun,
+          parse_fun,
+          module
+        )
       end)
 
     quote do
@@ -148,7 +154,9 @@ defmodule Kalevala.Character.Command.RouterMacros do
         quote do
           scope = [:"Elixir" | @module]
           module = String.to_atom(Enum.join(scope, "."))
-          @aliases {module, unquote(command), unquote(command_alias), unquote(fun), unquote(parse_fun)}
+
+          @aliases {module, unquote(command), unquote(command_alias), unquote(fun),
+                    unquote(parse_fun)}
         end
       end)
 
@@ -162,10 +170,12 @@ defmodule Kalevala.Character.Command.RouterMacros do
     internal_function_name = :"parsep_#{command_alias}_#{fun}"
     function_name = :"parse_#{command_alias}_#{fun}"
 
-    module = module || quote do
-      scope = [:"Elixir" | @module]
-      unquote(module) || String.to_atom(Enum.join(scope, "."))
-    end
+    module =
+      module ||
+        quote do
+          scope = [:"Elixir" | @module]
+          unquote(module) || String.to_atom(Enum.join(scope, "."))
+        end
 
     quote do
       defparsecp(
