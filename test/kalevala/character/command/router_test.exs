@@ -5,7 +5,8 @@ defmodule Kalevala.Character.Command.RouterTest do
     use Kalevala.Character.Command.Router, scope: TestGame
 
     module(MoveCommand) do
-      parse("north", :run)
+      parse("north", :run, aliases: ["n"])
+      parse("south", :run, aliases: ["s"])
     end
 
     module(SayCommand) do
@@ -29,10 +30,6 @@ defmodule Kalevala.Character.Command.RouterTest do
         |> spaces()
         |> text(:message)
       end)
-    end
-
-    module(MoveCommand) do
-      parse("north", :north, aliases: ["n"])
     end
   end
 
@@ -108,7 +105,7 @@ defmodule Kalevala.Character.Command.RouterTest do
       {:ok, parsed_command} = Router.parse("n")
 
       assert parsed_command.module == TestGame.MoveCommand
-      assert parsed_command.function == :north
+      assert parsed_command.function == :run
 
       assert parsed_command.params == %{
                "command" => "north"
