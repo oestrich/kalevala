@@ -490,6 +490,7 @@ defmodule Kantele.World.Loader do
         %Kantele.MiniMap.Cell{
           id: room.id,
           map_color: room.map_color,
+          name: room.name,
           x: room.x,
           y: room.y,
           z: room.z,
