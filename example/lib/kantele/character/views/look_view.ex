@@ -19,6 +19,7 @@ defmodule Kantele.Character.LookView do
         exits: Enum.map(room.exits, fn room_exit -> room_exit.exit_name end),
         item_instances: item_instances,
         name: room.name,
+        mini_map: mini_map.cells,
         x: room.x,
         y: room.y,
         z: room.z
@@ -28,7 +29,7 @@ defmodule Kantele.Character.LookView do
           room: room,
           characters: characters,
           item_instances: item_instances,
-          mini_map: mini_map
+          mini_map: mini_map.display
         })
     }
   end

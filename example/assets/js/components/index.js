@@ -5,6 +5,7 @@ import Home from "./Home";
 import Inventory from "./Inventory";
 import ItemWrapper from "./ItemWrapper";
 import Login from "./Login";
+import Map from "./Map";
 import Room from "./Room";
 import Sidebar, { SidebarSplit } from "./Sidebar";
 import Vitals from "./Vitals";
@@ -17,6 +18,7 @@ export {
   Inventory,
   ItemWrapper,
   Login,
+  Map,
   Room,
   Sidebar,
   SidebarSplit,

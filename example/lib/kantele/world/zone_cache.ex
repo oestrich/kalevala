@@ -14,6 +14,12 @@ defmodule Kantele.World.ZoneCache do
 
   def mini_map(zone_id, current_location) do
     {:ok, zone} = get(zone_id)
-    {:ok, MiniMap.display(zone.mini_map, current_location)}
+
+    mini_map = %{
+      cells: MiniMap.zoom(zone.mini_map, current_location),
+      display: MiniMap.display(zone.mini_map, current_location)
+    }
+
+    {:ok, mini_map}
   end
 end

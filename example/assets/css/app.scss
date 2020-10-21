@@ -76,3 +76,47 @@ div {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.map {
+  background: #1a202c;
+  border-radius: 10px;
+  display: inline-block;
+  height: 310px;
+  width: 310px;
+}
+
+line {
+  stroke: #a0aec0;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+rect {
+  height: 30;
+  width: 30;
+  rx: 10;
+  ry: 10;
+  stroke-width: 5;
+}
+
+rect {
+  fill: #a0aec0;
+  stroke: #a0aec0;
+}
+
+rect.active {
+  stroke: #f7fafc;
+}
+
+rect.blue {
+  fill: #4299e1;
+  stroke: #4299e1;
+}
+
+rect.blue.active {
+  stroke: #ebf8ff;
+}
+
+rect:hover {
+  stroke: #ebf8ff;
+}

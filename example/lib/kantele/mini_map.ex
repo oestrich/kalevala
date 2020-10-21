@@ -36,6 +36,19 @@ defmodule Kantele.MiniMap do
   defstruct [:id, cells: %{}]
 
   @doc """
+  Zoom the mini_map to visible rooms at the current location
+  """
+  def zoom(mini_map, {current_x, current_y, current_z}) do
+    mini_map.cells
+    |> Map.values()
+    |> Enum.filter(fn cell ->
+      cell.x >= current_x - 2 && cell.x <= current_x + 2 &&
+        cell.y >= current_y - 2 && cell.y <= current_y + 2 &&
+        cell.z >= current_z - 2 && cell.z <= current_z + 2
+    end)
+  end
+
+  @doc """
   Turns a MiniMap struct into an ASCII map
   """
   def display(mini_map, {current_x, current_y, current_z}) do

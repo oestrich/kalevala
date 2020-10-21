@@ -5,7 +5,18 @@ import { BrowserRouter as Router, Route, Redirect, Switch, withRouter } from "re
 
 import { CustomTagsContext, Keys, makeReduxSocket, Prompt, Terminal } from "./kalevala";
 
-import { Channels, CharacterSelect, Home, Inventory, Login, Room, Sidebar, SidebarSplit, Vitals } from "./components";
+import {
+  Channels,
+  CharacterSelect,
+  Home,
+  Inventory,
+  Login,
+  Map,
+  Room,
+  Sidebar,
+  SidebarSplit,
+  Vitals,
+} from "./components";
 import { customTags } from "./customTags";
 import { Creators, getLoginStatus } from "./redux";
 import { makeStore } from "./store";
@@ -108,6 +119,8 @@ const Client = () => {
           <Prompt />
         </div>
         <Sidebar side="right" width="w-1/4 max-w-xs">
+          <Map />
+          <SidebarSplit />
           <Channels />
         </Sidebar>
       </div>
