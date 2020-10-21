@@ -68,16 +68,16 @@ let Map = ({ room }) => {
 
 Map.propTypes = {
   room: PropTypes.shape({
-    x: PropTypes.number(),
-    y: PropTypes.number(),
-    z: PropTypes.number(),
-    mini_map: PropTypes.array(
+    x: PropTypes.number,
+    y: PropTypes.number,
+    z: PropTypes.number,
+    mini_map: PropTypes.arrayOf(
       PropTypes.shape({
         connections: PropTypes.shape({
-          north: PropTypes.string(),
-          south: PropTypes.string(),
-          east: PropTypes.string(),
-          west: PropTypes.string(),
+          north: PropTypes.string,
+          south: PropTypes.string,
+          east: PropTypes.string,
+          west: PropTypes.string,
         }),
       }),
     ),
