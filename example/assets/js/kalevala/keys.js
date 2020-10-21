@@ -17,7 +17,13 @@ export default class Keys {
   }
 
   isModifierKeyPressed() {
-    return this.keysDown.includes("Control") || this.keysDown.includes("Alt") || this.keysDown.includes("Meta");
+    return (
+      this.keysDown.includes("Control") ||
+      this.keysDown.includes("Alt") ||
+      this.keysDown.includes("Meta") ||
+      this.keysDown.includes("Tab") ||
+      this.keysDown.includes("Enter")
+    );
   }
 
   keyDown(event) {

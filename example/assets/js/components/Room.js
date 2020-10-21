@@ -20,9 +20,9 @@ const Exit = ({ active, className, direction, move }) => {
   const fullClassName = `${className} ${activeClassName} text-white font-bold py-2 text-center rounded`;
 
   return (
-    <div onClick={move} className={fullClassName}>
+    <button disabled={!active} onClick={move} className={fullClassName}>
       <Tooltip tip={exitTooltip({ active, direction })}>{direction}</Tooltip>
-    </div>
+    </button>
   );
 };
 
