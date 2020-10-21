@@ -35,7 +35,7 @@ Item.propTypes = {
 
 let Inventory = ({ dispatch, inventory }) => {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col overflow-y-scroll">
       <h3 className="text-xl text-gray-200 px-4 pt-4">Inventory</h3>
       <div className="flex-grow overflow-y-scroll">
         {inventory.map((itemInstance) => {
