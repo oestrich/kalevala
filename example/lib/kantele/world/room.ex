@@ -17,6 +17,7 @@ defmodule Kantele.World.Room do
     :name,
     :description,
     :map_color,
+    :map_icon,
     :x,
     :y,
     :z,

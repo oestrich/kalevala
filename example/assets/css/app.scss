@@ -85,38 +85,50 @@ div {
   width: 310px;
 }
 
-line {
-  stroke: #a0aec0;
-  stroke-width: 5;
-  stroke-linecap: round;
-}
-
-rect {
-  height: 30;
-  width: 30;
-  rx: 10;
-  ry: 10;
-  stroke-width: 5;
-}
-
-rect {
+.cell {
+  stroke-width: 2;
   fill: #a0aec0;
-  stroke: #a0aec0;
+  stroke: #718096;
+
+  &:hover {
+    stroke: #f7fafc;
+  }
+
+  &.active {
+    stroke: #f7fafc;
+  }
+
+  &.blue {
+    fill: #4299e1;
+    stroke: #3182ce;
+
+    &:hover {
+      stroke: #ebf8ff;
+    }
+  }
+
+  &.blue.active {
+    stroke: #ebf8ff;
+  }
 }
 
-rect.active {
-  stroke: #f7fafc;
-}
+.cell-exit {
+  rect {
+    fill: #a0aec0;
+  }
 
-rect.blue {
-  fill: #4299e1;
-  stroke: #4299e1;
-}
+  polyline {
+    stroke: #718096;
+    stroke-width: 2;
+  }
 
-rect.blue.active {
-  stroke: #ebf8ff;
-}
+  &.blue {
+    rect {
+      fill: #4299e1;
+    }
 
-rect:hover {
-  stroke: #ebf8ff;
+    polyline {
+      stroke: #3182ce;
+    }
+  }
 }

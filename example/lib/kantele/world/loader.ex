@@ -157,6 +157,7 @@ defmodule Kantele.World.Loader do
       name: room_data.name,
       description: room_data.description,
       map_color: Map.get(room_data, :map_color),
+      map_icon: Map.get(room_data, :map_icon),
       x: room_data.x,
       y: room_data.y,
       z: room_data.z,
@@ -490,6 +491,7 @@ defmodule Kantele.World.Loader do
         %Kantele.MiniMap.Cell{
           id: room.id,
           map_color: room.map_color,
+          map_icon: room.map_icon,
           name: room.name,
           x: room.x,
           y: room.y,

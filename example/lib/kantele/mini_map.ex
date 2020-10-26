@@ -16,7 +16,16 @@ defmodule Kantele.MiniMap.Cell do
 
   @derive Jason.Encoder
   @derive {Inspect, only: [:x, :y, :z]}
-  defstruct [:id, :map_color, :name, :x, :y, :z, connections: %Kantele.MiniMap.Connections{}]
+  defstruct [
+    :id,
+    :map_color,
+    :map_icon,
+    :name,
+    :x,
+    :y,
+    :z,
+    connections: %Kantele.MiniMap.Connections{}
+  ]
 end
 
 defmodule Kantele.MiniMap do

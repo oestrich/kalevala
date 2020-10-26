@@ -7,6 +7,123 @@ import { getEventsRoom } from "../redux";
 const rows = [2, 1, 0, -1, -2];
 const cols = [-2, -1, 0, 1, 2];
 
+let Exits = ({ cell, x }) => {
+  const { connections } = cell;
+
+  return (
+    <>
+      {connections.north && (
+        <g className={`cell-exit cell-north ${cell.map_color}`}>
+          <rect x={x + 10} y={-15} width={10} height={16} />
+          <polyline points={`${x + 10},-15 ${x + 10},1`} />
+          <polyline points={`${x + 20},-15 ${x + 20},1`} />
+        </g>
+      )}
+      {connections.south && (
+        <g className={`cell-exit cell-south ${cell.map_color}`}>
+          <rect x={x + 10} y={29} width={10} height={16} />
+          <polyline points={`${x + 10},29 ${x + 10},45`} />
+          <polyline points={`${x + 20},29 ${x + 20},45`} />
+        </g>
+      )}
+      {connections.west && (
+        <g className={`cell-exit cell-west ${cell.map_color}`}>
+          <rect x={x - 15} y={10} width={16} height={10} />
+          <polyline points={`${x - 15},10 ${x + 1},10`} />
+          <polyline points={`${x - 15},20 ${x + 1},20`} />
+        </g>
+      )}
+      {connections.east && (
+        <g className={`cell-exit cell-east ${cell.map_color}`}>
+          <rect x={x + 29} y={10} width={16} height={10} />
+          <polyline points={`${x + 29},10 ${x + 45},10`} />
+          <polyline points={`${x + 29},20 ${x + 45},20`} />
+        </g>
+      )}
+    </>
+  );
+};
+
+Exits.propTypes = {
+  x: PropTypes.number,
+  cell: PropTypes.shape({
+    map_color: PropTypes.string,
+    connections: PropTypes.shape({
+      north: PropTypes.string,
+      south: PropTypes.string,
+      east: PropTypes.string,
+      west: PropTypes.string,
+    }),
+  }),
+};
+
+let Cell = ({ cell, currentX, currentY, currentZ, x }) => {
+  let className = "cell";
+
+  if (cell.x == currentX && cell.y == currentY && cell.z == currentZ) {
+    className = `${className} active`;
+  }
+
+  className = `${className} ${cell.map_color}`;
+
+  let image = null;
+
+  if (cell.map_icon) {
+    image = (
+      <image x={x + 5} y="5" width="20" height="20" href={`/images/${cell.map_icon}.svg`} style={{ fill: "#4299e1" }} />
+    );
+  }
+
+  return (
+    <g className={className}>
+      <path d={`M${x + 5},0 h20 a5,5 0 0 1 5,5 v20 a5,5 0 0 1 -5,5 h-20 a5,5 0 0 1 -5,-5 v-20 a5,5 0 0 1 5,-5 z`} />
+      {image}
+      <title>{cell.name}</title>
+    </g>
+  );
+};
+
+Cell.propTypes = {
+  cell: PropTypes.shape({
+    map_color: PropTypes.string,
+    map_icon: PropTypes.string,
+    name: PropTypes.string,
+    x: PropTypes.number,
+    y: PropTypes.number,
+    z: PropTypes.number,
+  }),
+  currentX: PropTypes.number,
+  currentY: PropTypes.number,
+  currentZ: PropTypes.number,
+  x: PropTypes.number,
+};
+
+const Cells = ({ cells, cellComponent, currentX, currentY, currentZ }) => {
+  return rows.map((row) => {
+    const y = 20 + (-1 * row + 2) * 60; // eslint-disable-line no-mixed-operators
+
+    return (
+      <g key={row} transform={`translate(0, ${y})`}>
+        {cols.map((col) => {
+          const x = 20 + (col + 2) * 60; // eslint-disable-line no-mixed-operators
+
+          const cell = cells.find((cell) => {
+            return cell.x == col + currentX && cell.y == row + currentY && cell.z == currentZ;
+          });
+
+          if (!cell) {
+            return null;
+          }
+
+          const CustomTag = cellComponent;
+
+          return <CustomTag key={x} cell={cell} currentX={currentX} currentY={currentY} currentZ={currentZ} x={x} />;
+        })}
+      </g>
+    );
+  });
+};
+
 let Map = ({ room }) => {
   if (room === null) {
     return null;
@@ -21,46 +138,8 @@ let Map = ({ room }) => {
   return (
     <div className="flex flex-col items-center" style={{ height: 310 }}>
       <svg className="h-full" style={{ width: 310 }} version="1.1" xmlns="http://www.w3.org/2000/svg">
-        {rows.map((row) => {
-          const y = 20 + (-1 * row + 2) * 60; // eslint-disable-line no-mixed-operators
-
-          return (
-            <g key={row} transform={`translate(0, ${y})`}>
-              {cols.map((col) => {
-                const x = 20 + (col + 2) * 60; // eslint-disable-line no-mixed-operators
-
-                const cell = cells.find((cell) => {
-                  return cell.x == col + currentX && cell.y == row + currentY && cell.z == currentZ;
-                });
-
-                if (!cell) {
-                  return null;
-                }
-
-                let className = "";
-
-                if (cell.x == currentX && cell.y == currentY && cell.z == currentZ) {
-                  className = `${className} active`;
-                }
-
-                className = `${className} ${cell.map_color}`;
-
-                return (
-                  <React.Fragment key={x}>
-                    <rect className={className} x={x}>
-                      <title>{cell.name}</title>
-                    </rect>
-
-                    {cell.connections.north && <line x1={x + 15} y1="-10" x2={x + 15} y2="-20" />}
-                    {cell.connections.south && <line x1={x + 15} y1="40" x2={x + 15} y2="50" />}
-                    {cell.connections.west && <line x1={x - 20} y1="15" x2={x - 10} y2="15" />}
-                    {cell.connections.east && <line x1={x + 40} y1="15" x2={x + 50} y2="15" />}
-                  </React.Fragment>
-                );
-              })}
-            </g>
-          );
-        })}
+        <Cells cells={cells} currentX={currentX} currentY={currentY} currentZ={currentZ} cellComponent={Cell} />
+        <Cells cells={cells} currentX={currentX} currentY={currentY} currentZ={currentZ} cellComponent={Exits} />
       </svg>
     </div>
   );
