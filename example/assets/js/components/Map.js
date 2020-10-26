@@ -4,6 +4,12 @@ import { connect } from "react-redux";
 
 import { getEventsRoom } from "../redux";
 
+import Coins from "../../static/images/map-icons/coins.svg";
+import Drop from "../../static/images/map-icons/drop.svg";
+import Hammer from "../../static/images/map-icons/hammer.svg";
+import Stein from "../../static/images/map-icons/stein.svg";
+import Well from "../../static/images/map-icons/well.svg";
+
 const rows = [2, 1, 0, -1, -2];
 const cols = [-2, -1, 0, 1, 2];
 
@@ -57,6 +63,33 @@ Exits.propTypes = {
   }),
 };
 
+let Icon = ({ name, x, y }) => {
+  switch (name) {
+    case "coins":
+      return <Coins x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "drop":
+      return <Drop x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "hammer":
+      return <Hammer x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "stein":
+      return <Stein x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "well":
+      return <Well x={x} y={y} width="20" height="20" className="icon" />;
+  }
+
+  return null;
+};
+
+Icon.propTypes = {
+  name: PropTypes.string,
+  x: PropTypes.number,
+  y: PropTypes.number,
+};
+
 let Cell = ({ cell, currentX, currentY, currentZ, x }) => {
   let className = "cell";
 
@@ -69,9 +102,7 @@ let Cell = ({ cell, currentX, currentY, currentZ, x }) => {
   let image = null;
 
   if (cell.map_icon) {
-    image = (
-      <image x={x + 5} y="5" width="20" height="20" href={`/images/${cell.map_icon}.svg`} style={{ fill: "#4299e1" }} />
-    );
+    image = <Icon x={x + 5} y={5} name={cell.map_icon} />;
   }
 
   return (

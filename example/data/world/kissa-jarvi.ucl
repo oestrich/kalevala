@@ -30,6 +30,8 @@ rooms "path-1" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
 
+  map_color = "brown"
+
   x = 1
   y = 2
   z = 0
@@ -52,6 +54,8 @@ room_exits "path-1" {
 rooms "path-2" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
+
+  map_color = "brown"
 
   x = 1
   y = 1
@@ -87,6 +91,8 @@ rooms "path-3" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
 
+  map_color = "brown"
+
   x = 2
   y = 1
   z = 0
@@ -119,6 +125,8 @@ room_characters "path-3" {
 rooms "path-4" {
   name = "Kissa Path"
   description = "A dirt road leading away from Sammatti."
+
+  map_color = "brown"
 
   x = 3
   y = 1

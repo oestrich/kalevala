@@ -81,6 +81,9 @@ rooms "inn" {
   name = "Lohikäärme"
   description = "The interior of the small inn. There are several chairs sitting around a table. A small staircase leads upstairs."
 
+  map_color = "yellow"
+  map_icon = "stein"
+
   x = 1
   y = 0
   z = 0
@@ -123,6 +126,9 @@ rooms "well" {
   name = "Town Well"
   description = ""
 
+  map_color = "green"
+  map_icon = "well"
+
   x = 0
   y = 2
   z = 0
@@ -146,6 +152,9 @@ rooms "guild_hall" {
   name = "Trader's Guild Hall"
   description = "The local trader guild's guildhall."
 
+  map_color = "yellow"
+  map_icon = "coins"
+
   x = 1
   y = 1
   z = 0
@@ -160,6 +169,9 @@ room_exits "guild_hall" {
 rooms "blacksmith" {
   name = "Seppä"
   description = "The local blacksmith."
+
+  map_color = "yellow"
+  map_icon = "hammer"
 
   x = -1
   y = 0

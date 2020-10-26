@@ -77,6 +77,8 @@ div {
   scrollbar-width: none;
 }
 
+@import "colors";
+
 .map {
   background: #1a202c;
   border-radius: 10px;
@@ -85,50 +87,98 @@ div {
   width: 310px;
 }
 
-.cell {
-  stroke-width: 2;
-  fill: #a0aec0;
-  stroke: #718096;
+@mixin map-color($fill, $stroke, $strokeActive) {
+  fill: $fill;
+  stroke: $stroke;
 
   &:hover {
-    stroke: #f7fafc;
+    stroke: $strokeActive;
   }
 
   &.active {
-    stroke: #f7fafc;
+    stroke: $strokeActive;
+  }
+}
+
+@mixin map-exit($fill, $stroke) {
+  rect {
+    fill: $fill;
+  }
+
+  polyline {
+    stroke: $stroke;
+  }
+}
+
+.cell {
+  stroke-width: 2;
+  fill: $gray-500;
+  stroke: $gray-600;
+
+  &:hover {
+    stroke: $gray-100;
+  }
+
+  &.active {
+    stroke: $gray-100;
   }
 
   &.blue {
-    fill: #4299e1;
-    stroke: #3182ce;
+    @include map-color($blue-500, $blue-600, $blue-100);
 
-    &:hover {
-      stroke: #ebf8ff;
+    .icon {
+      fill: $gray-100;
     }
   }
 
-  &.blue.active {
-    stroke: #ebf8ff;
+  &.brown {
+    @include map-color($yellow-800, $yellow-900, $yellow-600);
+
+    .icon {
+      fill: $gray-100;
+    }
+  }
+
+  &.green {
+    @include map-color($green-500, $green-600, $green-100);
+
+    .icon {
+      fill: $gray-800;
+    }
+  }
+
+  &.yellow {
+    @include map-color($yellow-500, $yellow-600, $yellow-100);
+
+    .icon {
+      fill: $gray-800;
+    }
   }
 }
 
 .cell-exit {
   rect {
-    fill: #a0aec0;
+    fill: $gray-500;
   }
 
   polyline {
-    stroke: #718096;
+    stroke: $gray-600;
     stroke-width: 2;
   }
 
   &.blue {
-    rect {
-      fill: #4299e1;
-    }
+    @include map-exit($blue-500, $blue-600);
+  }
 
-    polyline {
-      stroke: #3182ce;
-    }
+  &.brown {
+    @include map-exit($yellow-800, $yellow-900);
+  }
+
+  &.green {
+    @include map-exit($green-500, $green-600);
+  }
+
+  &.yellow {
+    @include map-exit($yellow-500, $yellow-600);
   }
 }
