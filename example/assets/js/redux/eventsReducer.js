@@ -6,6 +6,7 @@ const INITIAL_STATE = {
   character: null,
   contexts: {},
   inventory: [],
+  miniMap: [],
   room: null,
   vitals: null,
 };
@@ -65,6 +66,10 @@ const eventReceived = (state, action) => {
 
     case "Room.Info": {
       return { ...state, room: event.data };
+    }
+
+    case "Zone.MiniMap": {
+      return { ...state, miniMap: event.data.mini_map };
     }
 
     default: {

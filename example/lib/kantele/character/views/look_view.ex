@@ -5,12 +5,7 @@ defmodule Kantele.Character.LookView do
   alias Kantele.Character.CharacterView
   alias Kantele.Character.ItemView
 
-  def render("look", %{
-        room: room,
-        characters: characters,
-        item_instances: item_instances,
-        mini_map: mini_map
-      }) do
+  def render("look", %{room: room, characters: characters, item_instances: item_instances}) do
     %EventText{
       topic: "Room.Info",
       data: %{
@@ -19,35 +14,60 @@ defmodule Kantele.Character.LookView do
         exits: Enum.map(room.exits, fn room_exit -> room_exit.exit_name end),
         item_instances: item_instances,
         name: room.name,
-        mini_map: mini_map.cells,
         x: room.x,
         y: room.y,
         z: room.z
       },
+      text: render("look.text", %{room: room})
+    }
+  end
+
+  def render("mini_map", %{mini_map: mini_map}) do
+    %EventText{
+      topic: "Zone.MiniMap",
+      data: %{
+        mini_map: mini_map.cells
+      },
+      text: [mini_map.display, "\n"]
+    }
+  end
+
+  def render("look.extra", %{room: room, characters: characters, item_instances: item_instances}) do
+    %EventText{
+      topic: "Room.Info.Extra",
+      data: %{},
       text:
-        render("look.text", %{
-          room: room,
+        render("look.extra.text", %{
           characters: characters,
           item_instances: item_instances,
-          mini_map: mini_map.display
+          room: room
         })
     }
   end
 
-  def render("look.text", %{
-        room: room,
-        characters: characters,
-        item_instances: item_instances,
-        mini_map: mini_map
-      }) do
+  def render("look.text", %{room: room}) do
     ~E"""
     {room-title id="<%= room.id %>" x="<%= to_string(room.x) %>" y="<%= to_string(room.y) %>" z="<%= to_string(room.z) %>"}<%= room.name %>{/room-title}
     <%= render("_description", %{room: room}) %>
-    <%= mini_map %>
-    <%= render("_items", %{item_instances: item_instances}) %>
-    <%= render("_exits", %{room: room}) %>
-    <%= render("_characters", %{characters: characters}) %>
     """
+  end
+
+  def render("look.extra.text", %{
+        characters: characters,
+        item_instances: item_instances,
+        room: room
+      }) do
+    lines = [
+      render("_items", %{item_instances: item_instances}),
+      render("_exits", %{room: room}),
+      render("_characters", %{characters: characters})
+    ]
+
+    lines
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(fn line ->
+      [line, "\n"]
+    end)
   end
 
   def render("_description", %{room: room}) do

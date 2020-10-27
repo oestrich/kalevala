@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 
-import { getEventsRoom } from "../redux";
+import { getEventsMiniMap, getEventsRoom } from "../redux";
 
 import Coins from "../../static/images/map-icons/coins.svg";
 import Drop from "../../static/images/map-icons/drop.svg";
@@ -163,12 +163,10 @@ const Cells = ({ cells, cellComponent, currentX, currentY, currentZ }) => {
   });
 };
 
-let Map = ({ room }) => {
+let Map = ({ cells, room }) => {
   if (room === null) {
     return null;
   }
-
-  const cells = room.mini_map;
 
   const currentX = room.x;
   const currentY = room.y;
@@ -185,27 +183,28 @@ let Map = ({ room }) => {
 };
 
 Map.propTypes = {
+  cells: PropTypes.arrayOf(
+    PropTypes.shape({
+      connections: PropTypes.shape({
+        north: PropTypes.string,
+        south: PropTypes.string,
+        east: PropTypes.string,
+        west: PropTypes.string,
+      }),
+    }),
+  ),
   room: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
     z: PropTypes.number,
-    mini_map: PropTypes.arrayOf(
-      PropTypes.shape({
-        connections: PropTypes.shape({
-          north: PropTypes.string,
-          south: PropTypes.string,
-          east: PropTypes.string,
-          west: PropTypes.string,
-        }),
-      }),
-    ),
   }),
 };
 
 let mapStateToProps = (state) => {
+  const mini_map = getEventsMiniMap(state);
   const room = getEventsRoom(state);
 
-  return { room };
+  return { cells: mini_map, room };
 };
 
 export default connect(mapStateToProps)(Map);

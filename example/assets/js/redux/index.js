@@ -31,6 +31,10 @@ export const getEventsInventory = (state) => {
   return getEvents(state).inventory;
 };
 
+export const getEventsMiniMap = (state) => {
+  return getEvents(state).miniMap;
+};
+
 export const getEventsRoom = (state) => {
   return getEvents(state).room;
 };

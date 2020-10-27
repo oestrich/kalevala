@@ -222,7 +222,9 @@ defmodule Kantele.World.Room.LookEvent do
     |> assign(:characters, characters)
     |> assign(:item_instances, item_instances)
     |> assign(:mini_map, mini_map)
-    |> render(event.from_pid, LookView, "look", %{})
+    |> render(event.from_pid, LookView, "look")
+    |> render(event.from_pid, LookView, "mini_map")
+    |> render(event.from_pid, LookView, "look.extra")
   end
 end
 
