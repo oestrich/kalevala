@@ -41,7 +41,7 @@ export const socketReceivedEvent = (state, action) => {
         let line = lines[i];
 
         if (context.newLines > MAX_LINES) {
-          return context;
+          break;
         }
 
         if (line instanceof NewLine) {

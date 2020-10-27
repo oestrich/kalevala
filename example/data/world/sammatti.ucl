@@ -6,6 +6,8 @@ rooms "town_square" {
   name = "Town Square"
   description = "You are in the town square."
 
+  map_icon = "wooden-sign"
+
   x = 0
   y = 0
   z = 0
@@ -63,6 +65,8 @@ room_items "town_square" {
 rooms "marketplace" {
   name = "Marketplace"
   description = "There are sellers hawking their wares all around you."
+
+  map_icon = "shop"
 
   x = 0
   y = 1

@@ -7,8 +7,10 @@ import { getEventsRoom } from "../redux";
 import Coins from "../../static/images/map-icons/coins.svg";
 import Drop from "../../static/images/map-icons/drop.svg";
 import Hammer from "../../static/images/map-icons/hammer.svg";
+import Shop from "../../static/images/map-icons/shop.svg";
 import Stein from "../../static/images/map-icons/stein.svg";
 import Well from "../../static/images/map-icons/well.svg";
+import WoodenSign from "../../static/images/map-icons/wooden-sign.svg";
 
 const rows = [2, 1, 0, -1, -2];
 const cols = [-2, -1, 0, 1, 2];
@@ -74,11 +76,17 @@ let Icon = ({ name, x, y }) => {
     case "hammer":
       return <Hammer x={x} y={y} width="20" height="20" className="icon" />;
 
+    case "shop":
+      return <Shop x={x} y={y} width="20" height="20" className="icon" />;
+
     case "stein":
       return <Stein x={x} y={y} width="20" height="20" className="icon" />;
 
     case "well":
       return <Well x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "wooden-sign":
+      return <WoodenSign x={x - 1} y={y} width="20" height="20" className="icon" />;
   }
 
   return null;

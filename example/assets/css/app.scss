@@ -112,15 +112,11 @@ div {
 
 .cell {
   stroke-width: 2;
-  fill: $gray-500;
-  stroke: $gray-600;
 
-  &:hover {
-    stroke: $gray-100;
-  }
+  @include map-color($gray-500, $gray-600, $gray-100);
 
-  &.active {
-    stroke: $gray-100;
+  .icon {
+    fill: $gray-900;
   }
 
   &.blue {
