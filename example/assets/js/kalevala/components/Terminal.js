@@ -263,7 +263,7 @@ Terminal.propTypes = {
 };
 
 let mapStateToProps = (state) => {
-  const lines = getSocketLines(state);
+  const lines = getSocketLines(state).slice(-100);
 
   return { font: "Monaco", fontSize: 16, lineHeight: 1.5, lines };
 };
