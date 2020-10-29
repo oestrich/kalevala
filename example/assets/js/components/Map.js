@@ -6,9 +6,12 @@ import { getEventsMiniMap, getEventsRoom } from "../redux";
 
 import Coins from "../../static/images/map-icons/coins.svg";
 import Drop from "../../static/images/map-icons/drop.svg";
+import FamilyHouse from "../../static/images/map-icons/family-house.svg";
 import Hammer from "../../static/images/map-icons/hammer.svg";
+import PineTree from "../../static/images/map-icons/pine-tree.svg";
 import Shop from "../../static/images/map-icons/shop.svg";
 import Stein from "../../static/images/map-icons/stein.svg";
+import TripleGate from "../../static/images/map-icons/triple-gate.svg";
 import Well from "../../static/images/map-icons/well.svg";
 import WoodenSign from "../../static/images/map-icons/wooden-sign.svg";
 
@@ -73,14 +76,23 @@ let Icon = ({ name, x, y }) => {
     case "drop":
       return <Drop x={x} y={y} width="20" height="20" className="icon" />;
 
+    case "family-house":
+      return <FamilyHouse x={x} y={y} width="20" height="20" className="icon" />;
+
     case "hammer":
       return <Hammer x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "pine-tree":
+      return <PineTree x={x} y={y} width="20" height="20" className="icon" />;
 
     case "shop":
       return <Shop x={x} y={y} width="20" height="20" className="icon" />;
 
     case "stein":
       return <Stein x={x} y={y} width="20" height="20" className="icon" />;
+
+    case "triple-gate":
+      return <TripleGate x={x} y={y} width="20" height="20" className="icon" />;
 
     case "well":
       return <Well x={x} y={y} width="20" height="20" className="icon" />;

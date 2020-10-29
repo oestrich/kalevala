@@ -76,9 +76,10 @@ rooms "marketplace" {
 room_exits "marketplace" {
   room_id = rooms.marketplace.id
 
-  north = rooms.well.id
+  east = rooms.well.id
+  north = rooms.guild_hall.id
   south = rooms.town_square.id
-  east = rooms.guild_hall.id
+  west = rooms.main-street-1.id
 }
 
 rooms "inn" {
@@ -133,8 +134,8 @@ rooms "well" {
   map_color = "green"
   map_icon = "well"
 
-  x = 0
-  y = 2
+  x = 1
+  y = 1
   z = 0
 
   features = [
@@ -149,7 +150,9 @@ rooms "well" {
 room_exits "well" {
   room_id = rooms.well.id
 
-  south = rooms.marketplace.id
+  north = rooms.park-3.id
+  east = rooms.park-1.id
+  west = rooms.marketplace.id
 }
 
 rooms "guild_hall" {
@@ -159,15 +162,16 @@ rooms "guild_hall" {
   map_color = "yellow"
   map_icon = "coins"
 
-  x = 1
-  y = 1
+  x = 0
+  y = 2
   z = 0
 }
 
 room_exits "guild_hall" {
   room_id = rooms.guild_hall.id
 
-  west = rooms.marketplace.id
+  south = rooms.marketplace.id
+  west = rooms.main-street-2.id
 }
 
 rooms "blacksmith" {
@@ -197,6 +201,176 @@ room_characters "blacksmith" {
       name = "Anni"
     }
   ]
+}
+
+rooms "main-street-1" {
+  name = "Main Street"
+  description = "A cobblestone road."
+
+  x = -1
+  y = 1
+  z = 0
+}
+
+room_exits "main-street-1" {
+  room_id = rooms.main-street-1.id
+
+  east = rooms.marketplace.id
+  north = rooms.main-street-2.id
+}
+
+rooms "main-street-2" {
+  name = "Main Street"
+  description = "A cobblestone road."
+
+  x = -1
+  y = 2
+  z = 0
+}
+
+room_exits "main-street-2" {
+  room_id = rooms.main-street-2.id
+
+  south = rooms.main-street-1.id
+  east = rooms.guild_hall.id
+  west = rooms.main-street-3.id
+}
+
+rooms "main-street-3" {
+  name = "Main Street"
+  description = "A cobblestone road."
+
+  x = -2
+  y = 2
+  z = 0
+}
+
+room_exits "main-street-3" {
+  room_id = rooms.main-street-3.id
+
+  north = rooms.town-hall.id
+  south = rooms.residence-1.id
+  east = rooms.main-street-2.id
+  west = rooms.residence-2.id
+}
+
+rooms "park-1" {
+  name = "Pysäköidä"
+  description = "A small park"
+
+  map_color = "green"
+  map_icon = "pine-tree"
+
+  x = 2
+  y = 1
+  z = 0
+}
+
+room_exits "park-1" {
+  room_id = rooms.park-1.id
+
+  north = rooms.park-2.id
+  west = rooms.well.id
+}
+
+rooms "park-2" {
+  name = "Pysäköidä"
+  description = "A small pond sits tranquil."
+
+  map_color = "blue"
+  map_icon = "drop"
+
+  x = 2
+  y = 2
+  z = 0
+
+  features = [
+    {
+      keyword = "spring"
+      short = "A small spring bubbles up out of some rocks."
+      long = "A small spring bubbles up out of some rocks."
+    }
+  ]
+}
+
+room_exits "park-2" {
+  room_id = rooms.park-2.id
+
+  south = rooms.park-1.id
+  west = rooms.park-3.id
+}
+
+rooms "park-3" {
+  name = "Pysäköidä"
+  description = "A small park"
+
+  map_color = "green"
+  map_icon = "pine-tree"
+
+  x = 1
+  y = 2
+  z = 0
+}
+
+room_exits "park-3" {
+  room_id = rooms.park-3.id
+
+  south = rooms.well.id
+  east = rooms.park-2.id
+}
+
+rooms "residence-1" {
+  name = "Town Residence"
+  description = "A small house"
+
+  map_icon = "family-house"
+  map_color = "yellow"
+
+  x = -2
+  y = 1
+  z = 0
+}
+
+room_exits "residence-1" {
+  room_id = rooms.residence-1.id
+
+  north = rooms.main-street-3.id
+}
+
+rooms "residence-2" {
+  name = "Town Residence"
+  description = "A small house"
+
+  map_icon = "family-house"
+  map_color = "yellow"
+
+  x = -3
+  y = 2
+  z = 0
+}
+
+room_exits "residence-2" {
+  room_id = rooms.residence-2.id
+
+  east = rooms.main-street-3.id
+}
+
+rooms "town-hall" {
+  name = "Town Hall"
+  description = "The town hall"
+
+  map_icon = "triple-gate"
+  map_color = "yellow"
+
+  x = -2
+  y = 3
+  z = 0
+}
+
+room_exits "town-hall" {
+  room_id = rooms.town-hall.id
+
+  south = rooms.main-street-3.id
 }
 
 characters "town_crier" {
