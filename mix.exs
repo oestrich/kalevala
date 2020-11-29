@@ -5,9 +5,16 @@ defmodule Kalevala.MixProject do
     [
       app: :kalevala,
       version: "0.1.0",
-      elixir: "~> 1.9",
+      elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: description(),
+      package: package(),
+      source_url: "https://github.com/oestrich/kalevala",
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -30,6 +37,22 @@ defmodule Kalevala.MixProject do
       {:ranch, "~> 1.7", optional: true},
       {:telemetry, "~> 0.4.1"},
       {:telnet, "~> 0.1"}
+    ]
+  end
+
+  defp description() do
+    """
+    Kalevala is a world building toolkit for text based games.
+    """
+  end
+
+  defp package() do
+    [
+      maintainers: ["Eric Oestrich"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/oestrich/kalevala"
+      }
     ]
   end
 end

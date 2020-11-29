@@ -203,8 +203,6 @@ defmodule Kalevala.World.Room.Movement do
   @doc """
   Handle the movement request
 
-  Called after `Kalevala.World.Room.movement_request/2`.
-
   - If an abort, forward to the character
   - Otherwise, Forward to the zone
   """
