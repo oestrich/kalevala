@@ -8,6 +8,7 @@ defmodule Kantele.MixProject do
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      xref: [exclude: IEx.Helpers],
       deps: deps()
     ]
   end
@@ -32,9 +33,9 @@ defmodule Kantele.MixProject do
       {:kalevala, path: "../"},
       {:plug_cowboy, "~> 2.2"},
       {:ranch, "~> 1.7"},
-      {:telemetry_metrics, "~> 0.4.0"},
-      {:telemetry_metrics_prometheus, "~> 0.3.1"},
-      {:telemetry_poller, "~> 0.4.1"}
+      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_metrics_prometheus, "~> 0.3"},
+      {:telemetry_poller, "~> 0.4"}
     ]
   end
 end
