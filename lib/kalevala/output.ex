@@ -3,6 +3,8 @@ defmodule Kalevala.Output.Context do
   Context struct for an output callback module
   """
 
+  @type t() :: %__MODULE__{}
+
   defstruct data: [], meta: %{}, opts: %{}
 end
 
