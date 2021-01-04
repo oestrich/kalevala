@@ -1,0 +1,5 @@
+image:
+  repository: oestrich/kalevala.dev
+
+web:
+  host: kalevala.dev
