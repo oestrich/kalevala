@@ -260,7 +260,7 @@ defmodule Kalevala.Character.Command.RouterMacros do
 
   Grabs between other pieces of the command
   """
-  defmacro spaces(parsec) do
+  defmacro spaces(parsec \\ NimbleParsec.empty()) do
     quote do
       unquote(parsec)
       |> ignore(utf8_string([?\s], min: 1))
@@ -304,12 +304,38 @@ defmodule Kalevala.Character.Command.RouterMacros do
   @doc """
   Wraps NimbleParsec macros to generate tagged text
 
-  This grabs as much as it can
+  This grabs as much as it can, or until the `stop` combinator is triggered
   """
-  defmacro text(parsec, tag) do
+  defmacro text(parsec, tag, opts \\ []) do
+    stop = Keyword.get(opts, :stop, quote(do: eos()))
+
     quote do
       unquote(parsec)
-      |> concat(unwrap_and_tag(utf8_string([], min: 1), unquote(tag)))
+      |> concat(
+        repeat(
+          lookahead_not(unquote(stop))
+          |> utf8_char([])
+        )
+        |> reduce({List, :to_string, []})
+        |> post_traverse({Kalevala.Character.Command.RouterHelpers, :trim, []})
+        |> unwrap_and_tag(unquote(tag))
+      )
     end
+  end
+end
+
+defmodule Kalevala.Character.Command.RouterHelpers do
+  @moduledoc false
+
+  @doc """
+  Trims strings in a `text/3` parse
+  """
+  def trim(_rest, strings, context, _line, _offset) do
+    strings =
+      Enum.map(strings, fn string ->
+        String.trim(string)
+      end)
+
+    {strings, context}
   end
 end

@@ -4,6 +4,19 @@ defmodule Kalevala.Character.Command.RouterTest do
   defmodule Router do
     use Kalevala.Character.Command.Router, scope: TestGame
 
+    module(GetCommand) do
+      parse("get", :run, fn command ->
+        command
+        |> spaces()
+        |> text(:item, stop: symbol("from"), trim: true)
+        |> optional(
+          symbol("from")
+          |> spaces()
+          |> text(:container)
+        )
+      end)
+    end
+
     module(MoveCommand) do
       parse("north", :run, aliases: ["n"])
       parse("south", :run, aliases: ["s"])
@@ -109,6 +122,33 @@ defmodule Kalevala.Character.Command.RouterTest do
 
       assert parsed_command.params == %{
                "command" => "north"
+             }
+    end
+  end
+
+  describe "text globbing" do
+    test "a command using only one text section" do
+      {:ok, parsed_command} = Router.parse("get silver sword")
+
+      assert parsed_command.module == TestGame.GetCommand
+      assert parsed_command.function == :run
+
+      assert parsed_command.params == %{
+               "command" => "get",
+               "item" => "silver sword"
+             }
+    end
+
+    test "a command with multiple text sections" do
+      {:ok, parsed_command} = Router.parse("get silver sword from large crate")
+
+      assert parsed_command.module == TestGame.GetCommand
+      assert parsed_command.function == :run
+
+      assert parsed_command.params == %{
+               "command" => "get",
+               "item" => "silver sword",
+               "container" => "large crate"
              }
     end
   end
