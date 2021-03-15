@@ -7,12 +7,23 @@ defmodule Kalevala.Character.Command.RouterTest do
     module(GetCommand) do
       parse("get", :run, fn command ->
         command
-        |> spaces()
         |> text(:item, stop: symbol("from"), trim: true)
         |> optional(
           symbol("from")
-          |> spaces()
           |> text(:container)
+        )
+      end)
+    end
+
+    module(GiveCommand) do
+      parse("give", :run, fn command ->
+        command
+        |> text(:item, stop: choice([symbol("from"), symbol("to")]), trim: true)
+        |> repeat(
+          choice([
+            text(symbol("from"), :container, stop: symbol("to"), trim: true),
+            text(symbol("to"), :character, stop: symbol("from"), trim: true)
+          ])
         )
       end)
     end
@@ -149,6 +160,30 @@ defmodule Kalevala.Character.Command.RouterTest do
                "command" => "get",
                "item" => "silver sword",
                "container" => "large crate"
+             }
+    end
+
+    test "a command with multiple stops" do
+      {:ok, parsed_command} = Router.parse("give silver sword from bag to merchant")
+
+      assert parsed_command.module == TestGame.GiveCommand
+      assert parsed_command.function == :run
+
+      assert parsed_command.params == %{
+               "command" => "give",
+               "item" => "silver sword",
+               "container" => "bag",
+               "character" => "merchant"
+             }
+
+      # Flipping the order
+      {:ok, parsed_command} = Router.parse("give silver sword to merchant from bag")
+
+      assert parsed_command.params == %{
+               "command" => "give",
+               "item" => "silver sword",
+               "container" => "bag",
+               "character" => "merchant"
              }
     end
   end
