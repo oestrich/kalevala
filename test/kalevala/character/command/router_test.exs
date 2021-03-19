@@ -7,22 +7,19 @@ defmodule Kalevala.Character.Command.RouterTest do
     module(GetCommand) do
       parse("get", :run, fn command ->
         command
-        |> text(:item, stop: symbol("from"), trim: true)
-        |> optional(
-          symbol("from")
-          |> text(:container)
-        )
+        |> text(:item)
+        |> optional(preposition("from", :container))
       end)
     end
 
     module(GiveCommand) do
       parse("give", :run, fn command ->
         command
-        |> text(:item, stop: choice([symbol("from"), symbol("to")]), trim: true)
+        |> text(:item, trim: true)
         |> repeat(
           choice([
-            text(symbol("from"), :container, stop: symbol("to"), trim: true),
-            text(symbol("to"), :character, stop: symbol("from"), trim: true)
+            preposition("from", :container),
+            preposition("to", :character)
           ])
         )
       end)
@@ -53,6 +50,20 @@ defmodule Kalevala.Character.Command.RouterTest do
         |> word(:name)
         |> spaces()
         |> text(:message)
+      end)
+    end
+
+    module(WalkCommand) do
+      parse("walk", :run, fn command ->
+        command
+        |> spaces()
+        |> repeat(
+          choice([
+            preposition("in", :in),
+            preposition("on", :on),
+            preposition("by", :by)
+          ])
+        )
       end)
     end
   end
@@ -184,6 +195,22 @@ defmodule Kalevala.Character.Command.RouterTest do
                "item" => "silver sword",
                "container" => "bag",
                "character" => "merchant"
+             }
+    end
+  end
+
+  describe "prepositional phrases" do
+    test "walk command with many prepositions" do
+      {:ok, parsed_command} = Router.parse("walk in the house on the lake by the river")
+
+      assert parsed_command.module == TestGame.WalkCommand
+      assert parsed_command.function == :run
+
+      assert parsed_command.params == %{
+               "command" => "walk",
+               "in" => "the house",
+               "on" => "the lake",
+               "by" => "the river"
              }
     end
   end

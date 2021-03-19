@@ -19,7 +19,7 @@ defmodule Kalevala.Character.Command.ParsedCommand do
   A parsed command
   """
 
-  defstruct [:module, :function, :params]
+  defstruct [:module, :function, :params, :keyword_params]
 end
 
 defmodule Kalevala.Character.Command.Router do
@@ -38,6 +38,7 @@ defmodule Kalevala.Character.Command.Router do
 
       Module.register_attribute(__MODULE__, :parse_functions, accumulate: true)
       Module.register_attribute(__MODULE__, :aliases, accumulate: true)
+      Module.register_attribute(__MODULE__, :stop_word_parsecs, accumulate: true)
 
       @before_compile Kalevala.Character.Command.Router
 
@@ -59,8 +60,36 @@ defmodule Kalevala.Character.Command.Router do
         )
       end)
 
+    stop_word_parsecs =
+      env.module
+      |> Module.get_attribute(:stop_word_parsecs)
+      |> Enum.map(fn function ->
+        stop_symbols = Module.get_attribute(env.module, function)
+
+        case stop_symbols do
+          [] ->
+            quote do
+              defcombinatorp(unquote(function), eos())
+            end
+
+          [stop_symbol] ->
+            quote do
+              defcombinatorp(unquote(function), string(unquote(stop_symbol)))
+            end
+
+          stop_symbols ->
+            quote do
+              defcombinatorp(
+                unquote(function),
+                choice(Enum.map(unquote(stop_symbols), &string/1))
+              )
+            end
+        end
+      end)
+
     quote do
       unquote(alias_functions)
+      unquote(stop_word_parsecs)
 
       def call(conn, text) do
         unquote(__MODULE__).call(__MODULE__, conn, text)
@@ -97,6 +126,7 @@ defmodule Kalevala.Character.Command.Router do
             %Kalevala.Character.Command.ParsedCommand{
               module: module,
               function: function,
+              keyword_params: params,
               params: process_params(params, command)
             }
 
@@ -169,6 +199,7 @@ defmodule Kalevala.Character.Command.RouterMacros do
   def generate_parse_function(command, command_alias, fun, parse_fun, module \\ nil) do
     internal_function_name = :"parsep_#{command_alias}_#{fun}"
     function_name = :"parse_#{command_alias}_#{fun}"
+    stop_words_attribute = :"stop_symbols_#{command_alias}_#{fun}"
 
     module =
       module ||
@@ -178,12 +209,16 @@ defmodule Kalevala.Character.Command.RouterMacros do
         end
 
     quote do
+      Module.register_attribute(__MODULE__, unquote(stop_words_attribute), accumulate: true)
+      @stop_words_attribute unquote(stop_words_attribute)
+
       defparsecp(
         unquote(internal_function_name),
         unquote(parse_fun).(command(unquote(command_alias)))
       )
 
       @parse_functions unquote(function_name)
+      @stop_word_parsecs unquote(stop_words_attribute)
 
       def unquote(function_name)(text) do
         unquote(__MODULE__).parse_text(
@@ -302,12 +337,50 @@ defmodule Kalevala.Character.Command.RouterMacros do
   end
 
   @doc """
+  Sets up a prepositional phrase
+
+  Example:
+
+      command
+      |> text(:item)
+      |> preposition("to", :character)
+  """
+  defmacro preposition(parsec \\ NimbleParsec.empty(), preposition, tag, opts \\ []) do
+    {parsec, preposition, tag, opts} =
+      case is_binary(parsec) do
+        true ->
+          {NimbleParsec.empty(), parsec, preposition, tag}
+
+        false ->
+          {parsec, preposition, tag, opts}
+      end
+
+    stop = Keyword.get(opts, :stop, default_stop_quote())
+
+    quote do
+      Module.put_attribute(__MODULE__, @stop_words_attribute, unquote(preposition))
+
+      unquote(parsec)
+      |> concat(
+        ignore(string(unquote(preposition)))
+        |> repeat(
+          lookahead_not(unquote(stop))
+          |> utf8_char([])
+        )
+        |> reduce({List, :to_string, []})
+        |> post_traverse({Kalevala.Character.Command.RouterHelpers, :trim, []})
+        |> unwrap_and_tag(unquote(tag))
+      )
+    end
+  end
+
+  @doc """
   Wraps NimbleParsec macros to generate tagged text
 
   This grabs as much as it can, or until the `stop` combinator is triggered
   """
   defmacro text(parsec, tag, opts \\ []) do
-    stop = Keyword.get(opts, :stop, quote(do: eos()))
+    stop = Keyword.get(opts, :stop, default_stop_quote())
 
     quote do
       unquote(parsec)
@@ -320,6 +393,12 @@ defmodule Kalevala.Character.Command.RouterMacros do
         |> post_traverse({Kalevala.Character.Command.RouterHelpers, :trim, []})
         |> unwrap_and_tag(unquote(tag))
       )
+    end
+  end
+
+  defp default_stop_quote() do
+    quote do
+      parsec(@stop_words_attribute)
     end
   end
 end
