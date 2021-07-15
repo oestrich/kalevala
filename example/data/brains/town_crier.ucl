@@ -238,9 +238,9 @@ brains "town_crier" {
         },
         {
           type = "actions/say"
+          delay = 500
           data = {
             channel_name = "rooms:${room_id}"
-            delay = 500
             text = "Welcome, ${character.name}!"
           }
         }

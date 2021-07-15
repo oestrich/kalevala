@@ -4,38 +4,26 @@ defmodule Kantele.BrainTest do
   import Kalevala.BrainTest
   import Kantele.TestHelpers
 
-  alias Kalevala.Character.Conn
-  alias Kantele.Brain
-
-  @brain Brain.process_all(Brain.load_all())["town_crier"]
-
   describe "town crier brain" do
-    setup do: %{brain: @brain}
-
-    test "say hello", %{brain: brain} do
-      character = generate_character("player")
+    test "say hello" do
+      nonplayer = generate_character("nonplayer", process_brain("town_crier"))
+      player = generate_character("player")
 
       event =
-        event(character, Kalevala.Event.Message, %Kalevala.Event.Message{
+        event(player, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
-          character: character,
+          character: player,
           id: Kalevala.Event.Message.generate_id(),
           text: "hi",
           type: "speech"
         })
 
       conn =
-        build_conn(%Kalevala.Character{
-          id: Kalevala.Character.generate_id(),
-          pid: self(),
-          name: "nonplayer",
-          room_id: "room-id",
-          brain: brain
-        })
+        nonplayer
+        |> build_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
           delay: 500,
           params: %{"channel_name" => "rooms:room-id", "text" => "Hello, player!"},
@@ -49,23 +37,25 @@ defmodule Kantele.BrainTest do
       ])
     end
 
-    test "say goblin", %{brain: brain} do
-      character = generate_character("player")
+    test "say goblin" do
+      nonplayer = generate_character("nonplayer", process_brain("town_crier"))
+      player = generate_character("player")
 
       event =
-        event(character, Kalevala.Event.Message, %Kalevala.Event.Message{
+        event(player, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
-          character: character,
+          character: player,
           id: Kalevala.Event.Message.generate_id(),
           text: "goblin",
           type: "speech"
         })
 
-      conn = build_conn(generate_character("nonplayer", brain))
+      conn =
+        nonplayer
+        |> build_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
           delay: 0,
           params: %{"channel_name" => "rooms:room-id", "text" => "I have a quest for you."},
@@ -74,23 +64,26 @@ defmodule Kantele.BrainTest do
       ])
     end
 
-    test "say boo", %{brain: brain} do
-      character = generate_character("player")
+    test "say boo" do
+      nonplayer = generate_character("nonplayer", process_brain("town_crier"))
+      player1 = generate_character("player")
+      player2 = generate_character("player2")
 
       event =
-        event(character, Kalevala.Event.Message, %Kalevala.Event.Message{
+        event(player1, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
-          character: character,
+          character: player1,
           id: Kalevala.Event.Message.generate_id(),
           text: "boo",
           type: "speech"
         })
 
-      conn = build_conn(generate_character("nonplayer", brain))
+      conn =
+        nonplayer
+        |> build_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
           delay: 0,
           params: %{"channel_name" => "rooms:room-id", "text" => "hides behind a desk"},
@@ -98,25 +91,23 @@ defmodule Kantele.BrainTest do
         }
       ])
 
-      brain = Conn.character(conn).brain
-      assert_brain_value(brain, "condition-#{character.id}", "cowering")
-
-      character2 = generate_character("player2")
+      assert_brain_value(conn, "condition-#{player1.id}", "cowering")
 
       event =
-        event(character, Kalevala.Event.Message, %Kalevala.Event.Message{
+        event(player2, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
-          character: character2,
+          character: player2,
           id: Kalevala.Event.Message.generate_id(),
           text: "boo",
           type: "speech"
         })
 
-      conn = build_conn(generate_character("nonplayer", Conn.character(conn).brain))
+      conn =
+        conn
+        |> refresh_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
           delay: 0,
           params: %{"channel_name" => "rooms:room-id", "text" => "hides behind a desk"},
@@ -125,19 +116,20 @@ defmodule Kantele.BrainTest do
       ])
 
       event =
-        event(character, Kalevala.Event.Message, %Kalevala.Event.Message{
+        event(player1, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
-          character: character,
+          character: player1,
           id: Kalevala.Event.Message.generate_id(),
           text: "boo",
           type: "speech"
         })
 
-      conn = build_conn(generate_character("nonplayer", Conn.character(conn).brain))
+      conn =
+        conn
+        |> refresh_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
           delay: 0,
           params: %{"channel_name" => "rooms:room-id", "text" => "*again*"},
@@ -146,47 +138,49 @@ defmodule Kantele.BrainTest do
       ])
     end
 
-    test "character entering", %{brain: brain} do
-      character = generate_character("player")
+    test "character entering" do
+      nonplayer = generate_character("nonplayer", process_brain("town_crier"))
+      player = generate_character("player")
 
       event =
-        event(character, Kalevala.Event.Movement.Notice, %Kalevala.Event.Movement.Notice{
-          character: character,
+        event(player, Kalevala.Event.Movement.Notice, %Kalevala.Event.Movement.Notice{
+          character: player,
           direction: :to,
           reason: "Player enters"
         })
 
-      conn = build_conn(generate_character("nonplayer", brain))
+      conn =
+        nonplayer
+        |> build_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
-          delay: 0,
+          delay: 500,
           params: %{
             "channel_name" => "rooms:room-id",
-            "text" => "Welcome, player!",
-            "delay" => 500
+            "text" => "Welcome, player!"
           },
           type: Kantele.Character.SayAction
         }
       ])
     end
 
-    test "ticking emote", %{brain: brain} do
-      character = generate_character("nonplayer", brain)
+    test "ticking emote" do
+      nonplayer = generate_character("nonplayer", process_brain("town_crier"))
 
       event =
-        event(character, "characters/emote", %{
+        event(nonplayer, "characters/emote", %{
           id: "looking",
           message: "looks around for someone to talk to."
         })
 
-      conn = build_conn(character)
+      conn =
+        nonplayer
+        |> build_conn()
+        |> run_brain(event)
 
-      conn = Kalevala.Brain.run(brain, conn, event)
-
-      assert_actions(conn.private.actions, [
+      assert_actions(conn, [
         %Kalevala.Character.Action{
           delay: 0,
           params: %{

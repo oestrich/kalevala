@@ -29,19 +29,36 @@ defmodule Kalevala.ConnTest do
   end
 
   @doc """
+  Refresh the conn struct for the character
+
+  Copies out an updated character and the session
+  """
+  def refresh_conn(conn) do
+    %Kalevala.Character.Conn{
+      character: Kalevala.Character.Conn.character(conn),
+      session: conn.session,
+      private: %Kalevala.Character.Conn.Private{
+        request_id: Kalevala.Character.Conn.Private.generate_request_id()
+      }
+    }
+  end
+
+  @doc """
   Assert the expected actions match the actions stored in the conn
 
   This expects the order to match and have no extra actions in the `actual_actions`.
   """
-  defmacro assert_actions(actual_actions, expected_actions) do
+  defmacro assert_actions(conn, expected_actions) do
     quote do
-      assert length(unquote(actual_actions)) == length(unquote(expected_actions))
+      actual_actions = unquote(conn).private.actions
+
+      assert length(actual_actions) == length(unquote(expected_actions))
 
       unquote(expected_actions)
       |> Enum.with_index()
       |> Enum.map(fn {expected_action, index} ->
         attributes = [:delay, :params, :type]
-        actual_action = Enum.at(unquote(actual_actions), index)
+        actual_action = Enum.at(actual_actions, index)
         assert Map.take(actual_action, attributes) == Map.take(expected_action, attributes)
       end)
     end
