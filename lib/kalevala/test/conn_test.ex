@@ -6,7 +6,7 @@ defmodule Kalevala.ConnTest do
   @doc """
   Generate an event struct
   """
-  def event(character, topic, data) do
+  def build_event(character, topic, data) do
     %Kalevala.Event{
       acting_character: character,
       from_pid: self(),
@@ -66,18 +66,16 @@ defmodule Kalevala.ConnTest do
 
   def process_output(conn, processors) do
     output =
-      Enum.map(conn.output, fn text ->
-        case text do
-          %Kalevala.Character.Conn.EventText{text: text} ->
-            Enum.reduce(processors, text.data, fn processor, text ->
-              Kalevala.Output.process(text, processor)
-            end)
+      Enum.map(conn.output, fn
+        %Kalevala.Character.Conn.EventText{text: text} ->
+          Enum.reduce(processors, text.data, fn processor, text ->
+            Kalevala.Output.process(text, processor)
+          end)
 
-          %Kalevala.Character.Conn.Text{data: text} ->
-            Enum.reduce(processors, text, fn processor, text ->
-              Kalevala.Output.process(text, processor)
-            end)
-        end
+        %Kalevala.Character.Conn.Text{data: text} ->
+          Enum.reduce(processors, text, fn processor, text ->
+            Kalevala.Output.process(text, processor)
+          end)
       end)
 
     Enum.join(output, "")

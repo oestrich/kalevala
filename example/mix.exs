@@ -28,6 +28,7 @@ defmodule Kantele.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 2.3"},
       {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:elias, "~> 0.2"},
       {:kalevala, path: "../"},

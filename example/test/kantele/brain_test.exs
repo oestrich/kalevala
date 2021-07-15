@@ -10,7 +10,7 @@ defmodule Kantele.BrainTest do
       player = generate_character("player")
 
       event =
-        event(player, Kalevala.Event.Message, %Kalevala.Event.Message{
+        build_event(player, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
           character: player,
           id: Kalevala.Event.Message.generate_id(),
@@ -42,7 +42,7 @@ defmodule Kantele.BrainTest do
       player = generate_character("player")
 
       event =
-        event(player, Kalevala.Event.Message, %Kalevala.Event.Message{
+        build_event(player, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
           character: player,
           id: Kalevala.Event.Message.generate_id(),
@@ -70,7 +70,7 @@ defmodule Kantele.BrainTest do
       player2 = generate_character("player2")
 
       event =
-        event(player1, Kalevala.Event.Message, %Kalevala.Event.Message{
+        build_event(player1, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
           character: player1,
           id: Kalevala.Event.Message.generate_id(),
@@ -94,7 +94,7 @@ defmodule Kantele.BrainTest do
       assert_brain_value(conn, "condition-#{player1.id}", "cowering")
 
       event =
-        event(player2, Kalevala.Event.Message, %Kalevala.Event.Message{
+        build_event(player2, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
           character: player2,
           id: Kalevala.Event.Message.generate_id(),
@@ -116,7 +116,7 @@ defmodule Kantele.BrainTest do
       ])
 
       event =
-        event(player1, Kalevala.Event.Message, %Kalevala.Event.Message{
+        build_event(player1, Kalevala.Event.Message, %Kalevala.Event.Message{
           channel_name: "rooms:room-id",
           character: player1,
           id: Kalevala.Event.Message.generate_id(),
@@ -143,7 +143,7 @@ defmodule Kantele.BrainTest do
       player = generate_character("player")
 
       event =
-        event(player, Kalevala.Event.Movement.Notice, %Kalevala.Event.Movement.Notice{
+        build_event(player, Kalevala.Event.Movement.Notice, %Kalevala.Event.Movement.Notice{
           character: player,
           direction: :to,
           reason: "Player enters"
@@ -170,7 +170,7 @@ defmodule Kantele.BrainTest do
       nonplayer = generate_character("nonplayer", process_brain("town_crier"))
 
       event =
-        event(nonplayer, "characters/emote", %{
+        build_event(nonplayer, "characters/emote", %{
           id: "looking",
           message: "looks around for someone to talk to."
         })

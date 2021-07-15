@@ -22,5 +22,8 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 kantele-*.tar
 
+data/accounts/
+test/data/accounts/
+
 assets/node_modules
 priv/static/
