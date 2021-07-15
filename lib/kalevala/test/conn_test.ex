@@ -63,4 +63,23 @@ defmodule Kalevala.ConnTest do
       end)
     end
   end
+
+  def process_output(conn, processors) do
+    output =
+      Enum.map(conn.output, fn text ->
+        case text do
+          %Kalevala.Character.Conn.EventText{text: text} ->
+            Enum.reduce(processors, text.data, fn processor, text ->
+              Kalevala.Output.process(text, processor)
+            end)
+
+          %Kalevala.Character.Conn.Text{data: text} ->
+            Enum.reduce(processors, text, fn processor, text ->
+              Kalevala.Output.process(text, processor)
+            end)
+        end
+      end)
+
+    Enum.join(output, "")
+  end
 end
