@@ -80,7 +80,7 @@ defmodule Kalevala.Character.View.Macro do
   end
 
   defp sigil_i_unwrap(text) when is_binary(text) do
-    :elixir_interpolation.unescape_chars(text)
+    :elixir_interpolation.unescape_string(text)
   end
 end
 
