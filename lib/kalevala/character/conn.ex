@@ -122,7 +122,8 @@ defmodule Kalevala.Character.Conn do
     output: [],
     options: [],
     private: %Private{},
-    session: %{}
+    session: %{},
+    flash: %{}
   ]
 
   @doc false
@@ -218,28 +219,20 @@ defmodule Kalevala.Character.Conn do
   time the controller is switched.
   """
   def put_flash(conn, key, value) do
-    flash =
-      conn
-      |> Map.get(:flash, %{})
-      |> Map.put(key, value)
-
-    put_session(conn, :flash, flash)
+    flash = Map.put(conn.flash, key, value)
+    Map.put(conn, :flash, flash)
   end
 
   @doc """
   Get a value out of the flash data
   """
-  def get_flash(conn, key) do
-    get_session(conn, :flash)
-    |> Map.get(key)
-  end
+  def get_flash(conn, key), do: Map.get(conn.flash, key)
 
   @doc """
   Put the new controller that the foreman should swap to
   """
   def put_controller(conn, controller) do
-    put_session(conn, :flash, %{})
-    |> put_private(:next_controller, controller)
+    put_private(conn, :next_controller, controller)
   end
 
   @doc """

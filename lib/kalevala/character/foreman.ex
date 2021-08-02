@@ -24,7 +24,8 @@ defmodule Kalevala.Character.Foreman do
     processing_action: nil,
     action_queue: [],
     private: %{},
-    session: %{}
+    session: %{},
+    flash: %{}
   ]
 
   @doc """
@@ -164,10 +165,12 @@ defmodule Kalevala.Character.Foreman do
     |> send_events()
 
     session = Map.merge(state.session, conn.session)
+    flash = Map.merge(state.flash, conn.flash)
 
     state =
       state
       |> Map.put(:session, session)
+      |> Map.put(:flash, flash)
       |> Map.put(:action_queue, state.action_queue ++ conn.private.actions)
 
     case conn.private.halt? do
@@ -251,7 +254,7 @@ defmodule Kalevala.Character.Foreman do
         {:noreply, state}
 
       false ->
-        state = %{state | controller: conn.private.next_controller}
+        state = %{state | controller: conn.private.next_controller, flash: %{}}
         {:noreply, state, {:continue, :init_controller}}
     end
   end
