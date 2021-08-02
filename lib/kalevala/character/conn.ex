@@ -122,8 +122,7 @@ defmodule Kalevala.Character.Conn do
     output: [],
     options: [],
     private: %Private{},
-    session: %{},
-    flash: %{}
+    session: %{}
   ]
 
   @doc false
