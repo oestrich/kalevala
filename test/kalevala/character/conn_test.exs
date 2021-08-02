@@ -92,6 +92,31 @@ defmodule Kalevala.Character.ConnTest do
     end
   end
 
+  describe "flash data" do
+    test "assign a new value" do
+      conn = %Conn{}
+      conn = Conn.put_flash(conn, :key, "value")
+
+      assert conn.session[:flash][:key] == "value"
+    end
+
+    test "get a value" do
+      conn = %Conn{}
+      conn = Conn.put_flash(conn, :key, "value")
+
+      assert Conn.get_flash(conn, :key) == "value"
+    end
+
+    test "resets between controller changes" do
+      conn = %Conn{}
+      conn = Conn.put_flash(conn, :key, "value")
+
+      conn = Conn.put_controller(conn, Controller)
+
+      assert Conn.get_flash(conn, :key) == nil
+    end
+  end
+
   describe "altering private data" do
     test "setting the next controller to use for a command" do
       conn = %Conn{}
