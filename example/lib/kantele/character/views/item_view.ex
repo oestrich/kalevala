@@ -9,9 +9,7 @@ defmodule Kantele.Character.ItemView do
     item = item_instance.item
 
     [
-      ~i({item-instance id="#{item_instance.id}" context="#{context}" name="#{item.name}" description="#{
-        item.description
-      }"}),
+      ~i({item-instance id="#{item_instance.id}" context="#{context}" name="#{item.name}" description="#{item.description}"}),
       render("name", %{item: item}),
       ~i({/item-instance})
     ]
