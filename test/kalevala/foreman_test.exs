@@ -35,6 +35,17 @@ defmodule Kalevala.ForemanTest do
 
       assert state.controller == ExampleController
     end
+
+    test "resets the flash state" do
+      conn = setup_conn()
+      state = setup_state()
+
+      conn = Conn.put_flash(conn, :key, "value")
+      conn = Conn.put_controller(conn, ExampleController)
+      {:noreply, state, {:continue, :init_controller}} = Foreman.handle_conn(conn, state)
+
+      assert state.flash == %{}
+    end
   end
 
   defp setup_conn() do

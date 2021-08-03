@@ -255,6 +255,7 @@ defmodule Kalevala.Character.Foreman do
 
       false ->
         state = %{state | controller: conn.private.next_controller, flash: %{}}
+
         {:noreply, state, {:continue, :init_controller}}
     end
   end
