@@ -74,21 +74,21 @@ defmodule Kantele.Character.LoginController do
           true ->
             conn
             |> put_flash(:login_state, :password)
-            |> put_session(:username, username)
+            |> put_flash(:username, username)
             |> send_option(:echo, true)
             |> prompt(LoginView, "password")
 
           false ->
             conn
             |> put_flash(:login_state, :registration)
-            |> put_session(:username, username)
+            |> put_flash(:username, username)
             |> prompt(LoginView, "check-registration")
         end
     end
   end
 
   defp process_password(conn, password) do
-    username = get_session(conn, :username)
+    username = get_flash(conn, :username)
 
     case Accounts.validate_login(username, password) do
       {:ok, account} ->
@@ -110,7 +110,8 @@ defmodule Kantele.Character.LoginController do
   end
 
   defp process_registration(conn, "y") do
-    put_controller(conn, RegistrationController)
+    username = get_flash(conn, :username)
+    put_controller(conn, RegistrationController, %{username: username})
   end
 
   defp process_registration(conn, _data) do

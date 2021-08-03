@@ -6,6 +6,7 @@ defmodule Kalevala.Character.Conn.Private do
   defstruct [
     :event_router,
     :next_controller,
+    :next_controller_flash,
     :request_id,
     :update_character,
     actions: [],
@@ -230,9 +231,13 @@ defmodule Kalevala.Character.Conn do
 
   @doc """
   Put the new controller that the foreman should swap to
+
+  Optionally provide the starting `flash` for the controller
   """
-  def put_controller(conn, controller) do
-    put_private(conn, :next_controller, controller)
+  def put_controller(conn, controller, flash \\ %{}) do
+    conn
+    |> put_private(:next_controller, controller)
+    |> put_private(:next_controller_flash, flash)
   end
 
   @doc """

@@ -30,7 +30,7 @@ defmodule Kantele.Character.LoginControllerTest do
         |> put_flash(:login_state, :username)
         |> LoginController.recv("username")
 
-      assert conn.session[:username] == "username"
+      assert conn.flash[:username] == "username"
 
       assert conn.flash[:login_state] == :password
       assert process_output(conn) =~ ~r/Password:/
@@ -43,14 +43,29 @@ defmodule Kantele.Character.LoginControllerTest do
         build_conn(nil)
         |> LoginController.init()
         |> put_flash(:login_state, :password)
-        |> put_session(:username, "username")
+        |> put_flash(:username, "username")
         |> LoginController.recv("password")
 
       assert conn.private.next_controller == Kantele.Character.CharacterController
+      assert conn.private.next_controller_flash == %{}
 
       output = process_output(conn)
 
       assert output =~ ~r/Welcome username/
+    end
+  end
+
+  describe "switching to registration" do
+    test "confirming registering the character" do
+      conn =
+        build_conn(nil)
+        |> LoginController.init()
+        |> put_flash(:login_state, :registration)
+        |> put_flash(:username, "new")
+        |> LoginController.recv("y")
+
+      assert conn.private.next_controller == Kantele.Character.RegistrationController
+      assert conn.private.next_controller_flash == %{username: "new"}
     end
   end
 end

@@ -255,7 +255,10 @@ defmodule Kalevala.Character.Foreman do
         {:noreply, state}
 
       false ->
-        state = %{state | controller: conn.private.next_controller, flash: %{}}
+        state =
+          state
+          |> Map.put(:controller, conn.private.next_controller)
+          |> Map.put(:flash, conn.private.next_controller_flash)
 
         {:noreply, state, {:continue, :init_controller}}
     end
