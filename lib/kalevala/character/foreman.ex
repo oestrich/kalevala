@@ -75,6 +75,7 @@ defmodule Kalevala.Character.Foreman do
     %Conn{
       character: state.character,
       session: state.session,
+      flash: state.flash,
       private: %Conn.Private{
         request_id: Conn.Private.generate_request_id()
       }

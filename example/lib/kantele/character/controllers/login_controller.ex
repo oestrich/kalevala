@@ -18,7 +18,7 @@ defmodule Kantele.Character.LoginController do
   @impl true
   def init(conn) do
     conn
-    |> put_session(:login_state, :username)
+    |> put_flash(:login_state, :username)
     |> render(LoginView, "welcome")
     |> prompt(LoginView, "name")
   end
@@ -42,7 +42,7 @@ defmodule Kantele.Character.LoginController do
   def recv(conn, data) do
     data = String.trim(data)
 
-    case get_session(conn, :login_state) do
+    case get_flash(conn, :login_state) do
       :username ->
         process_username(conn, data)
 
@@ -73,14 +73,14 @@ defmodule Kantele.Character.LoginController do
         case Accounts.exists?(username) do
           true ->
             conn
-            |> put_session(:login_state, :password)
+            |> put_flash(:login_state, :password)
             |> put_session(:username, username)
             |> send_option(:echo, true)
             |> prompt(LoginView, "password")
 
           false ->
             conn
-            |> put_session(:login_state, :registration)
+            |> put_flash(:login_state, :registration)
             |> put_session(:username, username)
             |> prompt(LoginView, "check-registration")
         end
@@ -95,14 +95,14 @@ defmodule Kantele.Character.LoginController do
         Logger.info("Signing in \"#{account.username}\"")
 
         conn
-        |> put_session(:login_state, :character)
+        |> put_flash(:login_state, :character)
         |> send_option(:echo, false)
         |> render(LoginView, "signed-in")
         |> put_controller(CharacterController)
 
       {:error, %{reason: :invalid}} ->
         conn
-        |> put_session(:login_state, :username)
+        |> put_flash(:login_state, :username)
         |> send_option(:echo, false)
         |> render(LoginView, "invalid-login")
         |> prompt(LoginView, "name")
@@ -110,9 +110,7 @@ defmodule Kantele.Character.LoginController do
   end
 
   defp process_registration(conn, "y") do
-    conn
-    |> put_session(:login_state, :username)
-    |> put_controller(RegistrationController)
+    put_controller(conn, RegistrationController)
   end
 
   defp process_registration(conn, _data) do

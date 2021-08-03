@@ -19,7 +19,7 @@ defmodule Kantele.Character.LoginControllerTest do
         build_conn(nil)
         |> LoginController.init()
 
-      assert conn.session[:login_state] == :username
+      assert conn.flash[:login_state] == :username
     end
   end
 
@@ -27,12 +27,12 @@ defmodule Kantele.Character.LoginControllerTest do
     test "after initializing the controller accepts the username" do
       conn =
         build_conn(nil)
-        |> put_session(:login_state, :username)
+        |> put_flash(:login_state, :username)
         |> LoginController.recv("username")
 
       assert conn.session[:username] == "username"
 
-      assert conn.session[:login_state] == :password
+      assert conn.flash[:login_state] == :password
       assert process_output(conn) =~ ~r/Password:/
     end
   end
@@ -42,7 +42,7 @@ defmodule Kantele.Character.LoginControllerTest do
       conn =
         build_conn(nil)
         |> LoginController.init()
-        |> put_session(:login_state, :password)
+        |> put_flash(:login_state, :password)
         |> put_session(:username, "username")
         |> LoginController.recv("password")
 
