@@ -24,3 +24,6 @@ kalevala-*.tar
 
 # vscode elixir extension stuff
 /.elixir_ls/
+
+/.nix-hex
+/.nix-mix
