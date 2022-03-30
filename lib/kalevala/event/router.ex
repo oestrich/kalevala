@@ -24,11 +24,9 @@ defmodule Kalevala.Event.Router do
   defmacro __before_compile__(_env) do
     quote do
       def call(conn, event) do
-        Enum.filter(@events, fn {topic, _module, _fun} ->
-          match?(^topic, event.topic)
-        end)
+        @events
         |> Enum.filter(fn {topic, module, fun} ->
-          call_interested?(topic, module, fun, event)
+          match?(^topic, event.topic) && call_interested?(topic, module, fun, event)
         end)
         |> Enum.reduce(conn, fn {topic, module, fun}, conn ->
           apply(module, fun, [conn, event])

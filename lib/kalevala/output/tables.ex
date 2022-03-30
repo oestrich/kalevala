@@ -255,7 +255,7 @@ defmodule Kalevala.Output.Tables do
   def display_rows(rows) do
     width = max_width(rows)
 
-    split_row = Enum.join(Enum.map(0..(width - 1), fn _i -> "-" end), "")
+    split_row = Enum.map_join(0..(width - 1), fn _i -> "-" end)
 
     rows = Enum.map(rows, &display_row(&1, width, split_row))
 
