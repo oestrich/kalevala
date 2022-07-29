@@ -32,14 +32,14 @@ defmodule Kantele.Character.RegistrationController do
   end
 
   defp process_password(conn, password) do
-    username = get_session(conn, :username)
+    username = get_flash(conn, :username)
 
     case Accounts.register(username, password) do
       {:ok, account} ->
         Logger.info("Created account: \"#{account.username}\"")
 
         conn
-        |> put_session(:login_state, :character)
+        |> put_flash(:login_state, :character)
         |> send_option(:echo, false)
         |> put_controller(CharacterController)
         |> render(LoginView, "signed-in")
