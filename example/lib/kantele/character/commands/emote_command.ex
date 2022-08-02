@@ -8,8 +8,8 @@ defmodule Kantele.Character.EmoteCommand do
   @impl true
   def parse(text, _opts) do
     case Emotes.get(text) do
-      {:ok, command} ->
-        {:dynamic, :broadcast, %{"text" => command.text}}
+      {:ok, %{command: command, text: text}} ->
+        {:dynamic, :broadcast, command, %{"text" => text}}
 
       {:error, :not_found} ->
         :skip

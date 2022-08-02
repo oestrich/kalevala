@@ -4,7 +4,7 @@ defmodule Kantele.Character.EmoteView do
   alias Kantele.Character.CharacterView
 
   def render("echo", %{character: character, text: text}) do
-    ~i({color foreground="white"}#{character.name}{/color} #{text}\n)
+    ~i(#{CharacterView.render("name", %{character: character})} #{text}\n)
   end
 
   def render("list", %{emotes: emotes}) do

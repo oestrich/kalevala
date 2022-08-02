@@ -271,8 +271,8 @@ defmodule Kalevala.Character.Command.RouterMacros do
 
   def parse_dynamic_text(module, arguments, text) do
     case module.parse(text, arguments) do
-      {:dynamic, function, params} ->
-        {:ok, {module, function}, params}
+      {:dynamic, function, command, params} ->
+        {:ok, {module, function}, command, params}
 
       :skip ->
         {:error, :unknown}
