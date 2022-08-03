@@ -146,6 +146,15 @@ defmodule Kalevala.Character.Command.RouterTest do
                "command" => "north"
              }
     end
+
+    test "failure: simple commands aren't caught when partially matching" do
+      # not finding the alias for `n`
+      {:error, :unknown} = Router.parse("nope")
+
+      # not finding `north`
+      {:error, :unknown} = Router.parse("northward")
+      {:error, :unknown} = Router.parse("north is a direction")
+    end
   end
 
   describe "text globbing" do

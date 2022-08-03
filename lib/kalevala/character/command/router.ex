@@ -27,6 +27,8 @@ defmodule Kalevala.Character.Command.Router do
   Parse player input to known commands
   """
 
+  require NimbleParsec
+
   alias Kalevala.Character.Command.ParsedCommand
 
   defmacro __using__(scope: scope) do
@@ -246,7 +248,10 @@ defmodule Kalevala.Character.Command.RouterMacros do
   end
 
   @doc false
-  def default_parse_function(command), do: command
+  # The default parse is the command only and nothing else
+  def default_parse_function(command) do
+    NimbleParsec.eos(command)
+  end
 
   @doc """
   Handle dynamic parsing
