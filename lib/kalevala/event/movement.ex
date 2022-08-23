@@ -44,6 +44,8 @@ end
 defmodule Kalevala.Event.Movement.Voting do
   @moduledoc """
   A voting event tracks the state of a character wishing to change rooms
+
+  If movement is refused, adjust `aborted` to be true to abort the event
   """
 
   alias Kalevala.Event
@@ -142,7 +144,8 @@ defmodule Kalevala.Event.Movement.Request do
 
   The zone then asks the `to` and `from` room if they are OK with the character moving. Each
   room will be `GenServer.call`ed to block and keep this synchronous. The room `movement/2`
-  callback will be called for each room, so they can vote on the movement.
+  callback will be called for each room, so they can vote on the movement. Return the event
+  with `aborted: true` to reject movement.
 
   `Kalevala.Event.Movement.Commit` - After both room's agree that the player can move,
   the zone sends this event to the character.
