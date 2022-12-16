@@ -95,6 +95,14 @@ defmodule Kalevala.World.Room.Context do
   end
 
   @doc """
+  Update the context data
+  """
+  def put_data(context, key, val) do
+    data = Map.put(context.data, key, val)
+    Map.put(context, :data, data)
+  end
+
+  @doc """
   Handle context after processing an event
   """
   def handle_context(context) do
