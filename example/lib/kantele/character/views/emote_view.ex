@@ -8,10 +8,7 @@ defmodule Kantele.Character.EmoteView do
   end
 
   def render("list", %{emotes: emotes}) do
-    available_emotes =
-      emotes
-      |> Enum.map(&render("_emote", %{emote: &1}))
-      |> Enum.join("\n")
+    available_emotes = Enum.map_join(emotes, "\n", &render("_emote", %{emote: &1}))
 
     ~E"""
     Emotes available:
