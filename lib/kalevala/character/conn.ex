@@ -449,6 +449,14 @@ defmodule Kalevala.Character.Conn do
     put_character(conn, character)
   end
 
+  @doc """
+  Get values in a character's meta map
+  """
+  def get_meta(conn, key) do
+    character = character(conn)
+    Meta.get(character.meta, key)
+  end
+
   defp put_private(conn, key, value) do
     private = Map.put(conn.private, key, value)
     Map.put(conn, :private, private)
