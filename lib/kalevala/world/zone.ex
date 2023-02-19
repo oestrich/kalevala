@@ -9,6 +9,9 @@ defmodule Kalevala.World.Zone do
 
   alias Kalevala.Event
   alias Kalevala.World.Zone.Movement
+  alias Kalevala.World.Zone.Handler
+  alias Kalevala.World.Zone.Callbacks
+  alias Kalevala.World.Zone.Context
 
   @type t() :: map()
 
@@ -65,6 +68,36 @@ defmodule Kalevala.World.Zone do
 
     {:noreply, state}
   end
+
+  @impl true
+  def handle_info(event = %Event{}, state) do
+    context =
+      state
+      |> Handler.event(event)
+      |> Context.handle_context()
+
+    state = Map.put(state, :data, context.data)
+
+    {:noreply, state}
+  end
+end
+
+defmodule Kalevala.World.Zone.Handler do
+  @moduledoc false
+
+  alias Kalevala.World.Zone.Callbacks
+  alias Kalevala.World.Zone.Context
+
+  def event(state, event) do
+    Callbacks.event(state.data, Context.new(state), event)
+  end
+end
+
+defprotocol Kalevala.World.Zone.Callbacks do
+  @doc """
+  Callback for when a new event is received
+  """
+  def event(zone, context, event)
 end
 
 defmodule Kalevala.World.BasicZone do
