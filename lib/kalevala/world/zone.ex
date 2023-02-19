@@ -16,11 +16,6 @@ defmodule Kalevala.World.Zone do
   @type t() :: map()
 
   @doc """
-  Called when the zone is initializing
-  """
-  @callback init(zone :: t()) :: t()
-
-  @doc """
   Replace internal zone state
   """
   def update(pid, zone) do
