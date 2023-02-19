@@ -48,7 +48,13 @@ defmodule Kalevala.World.Zone do
       callback_module: config.callback_module
     }
 
-    {:ok, state}
+    {:ok, state, {:continue, :initialized}}
+  end
+
+  @impl true
+  def handle_continue(:initialized, state) do
+    Callbacks.initialized(state.data)
+    {:noreply, state}
   end
 
   @impl true
@@ -93,6 +99,13 @@ defprotocol Kalevala.World.Zone.Callbacks do
   Called when the zone is initializing
   """
   def init(zone)
+
+  @doc """
+  Called after the room process is started
+
+  Directly after `init` is completed.
+  """
+  def initialized(zone)
 
   @doc """
   Callback for when a new event is received
