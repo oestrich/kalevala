@@ -45,7 +45,7 @@ defmodule Kalevala.World.Zone do
     Logger.info("Zone starting - #{options.zone.id}")
 
     config = options.config
-    zone = config.callback_module.init(options.zone)
+    zone = Callbacks.init(options.zone)
 
     state = %{
       data: zone,
@@ -94,6 +94,11 @@ defmodule Kalevala.World.Zone.Handler do
 end
 
 defprotocol Kalevala.World.Zone.Callbacks do
+  @doc """
+  Called when the zone is initializing
+  """
+  def init(zone)
+
   @doc """
   Callback for when a new event is received
   """
