@@ -101,7 +101,7 @@ defprotocol Kalevala.World.Zone.Callbacks do
   def init(zone)
 
   @doc """
-  Called after the room process is started
+  Called after the zone process is started
 
   Directly after `init` is completed.
   """
