@@ -89,7 +89,8 @@ defmodule Kalevala.World.Room do
 
   @impl true
   def handle_continue(:initialized, state) do
-    Callbacks.initialized(state.data)
+    data = Callbacks.initialized(state.data)
+    state = %{state | data: data}
     {:noreply, state}
   end
 
