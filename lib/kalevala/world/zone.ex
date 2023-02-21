@@ -53,7 +53,7 @@ defmodule Kalevala.World.Zone do
 
   @impl true
   def handle_continue(:initialized, state) do
-    Callbacks.initialized(state.data)
+    state = Callbacks.initialized(state.data)
     {:noreply, state}
   end
 
