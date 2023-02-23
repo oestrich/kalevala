@@ -82,6 +82,13 @@ defmodule Kalevala.World.Zone do
 
     {:noreply, state}
   end
+
+  @impl true
+  def handle_info(event = %Event.Delayed{}, state) do
+    event
+    |> Event.Delayed.to_event()
+    |> handle_info(state)
+  end
 end
 
 defmodule Kalevala.World.Zone.Handler do
