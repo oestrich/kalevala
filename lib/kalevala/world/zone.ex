@@ -85,9 +85,16 @@ defmodule Kalevala.World.Zone do
 
   @impl true
   def handle_info(event = %Event.Delayed{}, state) do
-    event
-    |> Event.Delayed.to_event()
-    |> handle_info(state)
+    event = Event.Delayed.to_event(event)
+
+    context =
+      state
+      |> Handler.event(event)
+      |> Context.handle_context()
+
+    state = Map.put(state, :data, context.data)
+
+    {:noreply, state}
   end
 end
 
