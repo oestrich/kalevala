@@ -95,21 +95,6 @@ defmodule Kalevala.World.Room.Context do
   end
 
   @doc """
-  Send an event to a pid on a delay
-  """
-
-  def delay_event(context, delay, to_pid, topic, data) do
-    event = %Kalevala.Event.Delayed{
-      delay: delay,
-      from_pid: self(),
-      topic: topic,
-      data: data
-    }
-
-    Map.put(context, :events, context.events ++ [{self(), event}])
-  end
-
-  @doc """
   Update the context data
   """
   def put_data(context, key, val) do
@@ -144,17 +129,8 @@ defmodule Kalevala.World.Room.Context do
   end
 
   defp send_events(context) do
-    {events, delayed_events} =
-      Enum.split_with(context.events, fn event ->
-        match?(%Kalevala.Event{}, event)
-      end)
-
-    Enum.each(events, fn {to_pid, event} ->
+    Enum.each(context.events, fn {to_pid, event} ->
       send(to_pid, event)
-    end)
-
-    Enum.each(delayed_events, fn {to_pid, delayed_event} ->
-      Process.send_after(to_pid, delayed_event, delayed_event.delay)
     end)
 
     context
