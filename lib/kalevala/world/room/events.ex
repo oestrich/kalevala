@@ -31,7 +31,20 @@ defmodule Kalevala.World.Room.Events do
     case event.data.room_id == state.data.id do
       true ->
         state = Movement.handle_event(state, event)
-        {:noreply, state}
+
+        event = %Kalevala.Event{
+          acting_character: event.data.character,
+          from_pid: event.from_pid,
+          topic: Kalevala.Event.Movement.Notice,
+          data: %Kalevala.Event.Movement.Notice{
+            character: event.data.character,
+            direction: event.data.direction,
+            data: event.data.data,
+            reason: event.data.reason
+          }
+        }
+
+        handle_event(event, state)
 
       false ->
         Room.global_name(event.data.room_id)
