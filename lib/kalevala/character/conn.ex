@@ -308,7 +308,7 @@ defmodule Kalevala.Character.Conn do
   Creates an even to move from one room to another
   """
   def move(conn, direction, room_id, view, template, data) do
-    assigns = merge_assigns(conn, data)
+    assigns = merge_assigns(conn, %{})
     render = view.render(template, assigns)
 
     event = %Kalevala.Event{
