@@ -89,7 +89,8 @@ defmodule Kalevala.World.Room.Events do
       |> Handler.event(event)
       |> Context.handle_context()
 
-    state = Map.put(state, :data, context.data)
+    private = Map.put(state.private, :item_instances, context.item_instances)
+    state = %{state | data: context.data, private: private}
 
     {:noreply, state}
   end
