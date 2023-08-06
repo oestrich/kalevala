@@ -67,7 +67,7 @@ defmodule Kalevala.World.Room.Context do
   @doc """
   Render a prompt back to a pid
   """
-  def prompt(context, to_pid, view, template, assigns) do
+  def prompt(context, to_pid, view, template, assigns \\ %{}) do
     assigns = Map.merge(context.assigns, assigns)
     data = view.render(template, assigns)
     push(context, to_pid, data, true)
