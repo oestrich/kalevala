@@ -5,6 +5,7 @@ defmodule Kalevala.World.Room.Context do
 
   alias Kalevala.Event
   alias Kalevala.Meta
+  alias Kalevala.World.Room.Handler
 
   @type t() :: %__MODULE__{}
 
@@ -100,6 +101,31 @@ defmodule Kalevala.World.Room.Context do
   def put_data(context, key, val) do
     data = Map.put(context.data, key, val)
     Map.put(context, :data, data)
+  end
+
+  @doc """
+  Broadcast an event to multiple characters in the room
+  """
+  def broadcast(context, topic, data, opts \\ []) do
+    recipients = Keyword.get(opts, :to, context.characters)
+
+    recipients =
+      case Keyword.get(opts, :except) do
+        nil ->
+          recipients
+
+        criteria when is_list(criteria) ->
+          Enum.reject(recipients, fn character ->
+            Enum.any?(criteria, &Handler.match_character?(character, &1))
+          end)
+
+        criterion ->
+          Enum.reject(recipients, &Handler.match_character?(&1, criterion))
+      end
+
+    Enum.reduce(recipients, context, fn character, acc ->
+      event(acc, character.pid, self(), topic, data)
+    end)
   end
 
   @doc """

@@ -142,6 +142,10 @@ defmodule Kalevala.World.Room.Handler do
     Callbacks.event(state.data, Context.new(state), event)
   end
 
+  def match_character?(characters, criterion) do
+    Callbacks.match_character?(characters, criterion)
+  end
+
   # Items
 
   def load_item(state, item_instance) do
@@ -240,6 +244,11 @@ defprotocol Kalevala.World.Room.Callbacks do
   the exit.
   """
   def confirm_movement(room, context, event)
+
+  @doc """
+  Callback for matching a character with some criterion.
+  """
+  def match_character?(characters, criterion)
 end
 
 defmodule Kalevala.World.BasicRoom do
