@@ -142,8 +142,8 @@ defmodule Kalevala.World.Room.Handler do
     Callbacks.event(state.data, Context.new(state), event)
   end
 
-  def match_character?(characters, criterion) do
-    Callbacks.match_character?(characters, criterion)
+  def match_character?(character, keyword) do
+    Callbacks.match_character?(character, keyword)
   end
 
   # Items
@@ -248,7 +248,7 @@ defprotocol Kalevala.World.Room.Callbacks do
   @doc """
   Callback for matching a character with some criterion.
   """
-  def match_character?(characters, criterion)
+  def match_character?(character, keyword)
 end
 
 defmodule Kalevala.World.BasicRoom do

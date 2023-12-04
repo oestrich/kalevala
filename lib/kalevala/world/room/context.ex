@@ -114,13 +114,13 @@ defmodule Kalevala.World.Room.Context do
         nil ->
           recipients
 
-        criteria when is_list(criteria) ->
+        keywords when is_list(keywords) ->
           Enum.reject(recipients, fn character ->
-            Enum.any?(criteria, &Handler.match_character?(character, &1))
+            Enum.any?(keywords, &Handler.match_character?(character, &1))
           end)
 
-        criterion ->
-          Enum.reject(recipients, &Handler.match_character?(&1, criterion))
+        keyword ->
+          Enum.reject(recipients, &Handler.match_character?(&1, keyword))
       end
 
     Enum.reduce(recipients, context, fn character, acc ->
