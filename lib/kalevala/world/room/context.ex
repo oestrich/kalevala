@@ -105,9 +105,18 @@ defmodule Kalevala.World.Room.Context do
 
   @doc """
   Broadcast an event to multiple characters in the room
+  Options:
+    - `to`: pre-filtered list of characters
+    - `except`: keyword or list of keywords
   """
   def broadcast(context, topic, data, opts \\ []) do
     recipients = Keyword.get(opts, :to, context.characters)
+
+    recipients =
+      case !is_list(recipients) do
+        true -> List.wrap(recipients)
+        false -> recipients
+      end
 
     recipients =
       case Keyword.get(opts, :except) do
