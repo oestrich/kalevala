@@ -244,11 +244,6 @@ defprotocol Kalevala.World.Room.Callbacks do
   the exit.
   """
   def confirm_movement(room, context, event)
-
-  @doc """
-  Callback for matching a character with some criterion.
-  """
-  def match_character?(character, keyword)
 end
 
 defmodule Kalevala.World.BasicRoom do

@@ -107,7 +107,6 @@ defmodule Kalevala.World.Room.Context do
   Broadcast an event to multiple characters in the room
   Options:
     - `to`: pre-filtered list of characters
-    - `except`: keyword or list of keywords
   """
   def broadcast(context, topic, data, opts \\ []) do
     recipients = Keyword.get(opts, :to, context.characters)
@@ -116,20 +115,6 @@ defmodule Kalevala.World.Room.Context do
       case !is_list(recipients) do
         true -> List.wrap(recipients)
         false -> recipients
-      end
-
-    recipients =
-      case Keyword.get(opts, :except) do
-        nil ->
-          recipients
-
-        keywords when is_list(keywords) ->
-          Enum.reject(recipients, fn character ->
-            Enum.any?(keywords, &Handler.match_character?(character, &1))
-          end)
-
-        keyword ->
-          Enum.reject(recipients, &Handler.match_character?(&1, keyword))
       end
 
     Enum.reduce(recipients, context, fn character, acc ->
