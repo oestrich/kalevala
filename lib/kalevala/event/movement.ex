@@ -30,7 +30,7 @@ defmodule Kalevala.Event.Movement.Commit do
   Struct for committing movement between two rooms
   """
 
-  defstruct [:character, :to, :from, :exit_name]
+  defstruct [:character, :to, :from, :exit_name, :entrance_name]
 end
 
 defmodule Kalevala.Event.Movement.Abort do
@@ -57,6 +57,7 @@ defmodule Kalevala.Event.Movement.Voting do
     :to,
     :from,
     :exit_name,
+    :entrance_name,
     :reason,
     aborted: false
   ]
@@ -86,7 +87,8 @@ defmodule Kalevala.Event.Movement.Voting do
         character: event.data.character,
         to: event.data.to,
         from: event.data.from,
-        exit_name: event.data.exit_name
+        exit_name: event.data.exit_name,
+        entrance_name: event.data.entrance_name
       }
     }
   end
