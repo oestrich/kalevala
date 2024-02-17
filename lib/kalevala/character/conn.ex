@@ -309,7 +309,8 @@ defmodule Kalevala.Character.Conn do
   """
   def move(conn, direction, room_id, view, template, assigns) do
     assigns = merge_assigns(conn, assigns)
-    data = view.render(template, assigns)
+    reason = view.render(template, assigns)
+    data = assigns || %{}
 
     event = %Kalevala.Event{
       acting_character: Private.character(conn),
@@ -318,9 +319,9 @@ defmodule Kalevala.Character.Conn do
       data: %Kalevala.Event.Movement{
         character: Private.character(conn),
         direction: direction,
-        reason: data,
+        reason: reason,
         room_id: room_id,
-        data: assigns
+        data: data
       }
     }
 
