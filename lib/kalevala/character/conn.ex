@@ -319,7 +319,8 @@ defmodule Kalevala.Character.Conn do
         character: Private.character(conn),
         direction: direction,
         reason: data,
-        room_id: room_id
+        room_id: room_id,
+        data: assigns
       }
     }
 
