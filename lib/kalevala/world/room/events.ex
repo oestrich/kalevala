@@ -39,7 +39,7 @@ defmodule Kalevala.World.Room.Events do
           data: %Kalevala.Event.Movement.Notice{
             character: event.data.character,
             direction: event.data.direction,
-            data: event.data.data,
+            data: Map.delete(event.data.data, :character),
             reason: event.data.reason
           }
         }
@@ -286,7 +286,7 @@ defmodule Kalevala.World.Room.Movement do
         character: event.data.character,
         direction: event.data.direction,
         reason: event.data.reason,
-        data: event.data.data
+        data: Map.delete(event.data.data, :character)
       }
     }
 
