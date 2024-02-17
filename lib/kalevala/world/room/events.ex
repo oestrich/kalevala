@@ -285,7 +285,8 @@ defmodule Kalevala.World.Room.Movement do
       data: %Kalevala.Event.Movement.Notice{
         character: event.data.character,
         direction: event.data.direction,
-        reason: event.data.reason
+        reason: event.data.reason,
+        data: event.data.data
       }
     }
 
