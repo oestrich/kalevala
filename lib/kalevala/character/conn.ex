@@ -116,6 +116,7 @@ defmodule Kalevala.Character.Conn do
   alias Kalevala.Meta
 
   defstruct [
+    :controller,
     :character,
     :params,
     assigns: %{},
