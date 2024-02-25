@@ -278,6 +278,9 @@ defmodule Kalevala.World.Room.Movement do
   Broadcast the event to characters in the room
   """
   def broadcast(state, event) do
+    data = event.data.data
+    data = if is_map(data), do: Map.delete(event.data.data, :character)
+
     event = %Kalevala.Event{
       acting_character: event.data.character,
       from_pid: event.from_pid,
@@ -286,7 +289,7 @@ defmodule Kalevala.World.Room.Movement do
         character: event.data.character,
         direction: event.data.direction,
         reason: event.data.reason,
-        data: Map.delete(event.data.data, :character)
+        data: data
       }
     }
 
