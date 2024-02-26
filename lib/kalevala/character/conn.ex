@@ -162,8 +162,8 @@ defmodule Kalevala.Character.Conn do
   defp merge_assigns(conn, assigns) do
     conn.session
     |> Map.put(:character, Private.character(conn))
-    |> Map.merge(conn.assigns)
     |> Map.merge(conn.flash)
+    |> Map.merge(conn.assigns)
     |> Map.merge(assigns)
   end
 
