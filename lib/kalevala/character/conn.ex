@@ -182,7 +182,7 @@ defmodule Kalevala.Character.Conn do
   Render text to the conn
   """
   def render(conn, view, template, assigns \\ %{}) do
-    assigns = merge_assigns(conn, assigns)
+    assigns = merge_assigns(conn.ai, assigns)
     data = view.render(template, assigns)
     push(conn, data, false)
   end
@@ -308,10 +308,9 @@ defmodule Kalevala.Character.Conn do
   @doc """
   Creates an even to move from one room to another
   """
-  def move(conn, direction, room_id, view, template, assigns) do
-    assigns = merge_assigns(conn, assigns)
+  def move(conn, direction, room_id, view, template, assigns \\ %{}) do
+    assigns = Map.merge(conn.assigns, assigns)
     reason = view.render(template, assigns)
-    data = assigns || %{}
 
     event = %Kalevala.Event{
       acting_character: Private.character(conn),
@@ -322,7 +321,7 @@ defmodule Kalevala.Character.Conn do
         direction: direction,
         reason: reason,
         room_id: room_id,
-        data: data
+        data: assigns
       }
     }
 
