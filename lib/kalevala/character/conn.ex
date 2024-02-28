@@ -160,9 +160,8 @@ defmodule Kalevala.Character.Conn do
   end
 
   defp merge_assigns(conn, assigns) do
-    conn.session
+    Map.new()
     |> Map.put(:character, Private.character(conn))
-    |> Map.merge(conn.flash)
     |> Map.merge(conn.assigns)
     |> Map.merge(assigns)
   end
@@ -308,8 +307,8 @@ defmodule Kalevala.Character.Conn do
   @doc """
   Creates an even to move from one room to another
   """
-  def move(conn, direction, room_id, view, template, assigns \\ %{}) do
-    assigns = Map.merge(conn.assigns, assigns)
+  def move(conn, direction, room_id, view, template, data \\ %{}) do
+    assigns = Map.merge(conn.assigns, data)
     reason = view.render(template, assigns)
 
     event = %Kalevala.Event{
@@ -321,7 +320,7 @@ defmodule Kalevala.Character.Conn do
         direction: direction,
         reason: reason,
         room_id: room_id,
-        data: assigns
+        data: data
       }
     }
 
