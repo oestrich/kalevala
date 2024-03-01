@@ -5,7 +5,6 @@ defmodule Kalevala.World.Room.Context do
 
   alias Kalevala.Event
   alias Kalevala.Meta
-  alias Kalevala.World.Room.Handler
 
   @type t() :: %__MODULE__{}
 
@@ -101,6 +100,18 @@ defmodule Kalevala.World.Room.Context do
   def put_data(context, key, val) do
     data = Map.put(context.data, key, val)
     Map.put(context, :data, data)
+  end
+
+  def update_character(context, character) do
+    %Kalevala.Character{id: id} = character
+
+    characters =
+      Enum.map(context.characters, fn
+        %{id: ^id} -> character
+        no_change -> no_change
+      end)
+
+    %{context | characters: characters}
   end
 
   @doc """
