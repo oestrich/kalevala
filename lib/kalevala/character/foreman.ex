@@ -73,6 +73,7 @@ defmodule Kalevala.Character.Foreman do
   @doc false
   def new_conn(state) do
     %Conn{
+      controller: state.controller,
       character: state.character,
       session: state.session,
       flash: state.flash,

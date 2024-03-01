@@ -73,6 +73,13 @@ defmodule Kalevala.Cache do
       end
 
       @doc """
+      Delete a value from the cache
+      """
+      def delete(key) do
+        Kalevala.Cache.delete(__MODULE__, key)
+      end
+
+      @doc """
       Get a value from the cache
 
       Unwraps the tagged tuple, returns the direct value. Raises an error
@@ -116,6 +123,13 @@ defmodule Kalevala.Cache do
       _ ->
         {:error, :not_found}
     end
+  end
+
+  @doc """
+  Delete a value from the cache
+  """
+  def delete(name, key) do
+    :ets.delete(name, key)
   end
 
   @doc """

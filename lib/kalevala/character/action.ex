@@ -6,7 +6,7 @@ defmodule Kalevala.Character.Action do
   flee in a random direction.
   """
 
-  @callback run(Conn.t(), map()) :: :ok
+  @callback run(Conn.t(), map()) :: Conn.t()
 
   defstruct [:request_id, :type, delay: 0, params: %{}]
 

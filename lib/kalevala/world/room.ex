@@ -89,7 +89,8 @@ defmodule Kalevala.World.Room do
 
   @impl true
   def handle_continue(:initialized, state) do
-    Callbacks.initialized(state.data)
+    data = Callbacks.initialized(state.data)
+    state = %{state | data: data}
     {:noreply, state}
   end
 
@@ -139,6 +140,10 @@ defmodule Kalevala.World.Room.Handler do
 
   def event(state, event) do
     Callbacks.event(state.data, Context.new(state), event)
+  end
+
+  def match_character?(character, keyword) do
+    Callbacks.match_character?(character, keyword)
   end
 
   # Items

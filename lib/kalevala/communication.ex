@@ -106,7 +106,7 @@ defmodule Kalevala.Communication do
         Channel.subscribe(pid, channel_name, subscriber_pid, options)
 
       _ ->
-        :error
+        {:error, :channel_not_found}
     end
   end
 
@@ -119,7 +119,7 @@ defmodule Kalevala.Communication do
         Channel.unsubscribe(pid, channel_name, subscriber_pid, options)
 
       _ ->
-        :error
+        {:error, :channel_not_found}
     end
   end
 
@@ -142,6 +142,6 @@ defmodule Kalevala.Communication do
     Only events with a topic of #{__MODULE__} allowed.
     """)
 
-    :error
+    {:error, :channel_not_found}
   end
 end
