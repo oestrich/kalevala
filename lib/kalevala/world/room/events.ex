@@ -91,8 +91,8 @@ defmodule Kalevala.World.Room.Events do
 
     private =
       state.private
-      |> Map.put(state.private, :characters, context.characters)
-      |> Map.put(state.private, :item_instances, context.item_instances)
+      |> Map.put(:characters, context.characters)
+      |> Map.put(:item_instances, context.item_instances)
 
     state = %{state | data: context.data, private: private}
 
