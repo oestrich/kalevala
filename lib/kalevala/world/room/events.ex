@@ -31,6 +31,7 @@ defmodule Kalevala.World.Room.Events do
     case event.data.room_id == state.data.id do
       true ->
         state = Movement.handle_event(state, event)
+        extra_data = with nil <- event.data.data, do: %{}
 
         event = %Kalevala.Event{
           acting_character: event.data.character,
@@ -39,7 +40,7 @@ defmodule Kalevala.World.Room.Events do
           data: %Kalevala.Event.Movement.Notice{
             character: event.data.character,
             direction: event.data.direction,
-            data: Map.delete(event.data.data, :character),
+            data: Map.delete(extra_data, :character),
             reason: event.data.reason
           }
         }
@@ -131,6 +132,11 @@ defmodule Kalevala.World.Room.Item do
     state
   end
 
+  def handle_drop_request({:proceed, event, item_instance, state, metadata})
+      when event.acting_character == %{type: zone} do
+    handle_spawn_request({:proceed, event, item_instance}, state, metadata)
+  end
+
   def handle_drop_request({:proceed, event, item_instance}, state, metadata) do
     character = event.acting_character
 
@@ -147,6 +153,10 @@ defmodule Kalevala.World.Room.Item do
     send(character.pid, event)
 
     add_item_instance(state, item_instance)
+  end
+
+  def handle_spawn_request({:proceed, event, item_instance}, state, metadata) do
+    zone = event.acting_character
   end
 
   @doc """
