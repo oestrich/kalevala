@@ -32,6 +32,9 @@ defmodule Kalevala.World.Room.Events do
       true ->
         state = Movement.handle_event(state, event)
 
+        extra_data = with nil <- event.data.data, do: %{}
+        extra_data = Map.delete(extra_data, :character)
+
         event = %Kalevala.Event{
           acting_character: event.data.character,
           from_pid: event.from_pid,
@@ -39,7 +42,7 @@ defmodule Kalevala.World.Room.Events do
           data: %Kalevala.Event.Movement.Notice{
             character: event.data.character,
             direction: event.data.direction,
-            data: Map.delete(event.data.data, :character),
+            data: extra_data,
             reason: event.data.reason
           }
         }
