@@ -161,7 +161,7 @@ defmodule Kalevala.Character.Conn do
 
   defp merge_assigns(conn, assigns) do
     Map.new()
-    |> Map.put(:character, Private.character(conn))
+    |> Map.put(:self, Private.character(conn))
     |> Map.merge(conn.assigns)
     |> Map.merge(assigns)
   end
@@ -308,6 +308,7 @@ defmodule Kalevala.Character.Conn do
   Creates an even to move from one room to another
   """
   def move(conn, direction, room_id, view, template, data \\ %{}) do
+    data = Map.put(data, :character, Private.character(conn))
     assigns = merge_assigns(conn, data)
 
     reason = view.render(template, assigns)
