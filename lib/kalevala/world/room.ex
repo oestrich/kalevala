@@ -116,7 +116,7 @@ defmodule Kalevala.World.Room do
   end
 
   def handle_call(:dump, _from, state) do
-    {:reply, state, state}
+    {:reply, state.data, state}
   end
 
   @impl true
