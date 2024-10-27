@@ -115,6 +115,10 @@ defmodule Kalevala.World.Room do
     {:reply, :ok, state}
   end
 
+  def handle_call(:dump, _from, state) do
+    {:reply, state, state}
+  end
+
   @impl true
   def handle_info(event = %Event{}, state) do
     Events.handle_event(event, state)
@@ -140,10 +144,6 @@ defmodule Kalevala.World.Room.Handler do
 
   def event(state, event) do
     Callbacks.event(state.data, Context.new(state), event)
-  end
-
-  def match_character?(character, keyword) do
-    Callbacks.match_character?(character, keyword)
   end
 
   # Items
