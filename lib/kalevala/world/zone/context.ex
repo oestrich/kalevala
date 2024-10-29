@@ -115,7 +115,7 @@ defmodule Kalevala.World.Zone.Context do
 
   defp send_events(context) do
     {events, delayed_events} =
-      Enum.split_with(context.events, fn event ->
+      Enum.split_with(context.events, fn {_, event} ->
         match?(%Kalevala.Event{}, event)
       end)
 
