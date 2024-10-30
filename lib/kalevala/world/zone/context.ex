@@ -7,7 +7,7 @@ defmodule Kalevala.World.Zone.Context do
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, events: [], output: []]
+  defstruct [:data, events: [], output: [], assigns: %{}]
 
   @doc """
   Create a new context struct from room state
