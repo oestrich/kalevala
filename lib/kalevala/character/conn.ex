@@ -94,7 +94,7 @@ defmodule Kalevala.Character.Conn.Text do
   new text.
   """
 
-  defstruct [:data, newline: false, go_ahead: false]
+  defstruct [:data, newline: false, go_ahead: true]
 end
 
 defmodule Kalevala.Character.Conn.Option do
