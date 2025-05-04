@@ -112,7 +112,6 @@ defmodule Kantele.MiniMap do
     expanded_min_y = min_y * 2 - 1
     expanded_max_y = max_y * 2 + 1
 
-    # credo:disable-for-lines:7 Credo.Check.Refactor.Nesting
     Enum.reduce(min_z..max_z, %{}, fn z, map ->
       Enum.reduce(expanded_min_y..expanded_max_y, map, fn y, map ->
         Enum.reduce(expanded_min_x..expanded_max_x, map, fn x, map ->

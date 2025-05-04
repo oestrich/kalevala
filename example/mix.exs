@@ -29,13 +29,11 @@ defmodule Kantele.MixProject do
   defp deps do
     [
       {:bcrypt_elixir, "~> 2.3"},
-      {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:elias, "~> 0.2"},
       {:kalevala, path: "../"},
       {:plug_cowboy, "~> 2.2"},
       {:ranch, "~> 1.7"},
       {:telemetry_metrics, "~> 0.4"},
-      {:telemetry_metrics_prometheus, "~> 0.3"},
       {:telemetry_poller, "~> 0.4"}
     ]
   end

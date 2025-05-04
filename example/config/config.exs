@@ -11,7 +11,6 @@ if Mix.env() == :test do
   config(:kantele, :accounts_path, "test/data/accounts")
 
   config(:kantele, :listener, start: false)
-  config(:kantele, :telemetry, start: false)
   config(:kantele, :world, kickoff: false)
 
   config(:logger, level: :warn)

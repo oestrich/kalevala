@@ -64,8 +64,7 @@ defmodule Kantele.Application do
       {Kantele.Character.Emotes, [name: Kantele.Character.Emotes]},
       {Kalevala.Character.Foreman.Supervisor, [name: Kantele.Character.Foreman.Supervisor]},
       telnet_listener(telnet_config),
-      websocket_listener(websocket_config),
-      {Kantele.Telemetry, []}
+      websocket_listener(websocket_config)
     ]
 
     children =
