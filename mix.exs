@@ -30,7 +30,6 @@ defmodule Kalevala.MixProject do
   defp deps do
     [
       {:benchee, "~> 1.0", only: :dev},
-      {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:nimble_parsec, "~> 1.0"},
       {:plug_cowboy, "~> 2.2", optional: true},
