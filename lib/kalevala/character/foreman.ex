@@ -143,7 +143,7 @@ defmodule Kalevala.Character.Foreman do
         |> handle_conn(state)
 
       false ->
-        Logger.warn("Character tried processing an action that was not next", type: :foreman)
+        Logger.warning("Character tried processing an action that was not next", type: :foreman)
 
         {:noreply, state}
     end

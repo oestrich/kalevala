@@ -297,7 +297,7 @@ defmodule Kalevala.Output.Tables do
   @doc """
   Build a list of padding spaces for a side of a cell
   """
-  def cell_padding(0.0), do: []
+  def cell_padding(+0.0), do: []
 
   def cell_padding(cell_padding) do
     Enum.map(1..trunc(cell_padding), fn _i ->

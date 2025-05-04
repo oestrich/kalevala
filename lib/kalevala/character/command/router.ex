@@ -414,12 +414,12 @@ defmodule Kalevala.Character.Command.RouterHelpers do
   @doc """
   Trims strings in a `text/3` parse
   """
-  def trim(_rest, strings, context, _line, _offset) do
+  def trim(rest, strings, context, _line, _offset) do
     strings =
       Enum.map(strings, fn string ->
         String.trim(string)
       end)
 
-    {strings, context}
+    {rest, strings, context}
   end
 end

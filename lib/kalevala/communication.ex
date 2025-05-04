@@ -137,7 +137,7 @@ defmodule Kalevala.Communication do
   end
 
   def publish(_channel_ets_key, channel_name, message, _options) do
-    Logger.warn("""
+    Logger.warning("""
     Trying to publish #{inspect(message)} on `#{channel_name}`.
     Only events with a topic of #{__MODULE__} allowed.
     """)
