@@ -13,7 +13,7 @@ if Mix.env() == :test do
   config(:kantele, :listener, start: false)
   config(:kantele, :world, kickoff: false)
 
-  config(:logger, level: :warn)
+  config(:logger, level: :warning)
 
   config(:bcrypt_elixir, log_rounds: 2)
 end
