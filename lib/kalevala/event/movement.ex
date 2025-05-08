@@ -3,7 +3,7 @@ defmodule Kalevala.Event.Movement do
   An event to move from one room to another
   """
 
-  defstruct [:character, :direction, :reason, :room_id]
+  defstruct [:character, :direction, :reason, :room_id, :data]
 
   @typedoc """
   A movement event
@@ -22,7 +22,7 @@ defmodule Kalevala.Event.Movement.Notice do
   Event to send a notice to other characters in the room
   """
 
-  defstruct [:character, :direction, :reason]
+  defstruct [:character, :direction, :reason, :data]
 end
 
 defmodule Kalevala.Event.Movement.Commit do
@@ -30,7 +30,7 @@ defmodule Kalevala.Event.Movement.Commit do
   Struct for committing movement between two rooms
   """
 
-  defstruct [:character, :to, :from, :exit_name]
+  defstruct [:character, :to, :from, :exit_name, :entrance_name]
 end
 
 defmodule Kalevala.Event.Movement.Abort do
@@ -57,6 +57,7 @@ defmodule Kalevala.Event.Movement.Voting do
     :to,
     :from,
     :exit_name,
+    :entrance_name,
     :reason,
     aborted: false
   ]
@@ -86,7 +87,8 @@ defmodule Kalevala.Event.Movement.Voting do
         character: event.data.character,
         to: event.data.to,
         from: event.data.from,
-        exit_name: event.data.exit_name
+        exit_name: event.data.exit_name,
+        entrance_name: event.data.entrance_name
       }
     }
   end

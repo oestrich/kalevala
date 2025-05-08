@@ -9,13 +9,11 @@ defmodule Kalevala.World.Zone do
 
   alias Kalevala.Event
   alias Kalevala.World.Zone.Movement
+  alias Kalevala.World.Zone.Handler
+  alias Kalevala.World.Zone.Callbacks
+  alias Kalevala.World.Zone.Context
 
   @type t() :: map()
-
-  @doc """
-  Called when the zone is initializing
-  """
-  @callback init(zone :: t()) :: t()
 
   @doc """
   Replace internal zone state
@@ -42,7 +40,7 @@ defmodule Kalevala.World.Zone do
     Logger.info("Zone starting - #{options.zone.id}")
 
     config = options.config
-    zone = config.callback_module.init(options.zone)
+    zone = Callbacks.init(options.zone)
 
     state = %{
       data: zone,
@@ -50,7 +48,14 @@ defmodule Kalevala.World.Zone do
       callback_module: config.callback_module
     }
 
-    {:ok, state}
+    {:ok, state, {:continue, :initialized}}
+  end
+
+  @impl true
+  def handle_continue(:initialized, state) do
+    data = Callbacks.initialized(state.data)
+    state = %{state | data: data}
+    {:noreply, state}
   end
 
   @impl true
@@ -65,6 +70,62 @@ defmodule Kalevala.World.Zone do
 
     {:noreply, state}
   end
+
+  @impl true
+  def handle_info(event = %Event{}, state) do
+    context =
+      state
+      |> Handler.event(event)
+      |> Context.handle_context()
+
+    state = Map.put(state, :data, context.data)
+
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info(event = %Event.Delayed{}, state) do
+    event = Event.Delayed.to_event(event)
+
+    context =
+      state
+      |> Handler.event(event)
+      |> Context.handle_context()
+
+    state = Map.put(state, :data, context.data)
+
+    {:noreply, state}
+  end
+end
+
+defmodule Kalevala.World.Zone.Handler do
+  @moduledoc false
+
+  alias Kalevala.World.Zone.Callbacks
+  alias Kalevala.World.Zone.Context
+
+  def event(state, event) do
+    Callbacks.event(state.data, Context.new(state), event)
+  end
+end
+
+defprotocol Kalevala.World.Zone.Callbacks do
+  @doc """
+  Called when the zone is initializing
+  """
+  def init(zone)
+
+  @doc """
+  Called after the zone process is started
+
+  Directly after `init` is completed.
+  """
+  def initialized(zone)
+
+  @doc """
+  Callback for when a new event is received
+  """
+  def event(zone, context, event)
 end
 
 defmodule Kalevala.World.BasicZone do

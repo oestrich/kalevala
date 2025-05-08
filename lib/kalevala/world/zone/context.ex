@@ -1,33 +1,20 @@
-defmodule Kalevala.World.Room.Context do
+defmodule Kalevala.World.Zone.Context do
   @moduledoc """
   Context for performing work for an event in a room
   """
 
   alias Kalevala.Event
-  alias Kalevala.Meta
 
   @type t() :: %__MODULE__{}
 
-  defstruct [:data, assigns: %{}, characters: [], events: [], item_instances: [], output: []]
+  defstruct [:data, events: [], output: [], assigns: %{}]
 
   @doc """
   Create a new context struct from room state
   """
   def new(state) do
-    item_instances =
-      Enum.map(state.private.item_instances, fn item_instance ->
-        %{item_instance | meta: Meta.trim(item_instance.meta)}
-      end)
-
-    characters =
-      Enum.map(state.private.characters, fn character ->
-        %{character | inventory: []}
-      end)
-
     %__MODULE__{
-      data: state.data,
-      characters: characters,
-      item_instances: item_instances
+      data: state.data
     }
   end
 
@@ -67,7 +54,7 @@ defmodule Kalevala.World.Room.Context do
   @doc """
   Render a prompt back to a pid
   """
-  def prompt(context, to_pid, view, template, assigns \\ %{}) do
+  def prompt(context, to_pid, view, template, assigns) do
     assigns = Map.merge(context.assigns, assigns)
     data = view.render(template, assigns)
     push(context, to_pid, data, true)
@@ -95,6 +82,21 @@ defmodule Kalevala.World.Room.Context do
   end
 
   @doc """
+  Send an event to a pid on a delay
+  """
+
+  def delay_event(context, delay, to_pid, topic, data) do
+    event = %Kalevala.Event.Delayed{
+      delay: delay,
+      from_pid: self(),
+      topic: topic,
+      data: data
+    }
+
+    Map.put(context, :events, context.events ++ [{self(), event}])
+  end
+
+  @doc """
   Update the context data
   """
   def put_data(context, key, val) do
@@ -102,44 +104,30 @@ defmodule Kalevala.World.Room.Context do
     Map.put(context, :data, data)
   end
 
-  def update_character(context, character) do
-    %Kalevala.Character{id: id} = character
-
-    characters =
-      Enum.map(context.characters, fn
-        %{id: ^id} -> character
-        no_change -> no_change
-      end)
-
-    %{context | characters: characters}
-  end
-
-  @doc """
-  Broadcast an event to multiple characters in the room
-  Options:
-    - `to`: pre-filtered list of characters
-  """
-  def broadcast(context, topic, data, opts \\ []) do
-    recipients = Keyword.get(opts, :to, context.characters)
-
-    recipients =
-      case !is_list(recipients) do
-        true -> List.wrap(recipients)
-        false -> recipients
-      end
-
-    Enum.reduce(recipients, context, fn character, acc ->
-      event(acc, character.pid, self(), topic, data)
-    end)
-  end
-
   @doc """
   Handle context after processing an event
   """
   def handle_context(context) do
     context
-    |> send_output()
     |> send_events()
+    |> send_output()
+  end
+
+  defp send_events(context) do
+    {events, delayed_events} =
+      Enum.split_with(context.events, fn {_, event} ->
+        match?(%Kalevala.Event{}, event)
+      end)
+
+    Enum.each(events, fn {to_pid, event} ->
+      send(to_pid, event)
+    end)
+
+    Enum.each(delayed_events, fn {to_pid, delayed_event} ->
+      Process.send_after(to_pid, delayed_event, delayed_event.delay)
+    end)
+
+    context
   end
 
   defp send_output(context) do
@@ -154,14 +142,6 @@ defmodule Kalevala.World.Room.Context do
     )
     |> Enum.each(fn {to_pid, text} ->
       send(to_pid, %Event.Display{output: text})
-    end)
-
-    context
-  end
-
-  defp send_events(context) do
-    Enum.each(context.events, fn {to_pid, event} ->
-      send(to_pid, event)
     end)
 
     context

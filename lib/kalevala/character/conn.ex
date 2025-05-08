@@ -94,7 +94,7 @@ defmodule Kalevala.Character.Conn.Text do
   new text.
   """
 
-  defstruct [:data, newline: false, go_ahead: false]
+  defstruct [:data, newline: false, go_ahead: true]
 end
 
 defmodule Kalevala.Character.Conn.Option do
@@ -116,6 +116,7 @@ defmodule Kalevala.Character.Conn do
   alias Kalevala.Meta
 
   defstruct [
+    :controller,
     :character,
     :params,
     assigns: %{},
@@ -159,10 +160,9 @@ defmodule Kalevala.Character.Conn do
   end
 
   defp merge_assigns(conn, assigns) do
-    conn.session
-    |> Map.put(:character, Private.character(conn))
+    Map.new()
+    |> Map.put(:self, Private.character(conn))
     |> Map.merge(conn.assigns)
-    |> Map.merge(conn.flash)
     |> Map.merge(assigns)
   end
 
@@ -307,9 +307,11 @@ defmodule Kalevala.Character.Conn do
   @doc """
   Creates an even to move from one room to another
   """
-  def move(conn, direction, room_id, view, template, assigns) do
-    assigns = merge_assigns(conn, assigns)
-    data = view.render(template, assigns)
+  def move(conn, direction, room_id, view, template, data \\ %{}) do
+    data = Map.put(data, :character, Private.character(conn))
+    assigns = merge_assigns(conn, data)
+
+    reason = view.render(template, assigns)
 
     event = %Kalevala.Event{
       acting_character: Private.character(conn),
@@ -318,8 +320,9 @@ defmodule Kalevala.Character.Conn do
       data: %Kalevala.Event.Movement{
         character: Private.character(conn),
         direction: direction,
-        reason: data,
-        room_id: room_id
+        reason: reason,
+        room_id: room_id,
+        data: data
       }
     }
 
@@ -447,6 +450,14 @@ defmodule Kalevala.Character.Conn do
     meta = Meta.put(character.meta, key, value)
     character = %{character | meta: meta}
     put_character(conn, character)
+  end
+
+  @doc """
+  Get values in a character's meta map
+  """
+  def get_meta(conn, key) do
+    character = character(conn)
+    Meta.get(character.meta, key)
   end
 
   defp put_private(conn, key, value) do

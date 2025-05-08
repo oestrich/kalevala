@@ -31,7 +31,23 @@ defmodule Kalevala.World.Room.Events do
     case event.data.room_id == state.data.id do
       true ->
         state = Movement.handle_event(state, event)
-        {:noreply, state}
+
+        extra_data = with nil <- event.data.data, do: %{}
+        extra_data = Map.delete(extra_data, :character)
+
+        event = %Kalevala.Event{
+          acting_character: event.data.character,
+          from_pid: event.from_pid,
+          topic: Kalevala.Event.Movement.Notice,
+          data: %Kalevala.Event.Movement.Notice{
+            character: event.data.character,
+            direction: event.data.direction,
+            data: extra_data,
+            reason: event.data.reason
+          }
+        }
+
+        handle_event(event, state)
 
       false ->
         Room.global_name(event.data.room_id)
@@ -76,7 +92,12 @@ defmodule Kalevala.World.Room.Events do
       |> Handler.event(event)
       |> Context.handle_context()
 
-    state = Map.put(state, :data, context.data)
+    private =
+      state.private
+      |> Map.put(:characters, context.characters)
+      |> Map.put(:item_instances, context.item_instances)
+
+    state = %{state | data: context.data, private: private}
 
     {:noreply, state}
   end
@@ -264,6 +285,9 @@ defmodule Kalevala.World.Room.Movement do
   Broadcast the event to characters in the room
   """
   def broadcast(state, event) do
+    data = event.data.data
+    data = if is_map(data), do: Map.delete(event.data.data, :character)
+
     event = %Kalevala.Event{
       acting_character: event.data.character,
       from_pid: event.from_pid,
@@ -271,7 +295,8 @@ defmodule Kalevala.World.Room.Movement do
       data: %Kalevala.Event.Movement.Notice{
         character: event.data.character,
         direction: event.data.direction,
-        reason: event.data.reason
+        reason: event.data.reason,
+        data: data
       }
     }
 
